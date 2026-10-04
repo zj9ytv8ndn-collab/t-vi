@@ -400,64 +400,126 @@ const rim=new THREE.DirectionalLight(0x4aa8ff,.6);rim.position.set(-2,1.5,-3);sc
 scene.add(new THREE.GridHelper(2.4,24,0x1c2c3c,0x141e2a)).position.y=0.0;
 
 const body=new THREE.Group();scene.add(body);
-const skinMat=new THREE.MeshStandardMaterial({color:0xc79a72,roughness:.72,metalness:.05,transparent:true,opacity:.92});
 const mats=[];
 function M(m){mats.push(m);return m;}
-function addPart(geo,mat,x,y,z){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);body.add(m);return m;}
-/* da (body surface) */
-addPart(new THREE.SphereGeometry(.115,24,20),skinMat,0,1.60,0);                 // đầu
-addPart(new THREE.CylinderGeometry(.055,.06,.14,16),skinMat,0,1.475,0);          // cổ
-addPart(new THREE.CylinderGeometry(.175,.135,.56,24),skinMat,0,1.17,0);          // thân
-addPart(new THREE.SphereGeometry(.14,20,16),skinMat,0,.90,0);                   // hông
-[-1,1].forEach(s=>{
-  addPart(new THREE.SphereGeometry(.062,14,12),skinMat,s*.225,1.425,0);          // vai
-  addPart(new THREE.CylinderGeometry(.048,.042,.60,14),skinMat,s*.225,1.11,0);   // cánh tay
-  addPart(new THREE.SphereGeometry(.052,12,10),skinMat,s*.225,.79,0);           // bàn tay
-  addPart(new THREE.CylinderGeometry(.068,.058,.86,16),skinMat,s*.10,.47,0);    // chân
-  const foot=addPart(new THREE.SphereGeometry(.07,14,10),skinMat,s*.10,.045,.05);
-  foot.scale.set(1,.62,1.7);
+/* ánh sáng studio mềm cho da */
+scene.add(new THREE.HemisphereLight(0xe8f0f8,0x6b5340,.5));
+const fillL=new THREE.DirectionalLight(0xbfd8ee,.35);fillL.position.set(-2,1.5,3);scene.add(fillL);
+
+/* --- chất liệu da (canvas texture) --- */
+function skinTexture(){
+  const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,512);
+  g.addColorStop(0,'#dcae84');g.addColorStop(.55,'#d0a077');g.addColorStop(1,'#c08e64');
+  x.fillStyle=g;x.fillRect(0,0,512,512);
+  for(let i=0;i<2600;i++){x.fillStyle=`rgba(${125+Math.random()*55|0},${75+Math.random()*40|0},${55+Math.random()*28|0},${Math.random()*.045})`;
+    const r=Math.random()*2.6+.5;x.beginPath();x.arc(Math.random()*512,Math.random()*512,r,0,7);x.fill();}
+  for(let i=0;i<26;i++){const r=28+Math.random()*66,px=Math.random()*512,py=Math.random()*512;
+    const rg=x.createRadialGradient(px,py,0,px,py,r);
+    rg.addColorStop(0,'rgba(165,105,72,.055)');rg.addColorStop(1,'rgba(165,105,72,0)');
+    x.fillStyle=rg;x.fillRect(px-r,py-r,r*2,r*2);}
+  return new THREE.CanvasTexture(c);
+}
+const skinMat=new THREE.MeshStandardMaterial({map:skinTexture(),color:0xffffff,roughness:.58,metalness:.03,transparent:true,opacity:.92});
+const hairMat=new THREE.MeshStandardMaterial({color:0x241a14,roughness:.85});
+
+/* --- hàm dựng bộ phận --- */
+function sph(r,mat,sx,sy,sz,px,py,pz,seg){const m=new THREE.Mesh(new THREE.SphereGeometry(r,seg||26,Math.max(8,(seg||26)*.72|0)),mat);
+  m.scale.set(sx,sy,sz);m.position.set(px,py,pz);body.add(m);return m;}
+function lathe(pts,mat,seg){return new THREE.Mesh(new THREE.LatheGeometry(pts.map(q=>new THREE.Vector2(q[0],q[1])),seg||40),mat);}
+
+/* ============ ĐẦU + MẶT ============ */
+sph(.114,skinMat,1,1.06,.98, 0,1.617,-.004);                 // sọ
+sph(.096,skinMat,.9,.8,.92, 0,1.56,.014);                    // hàm / má
+sph(.0165,skinMat,.62,1.2,.95, 0,1.607,.113,14);             // mũi
+sph(.019,skinMat,.45,1,.75, .114,1.608,0,12);                // tai p
+sph(.019,skinMat,.45,1,.75, -.114,1.608,0,12);               // tai t
+sph(.033,skinMat,1,.42,.5, .042,1.628,.104,12);              // lông mày p
+sph(.033,skinMat,1,.42,.5, -.042,1.628,.104,12);             // lông mày t
+const hair=sph(.1175,hairMat,1.02,1,.98,0,1.638,-.014);hair.geometry=new THREE.SphereGeometry(.1175,26,18,0,Math.PI*2,0,Math.PI*.52); // tóc
+const neck=new THREE.Mesh(new THREE.CylinderGeometry(.05,.058,.13,22),skinMat);neck.position.set(0,1.475,0);body.add(neck);
+
+/* ============ THÂN (lathe ellip) ============ */
+const TORSO=[[.135,.90],[.152,.95],[.162,1.02],[.168,1.10],[.170,1.17],[.166,1.24],[.154,1.31],[.138,1.37],[.106,1.43]];
+const torso=lathe(TORSO,skinMat);torso.scale.set(1,1,.8);body.add(torso);
+sph(.13,skinMat,1.14,.82,.92, 0,.935,-.004);                 // hông mượt
+sph(.085,skinMat,1,.78,.62, .073,1.268,.105);                // cơ ngực p
+sph(.085,skinMat,1,.78,.62, -.073,1.268,.105);               // cơ ngực t
+sph(.09,skinMat,.95,.85,.78, .062,.975,-.098);               // mông p
+sph(.09,skinMat,.95,.85,.78, -.062,.975,-.098);              // mông t
+sph(.07,skinMat,1,1,1, .225,1.418,0);                        // vai p
+sph(.07,skinMat,1,1,1, -.225,1.418,0);                       // vai t
+
+/* ============ TAY (có bắp tay, khuỷu) ============ */
+const ARM=[[.062,0],[.056,.10],[.047,.20],[.042,.28],[.0395,.32],[.0365,.42],[.0315,.52],[.0275,.60],[.019,.645]];
+[-1,1].forEach(sg=>{
+  const a=lathe(ARM,skinMat);a.position.set(sg*.225,.80,0);body.add(a);
+  sph(.05,skinMat,.72,1.18,.5, sg*.225,.752,.014);           // bàn tay
+  sph(.02,skinMat,1,.9,1.4, sg*.225,.70,.05,12);            // gợi ý ngón
 });
-/* bộ xương */
-const boneMat=M(new THREE.MeshStandardMaterial({color:0xd8e2ea,roughness:.5,wireframe:true,transparent:true,opacity:.55}));
+/* ============ CHÂN (đùi, bắp chuối, mắt cá) ============ */
+const LEG=[[.077,0],[.083,.08],[.078,.18],[.066,.28],[.0575,.40],[.056,.45],[.063,.57],[.055,.70],[.042,.80],[.033,.87]];
+[-1,1].forEach(sg=>{
+  const l=lathe(LEG,skinMat);l.position.set(sg*.10,.062,0);body.add(l);
+  const ft=sph(.07,skinMat,1,.6,1.75, sg*.10,.045,.05);      // bàn chân
+  sph(.03,skinMat,1,.6,1.2, sg*.10,.03,.155,12);            // ngón chân
+});
+/* bóng đổ mềm dưới chân */
+(function(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+ const g=x.createRadialGradient(64,64,4,64,64,62);g.addColorStop(0,'rgba(0,0,0,.5)');g.addColorStop(1,'rgba(0,0,0,0)');
+ x.fillStyle=g;x.fillRect(0,0,128,128);
+ const m=new THREE.Mesh(new THREE.CircleGeometry(.55,32),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+ m.rotation.x=-Math.PI/2;m.position.y=.002;body.add(m);})();
+
+/* ============ LỚP XƯƠNG (lưới) ============ */
+const boneMat=M(new THREE.MeshStandardMaterial({color:0xd8e2ea,roughness:.5,wireframe:true,transparent:true,opacity:.5}));
 const bones=new THREE.Group();bones.visible=false;body.add(bones);
-function bPart(geo,x,y,z){const m=new THREE.Mesh(geo,boneMat);m.position.set(x,y,z);bones.add(m);}
-bPart(new THREE.SphereGeometry(.10,10,8),0,1.60,0);
-bPart(new THREE.CylinderGeometry(.15,.12,.55,10,1,true),0,1.17,0);
-bPart(new THREE.SphereGeometry(.125,10,8),0,.90,0);
-[-1,1].forEach(s=>{bPart(new THREE.CylinderGeometry(.04,.035,.58,8,1,true),s*.225,1.11,0);
- bPart(new THREE.CylinderGeometry(.06,.05,.84,8,1,true),s*.10,.47,0);});
-/* cơ */
-const muscleMat=M(new THREE.MeshStandardMaterial({color:0xb0645a,roughness:.6,transparent:true,opacity:.6}));
+(function(){const add=(geo,px,py,pz,sx,sy,sz)=>{const m=new THREE.Mesh(geo,boneMat);m.position.set(px,py,pz);
+  if(sx)m.scale.set(sx,sy,sz);bones.add(m);};
+ const t2=lathe(TORSO,boneMat,20);t2.scale.set(.82,.99,.66);bones.add(t2);
+ add(new THREE.SphereGeometry(.1,12,10),0,1.615,0);
+ add(new THREE.CylinderGeometry(.042,.048,.12,10),0,1.475,0);
+ [-1,1].forEach(sg=>{
+   const a=lathe(ARM,boneMat,12);a.position.set(sg*.225,.815,0);a.scale.setScalar(.62);bones.add(a);
+   const l=lathe(LEG,boneMat,12);l.position.set(sg*.10,.09,0);l.scale.setScalar(.6);bones.add(l);});
+})();
+/* ============ LỚP CƠ ============ */
+const muscleMat=M(new THREE.MeshStandardMaterial({color:0xa8564e,roughness:.6,transparent:true,opacity:.5}));
 const muscles=new THREE.Group();muscles.visible=false;body.add(muscles);
-function muPart(geo,x,y,z){const m=new THREE.Mesh(geo,muscleMat);m.position.set(x,y,z);muscles.add(m);}
-muPart(new THREE.CylinderGeometry(.185,.15,.5,18),0,1.19,0);
-[-1,1].forEach(s=>{muPart(new THREE.CylinderGeometry(.056,.05,.58,12),s*.228,1.11,0);
- muPart(new THREE.CylinderGeometry(.075,.065,.84,14),s*.102,.47,0);});
-/* cơ quan nội tạng */
-const organMat=M(new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.95,roughness:.4}));
+(function(){
+ const t2=lathe(TORSO,muscleMat,36);t2.scale.set(.97,.995,.78);muscles.add(t2);
+ [-1,1].forEach(sg=>{
+  const a=lathe(ARM,muscleMat);a.position.set(sg*.225,.806,0);a.scale.set(1.05,1,1.05);muscles.add(a);
+  const l=lathe(LEG,muscleMat);l.position.set(sg*.10,.062,0);l.scale.set(1.06,1,1.06);muscles.add(l);});
+})();
+/* ============ NỘI TẠNG ============ */
 const organs=new THREE.Group();organs.visible=false;body.add(organs);
-function organ(geo,color,x,y,z){const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color,roughness:.45,transparent:true,opacity:.95}));organMat&&mats.push(m.material);m.position.set(x,y,z);organs.add(m);return m;}
+function organ(geo,color,x,y,z){const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color,roughness:.45,transparent:true,opacity:.95}));
+  mats.push(m.material);m.position.set(x,y,z);organs.add(m);return m;}
 organ(new THREE.SphereGeometry(.075,14,12),0xd96a6a,-.06,1.26,.02).scale.set(1,1.25,.9); // tim
-organ(new THREE.SphereGeometry(.11,14,12),0xe8b4b4,.10,1.30,-.01).scale.set(.8,1.2,.55);  // phổi phải
-organ(new THREE.SphereGeometry(.10,14,12),0xe8b4b4,-.11,1.31,-.01).scale.set(.8,1.1,.55); // phổi trái
+organ(new THREE.SphereGeometry(.11,14,12),0xe8b4b4,.10,1.30,-.01).scale.set(.8,1.2,.55);  // phổi p
+organ(new THREE.SphereGeometry(.10,14,12),0xe8b4b4,-.11,1.31,-.01).scale.set(.8,1.1,.55); // phổi t
 organ(new THREE.SphereGeometry(.10,14,12),0x8a5a3a,.09,1.00,.01).scale.set(1.15,.7,.8);   // gan
 organ(new THREE.SphereGeometry(.09,14,12),0xd9c98a,-.09,1.02,.01).scale.set(1,.8,.7);    // dạ dày
-organ(new THREE.SphereGeometry(.045,10,8),0xa8504a,.055,1.00,-.06);                      // thận phải
-organ(new THREE.SphereGeometry(.045,10,8),0xa8504a,-.055,1.00,-.06);                     // thận trái
+organ(new THREE.SphereGeometry(.045,10,8),0xa8504a,.055,1.00,-.06);                      // thận p
+organ(new THREE.SphereGeometry(.045,10,8),0xa8504a,-.055,1.00,-.06);                     // thận t
 
 /* ---------- vị trí huyệt ---------- */
 const ALL_POINTS=[];
+/* bán kính bề mặt theo đúng profile chi/tay — huyệt bám sát da */
+function profR(prof,off){for(let i=1;i<prof.length;i++){if(off<=prof[i][1]){const p0=prof[i-1],p1=prof[i];
+  return p0[0]+(p1[0]-p0[0])*(off-p0[1])/(p1[1]-p0[1]);}}return prof[prof.length-1][0];}
 function posOf(part,y,a,side){ // side: 1 phải, -1 trái, 0 giữa
   const rad=a*Math.PI/180;
   if(part==='h'){
-    if(a===-1)return new THREE.Vector3(0,1.60+.118,0);
+    if(a===-1)return new THREE.Vector3(0,1.617+.117,0);
     const t=Math.min(1,Math.max(0,(y-.83)/.155));
     const el=(1-t)*Math.PI, az=rad;
-    return new THREE.Vector3(.118*Math.sin(el)*Math.sin(az),1.60+.118*Math.cos(el),.118*Math.sin(el)*Math.cos(az));
+    return new THREE.Vector3(.117*Math.sin(el)*Math.sin(az),1.617+.117*Math.cos(el),.117*Math.sin(el)*Math.cos(az));
   }
   if(part==='f'){
     const sx=side===0?1:side;
-    return new THREE.Vector3(sx*.10+.045*Math.sin(rad),.055,.08+.045*Math.cos(rad));
+    return new THREE.Vector3(sx*.10+.05*Math.sin(rad),.055,.09+.05*Math.cos(rad));
   }
   if(part==='t'){
     const yy=.90+(y-.43)/.35*.60;
@@ -467,15 +529,17 @@ function posOf(part,y,a,side){ // side: 1 phải, -1 trái, 0 giữa
   }
   if(part==='a'){
     const yy=.80+(y-.45)/.33*.64;
+    const rr=profR(ARM,yy-.80)+.003;
     const sx=side===0?1:side;
-    return new THREE.Vector3(sx*.225+sx*.048*Math.sin(rad),yy,.048*Math.cos(rad));
+    return new THREE.Vector3(sx*.225+sx*rr*Math.sin(rad),yy,rr*Math.cos(rad));
   }
   // chân
   const yy=.06+(y-.03)/.425*.84;
+  const rr=profR(LEG,yy-.062)+.003;
   const sx=side===0?1:side;
   let eff=a; if(a<=20)eff=-90+a;            // huyệt kinh âm → mặt trong chân
-  const rr=eff*Math.PI/180;
-  return new THREE.Vector3(sx*.10+sx*.062*Math.sin(rr),yy,.062*Math.cos(rr));
+  const r2=eff*Math.PI/180;
+  return new THREE.Vector3(sx*.10+sx*rr*Math.sin(r2),yy,rr*Math.cos(r2));
 }
 /* ---------- kinh lạc + huyệt ---------- */
 const meridianGroups={},pointMeshes=[];
