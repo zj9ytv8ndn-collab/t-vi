@@ -4,6 +4,7 @@
 <!-- [2] Lazy-load English: 28 khoi reviewed-english + english-presentation (13.5MB) -> zlib-9+base64 trong #kd-en-blob; #kd-en-loader dung DecompressionStream, chay khi lang==="en" hoac __enEnsure(); VI mode 0 chi phi boot.
 <!-- [3] Chuoi decorator: 41124 resolve/pairs fallback __enBase (stub truoc bridge parse-time); presentation readyState-aware load hook.
 <!-- TEST: node --check moi block; VI boot 0 loi console [kd-en-lazy]; EN: __enEnsure() xong verify resolve(cau mau) -> EN.
+<!-- [8] PRO GATE v2 2026-10-14: Free = gieo 3 dong xu CHI HIEN ket luan co phap (.chvb), phan luon giai sau bi an + banner PRO; tra cuu khoa het 64 (FREE_HEX=0).
 <!-- [7] FIX 2026-10-14d: gate truoc day bi chen nham vao </body> dau tien (nam TRONG template string xuat/in cua engine) lam engine chet sau ~8.5KB -> watchdog. Bai hoc: anchor chuoi pho bien phai dung rfind + kiem chung ngu canh. Gate gio nam truoc </body> CUOI CUNG.
 <!-- [6] PRO GATE v1 2026-10-14: Free = gieo quẻ + quẻ 1-10; Pro = 9 tab môn + classics + history. Chặn capture-phase, không đụng engine. PRO_BRIDGE chờ wrapper StoreKit. Demo: link "Dùng thử 7 ngày" hoặc bấm tiêu đề paywall 7 lần = 30 ngày.
 <!-- [5] FIX 2026-10-14c: resolve 41124 null-safe (thiếu bản dịch EN trả undefined, không con null.trim crash).
@@ -16381,7 +16382,7 @@ Mua ban that: WKWebView wrapper se inject window.PRO_BRIDGE (StoreKit 2) truoc k
 (function(){'use strict';
 var W=window,D=document,LS='siching_pro',state=null;
 var PRO_TABS={'scr-hdlt':1,'scr-tuvi':1,'scr-kymon':1,'scr-lucnham':1,'scr-thaiat':1,'scr-battu':1,'scr-tarot':1,'scr-kd':1,'scr-hk':1,'scr-his':1};
-var FREE_HEX=10;
+var FREE_HEX=0;
 function load(){try{state=JSON.parse(localStorage.getItem(LS)||'null')}catch(e){}if(!state||typeof state!=='object')state={tier:'free'};}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 function active(){return state.tier==='pro'&&(!state.until||Date.now()<state.until);}
@@ -16411,9 +16412,40 @@ function paint(){
  var list=D.getElementById('hexList');
  if(list){list.querySelectorAll('.hex-item').forEach(function(it){var n=parseInt(it.dataset.n||'0',10);it.classList.toggle('prolock',!on&&n>FREE_HEX);});
   var banner=D.getElementById('proBanner');
-  if(!on&&!banner){banner=D.createElement('div');banner.id='proBanner';banner.innerHTML='\u{1F512} Qu\u1EBB 11\u201364 v\u00E0 9 m\u00F4n c\u1ED5 ph\u00E1p n\u1EB1m trong b\u1EA3n PRO \u2014 b\u1EA5m \u0111\u1EC3 xem';banner.addEventListener('click',function(){openPaywall('list');});var ref=null;list.querySelectorAll('.hex-item').forEach(function(it){if(parseInt(it.dataset.n||'0',10)===FREE_HEX)ref=it;});if(ref)ref.after(banner);else list.appendChild(banner);}
+  if(!on&&!banner){banner=D.createElement('div');banner.id='proBanner';banner.innerHTML='\u{1F512} Tra c\u1EE9u 64 qu\u1EBB v\u00E0 lu\u1EADn gi\u1EA3i \u0111\u1EA7y \u0111\u1EE7 n\u1EB1m trong b\u1EA3n PRO \u2014 b\u1EA5m \u0111\u1EC3 xem';banner.addEventListener('click',function(){openPaywall('list');});var ref=null;list.querySelectorAll('.hex-item').forEach(function(it){if(parseInt(it.dataset.n||'0',10)===FREE_HEX)ref=it;});if(ref)ref.after(banner);else list.appendChild(banner);}
   if(on&&banner)banner.remove();
  }
+}
+/* ---- reading lock: Free chi hien ket luan co phap sau khi gieo ---- */
+function lockReading(){
+ var box=D.getElementById('result'); if(!box)return;
+ if(active()){
+  if(box.dataset.prolocked==='1'){
+   box.dataset.prolocked='0';
+   Array.prototype.forEach.call(box.children,function(ch){ch.style.display='';});
+   var old=D.getElementById('proReadBanner'); if(old)old.remove();
+  }
+  return;
+ }
+ if(box.dataset.prolocked==='1')return;
+ var badge=box.querySelector('.chvb'); if(!badge)return;
+ var keep=null;
+ Array.prototype.forEach.call(box.children,function(ch){ if(!keep&&ch.contains&&ch.contains(badge))keep=ch; });
+ if(!keep)return;
+ box.dataset.prolocked='1';
+ var past=false;
+ Array.prototype.forEach.call(box.children,function(ch){
+  if(ch===keep){past=true;return;}
+  if(past)ch.style.display='none';
+ });
+ var ban=D.createElement('div'); ban.id='proReadBanner';
+ ban.style.cssText='margin:16px 4px;padding:22px 16px;border:1px dashed #c9a227;border-radius:16px;text-align:center;background:rgba(201,162,39,.07)';
+ ban.innerHTML='<div style="font-size:30px;margin-bottom:8px">\u{1F512}</div>'
+  +'<div style="color:#e8c766;font-weight:700;font-size:16px;margin-bottom:6px">K\u1EBFt lu\u1EADn c\u1ED5 ph\u00E1p \u1EDF tr\u00EAn \u0111\u00E3 \u0111\u1EE7 cho l\u1EA7n gieo n\u00E0y</div>'
+  +'<div style="font-size:13.5px;opacity:.85;margin-bottom:14px">Lu\u1EADn \u0111\u1EA7y \u0111\u1EE7 10 ch\u1EE7 \u0111\u1EC1 \u00D7 6 h\u00E0o \u00B7 qu\u1EBB bi\u1EBFn / du h\u1ED3n / quy h\u1ED3n \u00B7 ph\u00E9p th\u1EF1c h\u01B0 \u00B7 h\u1ECFi ti\u1EBFp \u2014 n\u1EB1m trong b\u1EA3n PRO.</div>'
+  +'<button style="padding:12px 24px;border:0;border-radius:12px;background:linear-gradient(135deg,#e8c766,#b8860b);color:#1a1408;font-weight:700;font-size:15px">M\u1EDF kho\u00E1 PRO</button>';
+ ban.querySelector('button').addEventListener('click',function(){openPaywall('reading');});
+ box.appendChild(ban);
 }
 /* ---- capture-phase interception ---- */
 D.addEventListener('click',function(e){
@@ -16459,6 +16491,8 @@ if(D.readyState==='loading')D.addEventListener('DOMContentLoaded',boot);else boo
 function boot(){paint();PRO.refresh();
  var list=D.getElementById('hexList');
  if(list&&!W.__kdProMO){try{W.__kdProMO=new MutationObserver(function(){paint();});W.__kdProMO.observe(list,{childList:true});}catch(_){}}
+ var rs=D.getElementById('result'); if(rs&&!W.__kdProMO2){try{W.__kdProMO2=new MutationObserver(function(){lockReading();});W.__kdProMO2.observe(rs,{childList:true});}catch(_){}}
+ lockReading();
 }
 })();
 </script>
