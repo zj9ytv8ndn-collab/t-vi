@@ -4,6 +4,7 @@
 <!-- [2] Lazy-load English: 28 khoi reviewed-english + english-presentation (13.5MB) -> zlib-9+base64 trong #kd-en-blob; #kd-en-loader dung DecompressionStream, chay khi lang==="en" hoac __enEnsure(); VI mode 0 chi phi boot.
 <!-- [3] Chuoi decorator: 41124 resolve/pairs fallback __enBase (stub truoc bridge parse-time); presentation readyState-aware load hook.
 <!-- TEST: node --check moi block; VI boot 0 loi console [kd-en-lazy]; EN: __enEnsure() xong verify resolve(cau mau) -> EN.
+<!-- [9] PRO GATE v3 2026-10-14: chan .gox (chi tiết) capture-phase + canh #mBody thay noi dung detail (co 綜卦) bang the khoa — Free khong lot duoc detail-view du bat ky duong nao.
 <!-- [8] PRO GATE v2 2026-10-14: Free = gieo 3 dong xu CHI HIEN ket luan co phap (.chvb), phan luon giai sau bi an + banner PRO; tra cuu khoa het 64 (FREE_HEX=0).
 <!-- [7] FIX 2026-10-14d: gate truoc day bi chen nham vao </body> dau tien (nam TRONG template string xuat/in cua engine) lam engine chet sau ~8.5KB -> watchdog. Bai hoc: anchor chuoi pho bien phai dung rfind + kiem chung ngu canh. Gate gio nam truoc </body> CUOI CUNG.
 <!-- [6] PRO GATE v1 2026-10-14: Free = gieo quẻ + quẻ 1-10; Pro = 9 tab môn + classics + history. Chặn capture-phase, không đụng engine. PRO_BRIDGE chờ wrapper StoreKit. Demo: link "Dùng thử 7 ngày" hoặc bấm tiêu đề paywall 7 lần = 30 ngày.
@@ -16452,7 +16453,9 @@ D.addEventListener('click',function(e){
  if(active())return;
  var b=e.target&&e.target.closest?e.target.closest('#tabs .tab'):null;
  if(b&&PRO_TABS[b.dataset.s]){e.preventDefault();e.stopPropagation();openPaywall(b.dataset.s);return;}
- var it=e.target&&e.target.closest?e.target.closest('#hexList .hex-item'):null;
+ var gx=e.target&&e.target.closest?e.target.closest('.gox'):null;
+ if(gx){e.preventDefault();e.stopPropagation();openPaywall('detail');return;}
+var it=e.target&&e.target.closest?e.target.closest('#hexList .hex-item'):null;
  if(it){var n=parseInt(it.dataset.n||'0',10);if(n>FREE_HEX){e.preventDefault();e.stopPropagation();openPaywall('list');}}
 },true);
 /* ---- paywall ---- */
@@ -16493,6 +16496,19 @@ function boot(){paint();PRO.refresh();
  if(list&&!W.__kdProMO){try{W.__kdProMO=new MutationObserver(function(){paint();});W.__kdProMO.observe(list,{childList:true});}catch(_){}}
  var rs=D.getElementById('result'); if(rs&&!W.__kdProMO2){try{W.__kdProMO2=new MutationObserver(function(){lockReading();});W.__kdProMO2.observe(rs,{childList:true});}catch(_){}}
  lockReading();
+ var mb=D.getElementById('mBody');
+ if(mb&&!W.__kdProMO3){try{W.__kdProMO3=new MutationObserver(function(){
+  if(active())return;
+  var h=mb.innerHTML||'';
+  if(h.indexOf('\u7D9C\u5DFD')>=0){
+   mb.innerHTML='<div style="text-align:center;padding:36px 18px">'
+    +'<div style="font-size:32px;margin-bottom:10px">\u{1F512}</div>'
+    +'<div style="color:#e8c766;font-weight:700;font-size:16px;margin-bottom:8px">Tra cứu quẻ chuyên sâu là tính năng PRO</div>'
+    +'<div style="font-size:13.5px;opacity:.85;margin-bottom:14px">Phản/Đối quẻ · Đắc chính · Thực hư · Bát cung kinh phòng · Tiên/Hậu thiên dịch giải · Lục giáp bốc thánh · Ứng kỳ · Cổ pháp chuyên sâu.</div>'
+    +'<button id="proModalBtn" style="padding:12px 24px;border:0;border-radius:12px;background:linear-gradient(135deg,#e8c766,#b8860b);color:#1a1408;font-weight:700;font-size:15px">Mở khoá PRO</button></div>';
+   var b2=D.getElementById('proModalBtn'); if(b2)b2.addEventListener('click',function(){openPaywall('detail');});
+  }
+ });W.__kdProMO3.observe(mb,{childList:true,subtree:true});}catch(_){}}
 }
 })();
 </script>
