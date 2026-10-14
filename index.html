@@ -4,9 +4,10 @@
 <!-- [2] Lazy-load English: 28 khoi reviewed-english + english-presentation (13.5MB) -> zlib-9+base64 trong #kd-en-blob; #kd-en-loader dung DecompressionStream, chay khi lang==="en" hoac __enEnsure(); VI mode 0 chi phi boot.
 <!-- [3] Chuoi decorator: 41124 resolve/pairs fallback __enBase (stub truoc bridge parse-time); presentation readyState-aware load hook.
 <!-- TEST: node --check moi block; VI boot 0 loi console [kd-en-lazy]; EN: __enEnsure() xong verify resolve(cau mau) -> EN.
+<!-- [7] FIX 2026-10-14d: gate truoc day bi chen nham vao </body> dau tien (nam TRONG template string xuat/in cua engine) lam engine chet sau ~8.5KB -> watchdog. Bai hoc: anchor chuoi pho bien phai dung rfind + kiem chung ngu canh. Gate gio nam truoc </body> CUOI CUNG.
 <!-- [6] PRO GATE v1 2026-10-14: Free = gieo quẻ + quẻ 1-10; Pro = 9 tab môn + classics + history. Chặn capture-phase, không đụng engine. PRO_BRIDGE chờ wrapper StoreKit. Demo: link "Dùng thử 7 ngày" hoặc bấm tiêu đề paywall 7 lần = 30 ngày.
 <!-- [5] FIX 2026-10-14c: resolve 41124 null-safe (thiếu bản dịch EN trả undefined, không con null.trim crash).
-<!-- [4] FIX 2026-10-14b: CSP thieu unsafe-eval chan eval() cua loader (loi tren may that: EN chi dich nhan UI, luan giai cong VI). Loader gio inject <script> dong (duoc phep boi unsafe-inline), eval chi con la fallback; loi ghi them vao localStorage kd_err de doc tren may.
+<!-- [4] FIX 2026-10-14b: CSP thieu unsafe-eval chan eval() cua loader (loi tren may that: EN chi dich nhan UI, luan giai cong VI). Loader gio inject the dong (duoc phep boi unsafe-inline), eval chi con la fallback; loi ghi them vao localStorage kd_err de doc tren may.
 -->
 <script id="kd-cast-text-41156">(function(){'use strict';var fixed={"Vui lòng nhập chi của năm (số 1–12).": "Enter the lunar year branch number (1–12).", "Vui lòng nhập tháng âm lịch (1–12).": "Enter the lunar month (1–12).", "Vui lòng nhập ngày âm lịch (1–30).": "Enter the lunar day (1–30).", "Vui lòng nhập chi của giờ (1–12).": "Enter the hour branch number (1–12).", "Vui lòng nhập số thứ nhất (≥ 1).": "Enter the first positive whole number.", "Vui lòng nhập số thứ hai (≥ 1).": "Enter the second positive whole number.", "Vui lòng nhập số thứ ba (≥ 1).": "Enter the third positive whole number.", "Vui lòng nhập một câu hoặc cụm chữ có ít nhất 2 chữ cái.": "Enter a phrase with at least two characters after whitespace and supported punctuation are removed.", "Vui lòng nhập Thiên thức (1–100).": "Enter the Heaven number (1–100).", "Vui lòng nhập Địa thức (1–100).": "Enter the Earth number (1–100).", "Vui lòng nhập Nhân thức (1–100).": "Enter the Human number (1–100).", " / 3</b> — tụ khí cầu <b>": " / 3</b> — casting the <b>", " / 6</b> — tụ khí vào ba đồng xu...": " / 6</b> — tossing three coins...", " — hào động!": " — moving line!", " ◈ hào động!": " ◈ moving line!", "</b><br>Sáu hào đã đủ — <b>quẻ thành!</b>": "</b><br>All six lines are ready — <b>hexagram complete!</b>", "<br><span style=\"color:var(--gold2)\">🪙 Bấm vào đồng xu để gieo lần ": "<br><span style=\"color:var(--gold2)\">🪙 Tap the coins for toss ", "Lần <b>": "Toss <b>", "Lần <b>6</b>: ": "Toss <b>6</b>: ", "Lần gieo <b>": "Toss <b>", "Lần gieo thứ <b>": "Toss <b>", "Ngửa": "Heads", "Nhân Thức": "Human number", "Sấp": "Tails", "Thiên Thức": "Heaven number", "ĐANG KHỞi QUẺ...": "CASTING...", "Địa Thức": "Earth number", "Đồng xu đang tung — lần gieo thứ <b>": "Coins are spinning — toss <b>", "🪙 <b>Bấm vào ba đồng xu để gieo lần 1 / 6</b><br><span class=\"dim\">Tịnh tâm, niệm thầm câu hỏi rồi chạm vào đồng xu</span>": "🪙 <b>Tap the three coins for toss 1 / 6</b><br><span class=\"dim\">Quiet your mind, reflect on your question, then tap the coins</span>", "Lão Âm · hào âm động": "Old Yin · moving yin line", "Thiếu Dương · hào dương": "Young Yang · stable yang line", "Thiếu Âm · hào âm": "Young Yin · stable yin line", "Lão Dương · hào dương động": "Old Yang · moving yang line"},identity=new Map();function norm(s){return String(s).normalize('NFC').replace(/\s+/g,' ').trim();}window.KD_registerCast56=function(s){identity.set(norm(s),s);String(s).split(/(<[^>]*>)/).forEach(function(t){if(t&&!t.startsWith('<'))identity.set(norm(t),t.trim());});return s;};window.KD_castText56=function(s){return window.S_ICHING_LANGUAGE==='vi'?s:window.KD_registerCast56(fixed[s]||s);};window.KD_CAST_DYNAMIC_ENGLISH={version:'4.11.56',fixed:fixed,identity:identity};})();</script>
 <script id="kd-completion-text-41157">(function(){'use strict';var fixed={"GIEO QUẺ": "CAST HEXAGRAM", "KHỞi QUẺ MAI HOA": "CAST PLUM BLOSSOM HEXAGRAM", "KHỞi THỨC QUỶ CỐC": "CAST GUI GU HEXAGRAM", "DỰNG QUẺ TỪ HÀO ĐÃ NHẬP": "BUILD HEXAGRAM FROM ENTERED LINES", "Tượng quẻ đã thành — <b>chiêm nghiệm...</b>": "Hexagram complete — <b>reflect on the reading...</b>", "📄 Xuất / In kết quả": "📄 Export / Print Results", "📤 Chia sẻ": "📤 Share", "🖼 Ảnh PNG": "🖼 PNG Image", "Đã sao chép toàn văn luận quẻ": "The full reading has been copied.", "Không thể sao chép tự động": "Could not copy automatically.", "Thiết bị không hỗ trợ chia sẻ/sao chép": "Sharing and copying are not supported on this device.", "Kết quả luận giải": "Interpretation Results"},names={"1": "The Creative", "2": "The Receptive", "3": "Difficulty at the Beginning", "4": "Youthful Folly", "5": "Waiting", "6": "Conflict", "7": "The Army", "8": "Holding Together", "9": "Small Taming", "10": "Treading", "11": "Peace", "12": "Standstill", "13": "Fellowship", "14": "Great Possession", "15": "Modesty", "16": "Enthusiasm", "17": "Following", "18": "Work on What Has Decayed", "19": "Approach", "20": "Contemplation", "21": "Biting Through", "22": "Grace", "23": "Splitting Apart", "24": "Return", "25": "Innocence", "26": "Great Taming", "27": "Nourishment", "28": "Great Preponderance", "29": "The Abysmal Water", "30": "The Clinging Fire", "31": "Influence", "32": "Duration", "33": "Retreat", "34": "Great Power", "35": "Progress", "36": "Darkening of the Light", "37": "The Family", "38": "Opposition", "39": "Obstruction", "40": "Deliverance", "41": "Decrease", "42": "Increase", "43": "Breakthrough", "44": "Coming to Meet", "45": "Gathering Together", "46": "Pushing Upward", "47": "Oppression", "48": "The Well", "49": "Revolution", "50": "The Cauldron", "51": "The Arousing Thunder", "52": "Keeping Still Mountain", "53": "Development", "54": "The Marrying Maiden", "55": "Abundance", "56": "The Wanderer", "57": "The Gentle Wind", "58": "The Joyous Lake", "59": "Dispersion", "60": "Limitation", "61": "Inner Truth", "62": "Small Preponderance", "63": "After Completion", "64": "Before Completion"},identity=new Map();function norm(s){return String(s).normalize('NFC').replace(/\s+/g,' ').trim();}window.KD_completionRegister57=function(s){identity.set(norm(s),s);String(s).split(/(<[^>]*>)/).forEach(function(t){if(t&&!t.startsWith('<'))identity.set(norm(t),t.trim());});return s;};window.KD_completionText57=function(s){return window.S_ICHING_LANGUAGE==='vi'?s:KD_completionRegister57(fixed[s]||s);};window.KD_completionTitle57=function(n,bien){var b=typeof BYN!=='undefined'?BYN[n]:null;if(window.S_ICHING_LANGUAGE==='vi')return 'Quẻ '+n+'. '+(b?b.name:'')+(bien?' → '+bien:'');return KD_completionRegister57('Hexagram '+n+'. '+(names[n]||'')+(bien?' → '+bien:''));};window.KD_COMPLETION_ENGLISH={version:'4.11.57',fixed:fixed,names:names,identity:identity};})();</script>
@@ -1298,100 +1299,7 @@ function shareBatTuPNG(tt,nc,name){
 function exportHTML(title,bodyHtml){
  try{
  var css='body{font-family:serif;max-width:760px;margin:24px auto;padding:0 16px;color:#1c1a12;background:#fdfaf2;line-height:1.65}h1{font-size:22px;border-bottom:2px solid #b8942a;padding-bottom:8px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #c9b98a;padding:5px 8px}img,svg{max-width:100%}.card{border:1px solid #d8c894;border-radius:10px;padding:10px 14px;margin:10px 0}@media print{body{margin:0;max-width:none;background:#fff}.card{break-inside:avoid}button{display:none}}';
- var doc='<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+css+'</style></head><body><h1>'+esc(title)+'</h1>'+bodyHtml+'<hr><p style="font-size:12px;color:#777">Xuất từ ứng dụng Kinh Dịch 64 Quẻ · '+new Date().toLocaleString('vi-VN')+' — nội dung mang tính chiêm nghiệm tham khảo.</p>'+'
-<script id="kd-pro-gate">
-/* ===== KD PRO GATE v1 — Free + Pro (2026-10-14) =====
-Kien truc: capture-phase interception tren document (chay TRUOC listener goc cua tab),
-khong sua engine. Free: gieo quẻ 3 dong xu day du + tra cuu quẻ 1-10.
-Pro: 9 mon con lai (hdlt,tuvi,kymon,lucnham,thaiat,battu,tarot,kd,hk) + nhat ky (his).
-Mua ban that: WKWebView wrapper se inject window.PRO_BRIDGE (StoreKit 2) truoc khi file chay.
-*/
-(function(){'use strict';
-var W=window,D=document,LS='siching_pro',state=null;
-var PRO_TABS={'scr-hdlt':1,'scr-tuvi':1,'scr-kymon':1,'scr-lucnham':1,'scr-thaiat':1,'scr-battu':1,'scr-tarot':1,'scr-kd':1,'scr-hk':1,'scr-his':1};
-var FREE_HEX=10;
-function load(){try{state=JSON.parse(localStorage.getItem(LS)||'null')}catch(e){}if(!state||typeof state!=='object')state={tier:'free'};}
-function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
-function active(){return state.tier==='pro'&&(!state.until||Date.now()<state.until);}
-function toast(msg){var t=D.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;left:50%;bottom:18%;transform:translateX(-50%);background:#1c1830;color:#f0e6c8;border:1px solid #c9a227;border-radius:12px;padding:10px 18px;z-index:99999;font-size:14px;max-width:86vw;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.5)';D.body.appendChild(t);setTimeout(function(){t.remove()},3200);}
-var PRO={
- has:active,
- state:function(){return state;},
- refresh:async function(){load();if(W.PRO_BRIDGE&&W.PRO_BRIDGE.entitlements){try{var e=await W.PRO_BRIDGE.entitlements();if(e&&e.tier){state=e;save();}}catch(_){}}paint();return active();},
- buy:async function(plan){if(W.PRO_BRIDGE&&W.PRO_BRIDGE.buy){try{var e=await W.PRO_BRIDGE.buy(plan);if(e&&e.tier==='pro'){state=e;save();paint();toast('Cam on ban! Da mo khoa PRO.');return true;}}catch(err){toast(String(err&&err.message||err));return false;}}toast('Ban web chua lien ket App Store. Mua qua app iOS de mo khoa.');return false;},
- restore:async function(){if(W.PRO_BRIDGE&&W.PRO_BRIDGE.restore){try{var e=await W.PRO_BRIDGE.restore();if(e&&e.tier==='pro'){state=e;save();paint();toast('Da khoi phuc ban PRO.');return true;}}catch(err){toast(String(err&&err.message||err));return false;}}toast('Khong tim thay giao dich tren thiet bi nay.');return false;},
- demo:function(days){state={tier:'pro',src:'demo',until:Date.now()+(days||7)*864e5};save();paint();toast('Da mo PRO dung thu '+(days||7)+' ngay.');}
-};
-W.PRO=PRO;
-W.PRO_BRIDGE=W.PRO_BRIDGE||null;
-/* ---- lock visuals ---- */
-var st=D.createElement('style');st.textContent='#tabs .tab{position:relative}#tabs .tab .plk{position:absolute;top:1px;right:3px;font-size:9px;line-height:1;opacity:.9;pointer-events:none}#hexList .hex-item.prolock{opacity:.55}#hexList .hex-item.prolock .gl::after{content:" \\1F512";font-size:10px}#proBanner{grid-column:1/-1;text-align:center;padding:14px 10px;border:1px dashed #c9a227;border-radius:12px;color:#e8c766;font-size:13.5px;background:rgba(201,162,39,.06);cursor:pointer}';
-D.head.appendChild(st);
-function paint(){
- var on=active();
- D.querySelectorAll('#tabs .tab').forEach(function(b){
-  var lock=!on&&PRO_TABS[b.dataset.s];
-  b.classList.toggle('prolock',!!lock);
-  var ic=b.querySelector('.plk');
-  if(lock&&!ic){ic=D.createElement('span');ic.className='plk';ic.textContent='\u{1F512}';b.appendChild(ic);}
-  if(!lock&&ic)ic.remove();
- });
- var list=D.getElementById('hexList');
- if(list){list.querySelectorAll('.hex-item').forEach(function(it){var n=parseInt(it.dataset.n||'0',10);it.classList.toggle('prolock',!on&&n>FREE_HEX);});
-  var banner=D.getElementById('proBanner');
-  if(!on&&!banner){banner=D.createElement('div');banner.id='proBanner';banner.innerHTML='\u{1F512} Qu\u1EBB 11\u201364 v\u00E0 9 m\u00F4n c\u1ED5 ph\u00E1p n\u1EB1m trong b\u1EA3n PRO \u2014 b\u1EA5m \u0111\u1EC3 xem';banner.addEventListener('click',function(){openPaywall('list');});var ref=null;list.querySelectorAll('.hex-item').forEach(function(it){if(parseInt(it.dataset.n||'0',10)===FREE_HEX)ref=it;});if(ref)ref.after(banner);else list.appendChild(banner);}
-  if(on&&banner)banner.remove();
- }
-}
-/* ---- capture-phase interception ---- */
-D.addEventListener('click',function(e){
- if(active())return;
- var b=e.target&&e.target.closest?e.target.closest('#tabs .tab'):null;
- if(b&&PRO_TABS[b.dataset.s]){e.preventDefault();e.stopPropagation();openPaywall(b.dataset.s);return;}
- var it=e.target&&e.target.closest?e.target.closest('#hexList .hex-item'):null;
- if(it){var n=parseInt(it.dataset.n||'0',10);if(n>FREE_HEX){e.preventDefault();e.stopPropagation();openPaywall('list');}}
-},true);
-/* ---- paywall ---- */
-var pw=null,taps=0,tapT=0;
-function openPaywall(from){
- if(!pw){
-  pw=D.createElement('div');pw.id='kdPaywall';pw.style.cssText='position:fixed;inset:0;background:rgba(6,4,14,.82);z-index:99998;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(4px)';
-  pw.innerHTML='<div style="max-width:420px;width:100%;background:#14121f;border:1px solid #c9a227;border-radius:20px;padding:22px 20px;color:#f0e6c8;font-size:15px;line-height:1.6;max-height:88vh;overflow:auto">'
-  +'<div id="pwTitle" style="font-size:21px;color:#e8c766;text-align:center;margin-bottom:4px">\u2697\uFE0F S I CHING \u2014 B\u1EA3n PRO</div>'
-  +'<div style="opacity:.85;font-size:13.5px;margin-bottom:12px">M\u1EDF kho\u00E1 tr\u1ECDn b\u1ED9 9 m\u00F4n \u2014 ch\u1EA1y ho\u00E0n to\u00E0n tr\u00EAn m\u00E1y, kh\u00F4ng c\u1EA7n m\u1EA1ng:</div>'
-  +'<ul style="margin:0 0 14px;padding-left:20px;font-size:14px">'
-  +'<li>Tra c\u1EE9u \u0111\u1EE7 64 qu\u1EBB \u2014 lu\u1EADn 10 ch\u1EE7 \u0111\u1EC1 \u00D7 6 h\u00E0o</li>'
-  +'<li>T\u1EED Vi \u00B7 K\u1EF3 M\u00F4n \u00B7 L\u1EE5c Nh\u00E2m \u00B7 Th\u00E1i \u1EA4t \u00B7 B\u00E1t T\u1EF1</li>'
-  +'<li>Huy\u1EC1n Kh\u00F4ng \u00B7 Tarot \u00B7 H\u00E0 \u0110\u1ED3 \u2013 L\u1EA1c Th\u01B0 \u00B7 Kinh v\u0103n H\u00E1n-N\u00F4m</li>'
-  +'<li>Nh\u1EADt k\u00FD gieo qu\u1EBB + h\u1ECFi ti\u1EBFp theo qu\u1EBB</li></ul>'
-  +'<button data-plan="pro.yearly" style="width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,#e8c766,#b8860b);color:#1a1408;font-weight:700;font-size:16px;margin-bottom:10px">PRO N\u0102M \u2014 $14.99/n\u0103m</button>'
-  +'<button data-plan="pro.lifetime" style="width:100%;padding:13px;border:1px solid #c9a227;border-radius:14px;background:transparent;color:#e8c766;font-weight:600;font-size:15px;margin-bottom:10px">TR\u1ECCN \u0110\u1EDDI \u2014 $29.99 \u00B7 m\u1ED9t l\u1EA7n duy nh\u1EA5t</button>'
-  +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.85"><span id="pwRestore" style="text-decoration:underline;cursor:pointer">Kh\u00F4i ph\u1EE5c giao d\u1ECBch</span><span id="pwClose" style="cursor:pointer;padding:6px 10px;border:1px solid #555;border-radius:10px">\u0110\u1EC3 sau</span></div>'
-  +'<div style="margin-top:12px;font-size:11.5px;opacity:.6;text-align:center">Thanh to\u00E1n qua Apple \u00B7 Hu\u1EF7 b\u1EA5t k\u1EF3 l\u00FAc n\u00E0o trong C\u00E0i \u0111\u1EB7t \u00B7 \u0110\u1ED3ng b\u1ED9 qua App Store<br><span id="pwDemo" style="text-decoration:underline;cursor:pointer;opacity:.8">D\u00F9ng th\u1EED 7 ng\u00E0y (demo)</span></div></div>';
-  pw.addEventListener('click',function(e){if(e.target===pw)closePaywall();});
-  pw.querySelectorAll('button[data-plan]').forEach(function(btn){btn.addEventListener('click',function(){PRO.buy(btn.dataset.plan).then(function(ok){if(ok)closePaywall();});});});
-  pw.querySelector('#pwClose').addEventListener('click',closePaywall);
-  pw.querySelector('#pwRestore').addEventListener('click',function(){PRO.restore();});
-  pw.querySelector('#pwDemo').addEventListener('click',function(){PRO.demo(7);closePaywall();});
-  var title=pw.querySelector('#pwTitle');
-  title.addEventListener('click',function(){var now=Date.now();if(now-tapT>2500)taps=0;tapT=now;if(++taps>=7){PRO.demo(30);closePaywall();}});
-  D.body.appendChild(pw);
- }
- pw.style.display='flex';
-}
-function closePaywall(){if(pw)pw.style.display='none';}
-W.__openPaywall=openPaywall;
-/* ---- boot ---- */
-load();
-if(D.readyState==='loading')D.addEventListener('DOMContentLoaded',boot);else boot();
-function boot(){paint();PRO.refresh();
- var list=D.getElementById('hexList');
- if(list&&!W.__kdProMO){try{W.__kdProMO=new MutationObserver(function(){paint();});W.__kdProMO.observe(list,{childList:true});}catch(_){}}
-}
-})();
-</script>
-
-</body></html>';
+ var doc='<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+css+'</style></head><body><h1>'+esc(title)+'</h1>'+bodyHtml+'<hr><p style="font-size:12px;color:#777">Xuất từ ứng dụng Kinh Dịch 64 Quẻ · '+new Date().toLocaleString('vi-VN')+' — nội dung mang tính chiêm nghiệm tham khảo.</p>'+'</body></html>';
  var blob=new Blob([doc],{type:'text/html;charset=utf-8'});
  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
  a.download=title.replace(/[^\w\u00C0-\u1EF9]+/g,'_').slice(0,60)+'.html';
@@ -16463,4 +16371,95 @@ if(e.type==='judgment'&&!vi){var L=LUAN64[e.num]||{},state=window.KD_MAIN_TEXT_R
 var checked=window.KD_YAO_REVIEWED169&&window.KD_YAO_REVIEWED169.map.get(e.num+'|'+e.index);if(e.type==='line'&&checked&&raw&&raw.t===checked.source.t&&raw.m===checked.source.m){h+='<div data-reviewed-line="'+e.num+'|'+e.index+'"><p lang="zh">'+esc(checked.classical)+'</p><p data-english-user-content><b>'+text(vi,'Bản dịch đã đối chiếu: ','Source-reviewed translation: ')+'</b>'+esc(checked[vi?'vi':'en'])+'</p><p data-english-user-content>'+esc(checked[vi?'noteVi':'noteEn'])+'</p><a data-english-user-content target="_blank" rel="noopener noreferrer" href="'+checked.reference+'">'+text(vi,'Đọc kinh văn','Read the classical text')+'</a></div><details><summary data-english-user-content>'+text(vi,'Lời diễn giải gốc trong app','Original app interpretation')+'</summary><p lang="vi">'+esc(raw.m)+'</p></details>';h+='</section>';return;}
 if(raw){h+='<details data-selected-original-pending><summary data-english-user-content>'+text(vi,'Đoạn gốc trong app · phiên âm/dịch còn chờ rà','Original app passage · transcription/translation review pending')+'</summary><div lang="vi" style="overflow-wrap:anywhere">';['t','m','d','dm'].forEach(function(k){if(raw[k])h+='<p>'+esc(raw[k])+'</p>';});h+='</div></details>';}else h+='<p data-english-user-content>'+text(vi,'Chưa có đoạn gốc cho vị trí được chọn.','No original passage is available for the selected position.')+'</p>';h+='</section>';});return h+'</div>';};window.KD_RELEASE='4.11.169';window.KD_CHANGED_SELECTION169={version:'4.11.169',select:select,scope:'Bilingual passage-selection rules; Qian/Kun three-line diagram anchors checked; other diagram mappings and original passage translations remain pending.'};})();
 window.KD_THREE_CHANGE_ANCHORS141={version:'4.11.169',source:'https://zh.wikisource.org/wiki/易學啟蒙通釋_(四庫全書本)/卷下',qianRelated:[12,53,56,31,59,64,47,18,48,32,42,21,17,22,63,55,41,60,54,11],kunRelated:[11,54,60,41,55,63,22,17,21,42,32,48,18,47,64,59,31,56,53,12],scope:'20 three-line patterns for Qian and 20 for Kun; other historical diagrams not independently checked.'};</script>
+<script id="kd-pro-gate">
+/* ===== KD PRO GATE v1 — Free + Pro (2026-10-14) =====
+Kien truc: capture-phase interception tren document (chay TRUOC listener goc cua tab),
+khong sua engine. Free: gieo quẻ 3 dong xu day du + tra cuu quẻ 1-10.
+Pro: 9 mon con lai (hdlt,tuvi,kymon,lucnham,thaiat,battu,tarot,kd,hk) + nhat ky (his).
+Mua ban that: WKWebView wrapper se inject window.PRO_BRIDGE (StoreKit 2) truoc khi file chay.
+*/
+(function(){'use strict';
+var W=window,D=document,LS='siching_pro',state=null;
+var PRO_TABS={'scr-hdlt':1,'scr-tuvi':1,'scr-kymon':1,'scr-lucnham':1,'scr-thaiat':1,'scr-battu':1,'scr-tarot':1,'scr-kd':1,'scr-hk':1,'scr-his':1};
+var FREE_HEX=10;
+function load(){try{state=JSON.parse(localStorage.getItem(LS)||'null')}catch(e){}if(!state||typeof state!=='object')state={tier:'free'};}
+function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+function active(){return state.tier==='pro'&&(!state.until||Date.now()<state.until);}
+function toast(msg){var t=D.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;left:50%;bottom:18%;transform:translateX(-50%);background:#1c1830;color:#f0e6c8;border:1px solid #c9a227;border-radius:12px;padding:10px 18px;z-index:99999;font-size:14px;max-width:86vw;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.5)';D.body.appendChild(t);setTimeout(function(){t.remove()},3200);}
+var PRO={
+ has:active,
+ state:function(){return state;},
+ refresh:async function(){load();if(W.PRO_BRIDGE&&W.PRO_BRIDGE.entitlements){try{var e=await W.PRO_BRIDGE.entitlements();if(e&&e.tier){state=e;save();}}catch(_){}}paint();return active();},
+ buy:async function(plan){if(W.PRO_BRIDGE&&W.PRO_BRIDGE.buy){try{var e=await W.PRO_BRIDGE.buy(plan);if(e&&e.tier==='pro'){state=e;save();paint();toast('Cam on ban! Da mo khoa PRO.');return true;}}catch(err){toast(String(err&&err.message||err));return false;}}toast('Ban web chua lien ket App Store. Mua qua app iOS de mo khoa.');return false;},
+ restore:async function(){if(W.PRO_BRIDGE&&W.PRO_BRIDGE.restore){try{var e=await W.PRO_BRIDGE.restore();if(e&&e.tier==='pro'){state=e;save();paint();toast('Da khoi phuc ban PRO.');return true;}}catch(err){toast(String(err&&err.message||err));return false;}}toast('Khong tim thay giao dich tren thiet bi nay.');return false;},
+ demo:function(days){state={tier:'pro',src:'demo',until:Date.now()+(days||7)*864e5};save();paint();toast('Da mo PRO dung thu '+(days||7)+' ngay.');}
+};
+W.PRO=PRO;
+W.PRO_BRIDGE=W.PRO_BRIDGE||null;
+/* ---- lock visuals ---- */
+var st=D.createElement('style');st.textContent='#tabs .tab{position:relative}#tabs .tab .plk{position:absolute;top:1px;right:3px;font-size:9px;line-height:1;opacity:.9;pointer-events:none}#hexList .hex-item.prolock{opacity:.55}#hexList .hex-item.prolock .gl::after{content:" \\1F512";font-size:10px}#proBanner{grid-column:1/-1;text-align:center;padding:14px 10px;border:1px dashed #c9a227;border-radius:12px;color:#e8c766;font-size:13.5px;background:rgba(201,162,39,.06);cursor:pointer}';
+D.head.appendChild(st);
+function paint(){
+ var on=active();
+ D.querySelectorAll('#tabs .tab').forEach(function(b){
+  var lock=!on&&PRO_TABS[b.dataset.s];
+  b.classList.toggle('prolock',!!lock);
+  var ic=b.querySelector('.plk');
+  if(lock&&!ic){ic=D.createElement('span');ic.className='plk';ic.textContent='\u{1F512}';b.appendChild(ic);}
+  if(!lock&&ic)ic.remove();
+ });
+ var list=D.getElementById('hexList');
+ if(list){list.querySelectorAll('.hex-item').forEach(function(it){var n=parseInt(it.dataset.n||'0',10);it.classList.toggle('prolock',!on&&n>FREE_HEX);});
+  var banner=D.getElementById('proBanner');
+  if(!on&&!banner){banner=D.createElement('div');banner.id='proBanner';banner.innerHTML='\u{1F512} Qu\u1EBB 11\u201364 v\u00E0 9 m\u00F4n c\u1ED5 ph\u00E1p n\u1EB1m trong b\u1EA3n PRO \u2014 b\u1EA5m \u0111\u1EC3 xem';banner.addEventListener('click',function(){openPaywall('list');});var ref=null;list.querySelectorAll('.hex-item').forEach(function(it){if(parseInt(it.dataset.n||'0',10)===FREE_HEX)ref=it;});if(ref)ref.after(banner);else list.appendChild(banner);}
+  if(on&&banner)banner.remove();
+ }
+}
+/* ---- capture-phase interception ---- */
+D.addEventListener('click',function(e){
+ if(active())return;
+ var b=e.target&&e.target.closest?e.target.closest('#tabs .tab'):null;
+ if(b&&PRO_TABS[b.dataset.s]){e.preventDefault();e.stopPropagation();openPaywall(b.dataset.s);return;}
+ var it=e.target&&e.target.closest?e.target.closest('#hexList .hex-item'):null;
+ if(it){var n=parseInt(it.dataset.n||'0',10);if(n>FREE_HEX){e.preventDefault();e.stopPropagation();openPaywall('list');}}
+},true);
+/* ---- paywall ---- */
+var pw=null,taps=0,tapT=0;
+function openPaywall(from){
+ if(!pw){
+  pw=D.createElement('div');pw.id='kdPaywall';pw.style.cssText='position:fixed;inset:0;background:rgba(6,4,14,.82);z-index:99998;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(4px)';
+  pw.innerHTML='<div style="max-width:420px;width:100%;background:#14121f;border:1px solid #c9a227;border-radius:20px;padding:22px 20px;color:#f0e6c8;font-size:15px;line-height:1.6;max-height:88vh;overflow:auto">'
+  +'<div id="pwTitle" style="font-size:21px;color:#e8c766;text-align:center;margin-bottom:4px">\u2697\uFE0F S I CHING \u2014 B\u1EA3n PRO</div>'
+  +'<div style="opacity:.85;font-size:13.5px;margin-bottom:12px">M\u1EDF kho\u00E1 tr\u1ECDn b\u1ED9 9 m\u00F4n \u2014 ch\u1EA1y ho\u00E0n to\u00E0n tr\u00EAn m\u00E1y, kh\u00F4ng c\u1EA7n m\u1EA1ng:</div>'
+  +'<ul style="margin:0 0 14px;padding-left:20px;font-size:14px">'
+  +'<li>Tra c\u1EE9u \u0111\u1EE7 64 qu\u1EBB \u2014 lu\u1EADn 10 ch\u1EE7 \u0111\u1EC1 \u00D7 6 h\u00E0o</li>'
+  +'<li>T\u1EED Vi \u00B7 K\u1EF3 M\u00F4n \u00B7 L\u1EE5c Nh\u00E2m \u00B7 Th\u00E1i \u1EA4t \u00B7 B\u00E1t T\u1EF1</li>'
+  +'<li>Huy\u1EC1n Kh\u00F4ng \u00B7 Tarot \u00B7 H\u00E0 \u0110\u1ED3 \u2013 L\u1EA1c Th\u01B0 \u00B7 Kinh v\u0103n H\u00E1n-N\u00F4m</li>'
+  +'<li>Nh\u1EADt k\u00FD gieo qu\u1EBB + h\u1ECFi ti\u1EBFp theo qu\u1EBB</li></ul>'
+  +'<button data-plan="pro.yearly" style="width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,#e8c766,#b8860b);color:#1a1408;font-weight:700;font-size:16px;margin-bottom:10px">PRO N\u0102M \u2014 $14.99/n\u0103m</button>'
+  +'<button data-plan="pro.lifetime" style="width:100%;padding:13px;border:1px solid #c9a227;border-radius:14px;background:transparent;color:#e8c766;font-weight:600;font-size:15px;margin-bottom:10px">TR\u1ECCN \u0110\u1EDDI \u2014 $29.99 \u00B7 m\u1ED9t l\u1EA7n duy nh\u1EA5t</button>'
+  +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.85"><span id="pwRestore" style="text-decoration:underline;cursor:pointer">Kh\u00F4i ph\u1EE5c giao d\u1ECBch</span><span id="pwClose" style="cursor:pointer;padding:6px 10px;border:1px solid #555;border-radius:10px">\u0110\u1EC3 sau</span></div>'
+  +'<div style="margin-top:12px;font-size:11.5px;opacity:.6;text-align:center">Thanh to\u00E1n qua Apple \u00B7 Hu\u1EF7 b\u1EA5t k\u1EF3 l\u00FAc n\u00E0o trong C\u00E0i \u0111\u1EB7t \u00B7 \u0110\u1ED3ng b\u1ED9 qua App Store<br><span id="pwDemo" style="text-decoration:underline;cursor:pointer;opacity:.8">D\u00F9ng th\u1EED 7 ng\u00E0y (demo)</span></div></div>';
+  pw.addEventListener('click',function(e){if(e.target===pw)closePaywall();});
+  pw.querySelectorAll('button[data-plan]').forEach(function(btn){btn.addEventListener('click',function(){PRO.buy(btn.dataset.plan).then(function(ok){if(ok)closePaywall();});});});
+  pw.querySelector('#pwClose').addEventListener('click',closePaywall);
+  pw.querySelector('#pwRestore').addEventListener('click',function(){PRO.restore();});
+  pw.querySelector('#pwDemo').addEventListener('click',function(){PRO.demo(7);closePaywall();});
+  var title=pw.querySelector('#pwTitle');
+  title.addEventListener('click',function(){var now=Date.now();if(now-tapT>2500)taps=0;tapT=now;if(++taps>=7){PRO.demo(30);closePaywall();}});
+  D.body.appendChild(pw);
+ }
+ pw.style.display='flex';
+}
+function closePaywall(){if(pw)pw.style.display='none';}
+W.__openPaywall=openPaywall;
+/* ---- boot ---- */
+load();
+if(D.readyState==='loading')D.addEventListener('DOMContentLoaded',boot);else boot();
+function boot(){paint();PRO.refresh();
+ var list=D.getElementById('hexList');
+ if(list&&!W.__kdProMO){try{W.__kdProMO=new MutationObserver(function(){paint();});W.__kdProMO.observe(list,{childList:true});}catch(_){}}
+}
+})();
+</script>
 </body></html>
