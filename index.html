@@ -2,6 +2,9 @@
 
 <div id='hdltToolMount'></div><script>if(typeof hdltToolBlock==='function')document.getElementById('hdltToolMount').innerHTML=hdltToolBlock();</script> html><html lang="vi"><script id="s-iching-language-bootstrap">(function(){var lang="en";try{var q=new URLSearchParams(location.search).get("lang");lang=q==="vi"||q==="en"?q:localStorage.getItem("s-iching-language")||sessionStorage.getItem("s-iching-language")||"vi"}catch(e){}window.S_ICHING_LANGUAGE=lang==="vi"?"vi":"en";document.documentElement.lang=window.S_ICHING_LANGUAGE;document.title="S I CHING"})();</script><head>
 <!-- KD CHANGELOG 2026-10-14 (p41-enlazy-vi) -->
+<!-- [95] BAT TU NGU HO DON REVERT 2026-10-15: mau (mChi-2)+120 o [44] LA SAI co phap — can thang phai TIEN theo chu ky 60 (+10 cho thang Ty = cung can thang Dan; +11 cho thang Suu) chu khong LUI. Minh chung thuc te: 2024-12 = Binh Ty (丙子月), 2025-1 = Dinh Suu (丁丑月), 3/2/1984 = At Suu (乙丑, lien mach truoc Binh Dan 1984). Vá 3 diem: tinhTuTru mCan, kmLap mCanT, kdWithTimeContext r.thang.can — tra ve (x-2+12)%12. 5 moc loi xanh + 4 moc regression dong nhat (Binh Dan/At Hoi/Mau Dan/Dinh Mao). Minh oan: Thai At N(1034)=10154950 khop 金鏡卷七 (khong loi epoch); Tu Vi Dia Khong/Dia Kiep an theo GIO (亥上起子時 順劫逆空) dung 全書 — khong phai bug. Bai hoc (lap lai [49]): phai doc code + doi chieu nguyen van/lich thuc te truoc khi cham. -->
+<!-- [97] TU VI TIEU HAN + AN QUANG 2026-10-16: (1) Tiểu hạn SAI 2 DIEM theo 安小限訣: khoi diem la NGO (午宮起一歲) chu khong Thìn (_tvChiPos(4)=Thìn -> _tvChiPos(6)=Ngo); chieu hanh NAM THUAN/NU NGHICH chu khong dung phep duong nam/am nu cua DAI HAN. Them co 'nam' vao anLaSo return (truoc chi co duongYNam hon hop). Van ban UI cap nhat theo. (2) Ân Quang/Thiên Quý lech 1 cung: quyet 《全書》「文昌起初一順行，文曲起初一逆行」— ngay 1 an TAI cung sao goc; code cu thua -1/+1. Sau vá: ngay 1 Ân Quang = cung Văn Xương, Thiên Quý = cung Văn Khúc. Test dong: nam 1990 tieu han 2026 (37 tuoi) tai Ngo; nam tuoi 2 tai Mui; nu tuoi 2 tai Ty. -->
+<!-- [96] TU VI THIEN Y + CO/QUA 2026-10-16: (1) Thien Y (天醫) [45] ghi 'sang Mao' nhung code an (2+lM-1)=Thìn — Mão=1 o grid Dần nen van lech +1; da ve dung: thang 1 -> Mão(1), thang 6 -> Thân(6). (2) Cô Thần/Quả Tú: mang cu sinh theo cap so +3 thay vi bang kinh: Hợi-Tý-Sửu -> Cô Tuất(8)/Quả Mùi(5); Dần-Mão-Thìn -> Tỵ(3)/Sửu(11); Tỵ-Ngọ-Mùi -> Thân(6)/Thìn(2); Thân-Dậu-Tuất -> Hợi(9)/Tuất(8). 2 nhom cu dung nen lot audit [43]; nhom Thuy sai Cô + nhom Kim sai Quả. Test dong: 2020 Cô Tuất/Quả Mùi, 2004 Quả Tuất, 1990 khong đổi. -->
 <!-- [51] HA DO LAC THU RUT CO 2026-10-15: diem ~70 'chua doc' da duoc doc — module la ban do tham chieu tinh (khong phai khung rong): Ha Do cham dung toa do (1-6 Bac Thuy, 2-7 Nam Hoa, 3-8 Dong Moc, 4-9 Tay Kim, 5-10 Trung Tho), Lac Thu dung ma tran chuan [[4,9,2],[3,5,7],[8,1,6]] + gan cung Hau Thien dung 9/10, van giai nghia song ngu dung co phap (天生地成, Ha Do la the). Chot 82 — dung nhung tinh chat tham chieu han che tran nang cap. Vay ket thuc dot audit toan app: 10/10 man hinh da duoc doc truc tiep it nhat mot lan. -->
 <!-- [50] HK+XUAN KHONG RUT CO 2026-10-15: diem 70 cu LA SAI — module co: cung menh (digit-sum, nam 11-s/nu +4, 5 ki 2/8 — dung quyet), bat trach Dong/Tay tu menh dung, 9 sao HK day du (Han ngu, ngu hanh, cat hung), tam nguyen cuu van (1864 + (p-1)*20 — dung chuan; phat hien 1 loi: p>9 bi clamp=9, phai la chu ky lai ((p-1)%9)+1 cho sau 2043 — da vá), phi tinh nien/thang/ngay/gio day du (thang: khoi tu theo nien chi tam hop {tu ngo mao dau 8, dan than ty hoi 2, thin tuat suu mui 5} roi NGHICH bo — dung 月白訣). Chot HK 84. Tarot chot 85 (o [49]). -->
 <!-- [49] TAROT RUT CO 2026-10-15: diem 72 trong cac bao cao truoc LA SAI — doc module thay: 78 la day du upright/reversed x 6 chu de, 7 spreads (Celtic Cross 10 la dung chuan), SVG art per la, Golden Dawn 1888 day du (22 duong chu Hebrew + Mother/Double/Single, 10 Sephiroth, 4 the gioi Atziluth/Briah/Yetzirah/Assiah dung chuan, court-the-Sephiroth, do chieu 22 An chu Kinh Dich co ghi mien trach), disclaimer dao duc. Chot lai 85. Bài học ghi: phai doc code truoc khi chấm — cùng sai lầm như Bát Tự ở phiên truoc. -->
@@ -5529,19 +5532,19 @@ function anLaSo(lD,lM,lY,hIdx,nam){
  var chiIdY=chiY;
  put((chiY-2+12)%12,'Thái Tuế');put((chiY-1+12)%12,'Thiên Không');
  put((7+(lM-1))%12,'Thiên Hình');
- put((11+(lM-1))%12,'Thiên Riêu');put((2+(lM-1))%12,'Thiên Y');
+ put((11+(lM-1))%12,'Thiên Riêu');put((1+(lM-1))%12,'Thiên Y');
  put([6,6,8,8,10,10,0,0,2,2,4,4][lM-1],'Thiên Giải');put((5+(lM-1))%12,'Địa Giải');put([0,0,10,10,8,8,6,6,4,4,2,2][lM-1],'Âm Sát');put([3,3,3,6,6,6,0,0,0,9,9,9][lM-1],'Thiên Vu');var tlMap={0:[6,7],5:[6,7],1:[4,5],6:[4,5],2:[2,3],7:[2,3],3:[0,1],8:[0,1],4:[10,11],9:[10,11]};tlMap[canY].forEach(function(p){put(p,'Tiết Lộ Không Vong');});
  put((4+hIdx)%12,'Thai Phụ');put((0-hIdx+12)%12,'Phong Cáo'); /* [66] 封誥寅起子Nghich theo iztro/福山堂/laiboyee (台輔 nguoc lai: ngo thuan — giu) */
  var taPos=(2+(lM-1))%12, huuPos=(8-(lM-1)+12)%12, xuongPos=(8-hIdx+12)%12, khucPos=(2+hIdx)%12;
  put((taPos+(lD-1))%12,'Tam Thai');put((huuPos-(lD-1)+120)%12,'Bát Tọa');
- put((xuongPos+(lD-1)-1+120)%12,'Ân Quang');put((khucPos-(lD-1)+1+120)%12,'Thiên Quý');
+ put((xuongPos+(lD-1)+120)%12,'Ân Quang');put((khucPos-(lD-1)+120)%12,'Thiên Quý');
  put((menh+chiY)%12,'Thiên Tài');put((than+chiY)%12,'Thiên Thọ');
  put(3,'Thiên La');put(9,'Địa Võng');
  put((8-chiIdY+12)%12,'Giải Thần');
  put((2+chiIdY)%12,'Long Trì');put((10+chiIdY)%12,'Nguyệt Đức');
  put([8,3,2,0,5,1,9,5,0,4,8,0][lM-1],'Thiên Nguyệt');/* ĐÃ THÊM an theo 天月訣 (tháng âm) — trước đây chỉ có text không có an */put((7+chiIdY)%12,'Thiên Đức');
  var hl=(1-chiIdY+12)%12;put(hl,'Hồng Loan');put((hl+6)%12,'Thiên Hỷ');
- var coThu=[0,0,3,3,3,6,6,6,9,9,9,0];var quaTu=[8,8,11,11,11,2,2,2,5,5,5,8];
+ var coThu=[8,8,3,3,3,6,6,6,9,9,9,8];var quaTu=[5,5,11,11,11,2,2,2,8,8,8,5];
  put(coThu[chiIdY],'Cô Thần');put(quaTu[chiIdY],'Quả Tú');
  var hoaCai=[2,11,8,5];put(hoaCai[chiGrp],'Hoa Cái');
  var kiepSat=[3,0,9,6];put(kiepSat[chiGrp],'Kiếp Sát');
@@ -5576,7 +5579,7 @@ var jzi=(lY-4)%60; var decStartChi=(chiY-(jzi%10)+12)%12;
  var cungOf={};for(var k=0;k<12;k++)cungOf[CUNGNAMES[k]]=(menh-k+12)%12;
  var duongNam=(canY%2===0);var thuan=(nam&&duongNam)||(!nam&&!duongNam);
  var daiHan=[];for(var k2=0;k2<12;k2++){var cp=thuan?((menh+k2)%12):((menh-k2+12)%12);daiHan.push({pos:cp,from:cucSo+k2*10,to:cucSo+k2*10+9});}
- return{ly:lY,menh:menh,than:than,cungCan:cungCan,stars:stars,cungOf:cungOf,cucSo:cucSo,cucName:cucName,mcCC:mcCC,napam:na,daiHan:daiHan,canY:canY,chiY:chiY,thuan:thuan,ccYear:canChiYear(lY),tuan:tuan,triet:triet,tsRing:tsRing,bacSi:bacSi,jiangQian:jiangQian,tuếKiến:tuếKiến,tsMode:TS_MODE,tsModeName:TS_MODE_NAME[TS_MODE],menhChu:MCHU[(menh+2)%12],thanChu:TCHU[chiY],duongYNam:(nam&&canY%2===0)||(!nam&&canY%2===1)};
+ return{ly:lY,menh:menh,than:than,cungCan:cungCan,stars:stars,cungOf:cungOf,cucSo:cucSo,cucName:cucName,mcCC:mcCC,napam:na,daiHan:daiHan,canY:canY,chiY:chiY,thuan:thuan,ccYear:canChiYear(lY),tuan:tuan,triet:triet,tsRing:tsRing,bacSi:bacSi,jiangQian:jiangQian,tuếKiến:tuếKiến,tsMode:TS_MODE,tsModeName:TS_MODE_NAME[TS_MODE],menhChu:MCHU[(menh+2)%12],thanChu:TCHU[chiY],nam:nam,duongYNam:(nam&&canY%2===0)||(!nam&&canY%2===1)};
 }
 
 var TV_P12=['Mệnh','Quan Lộc','Tài Bạch','Phu Thê','Tử Tức','Thiên Di','Phúc Đức','Tật Ách','Điền Trạch','Huynh Đệ','Nô Bộc','Phụ Mẫu'];
@@ -5744,8 +5747,8 @@ function tvLuuSaoBlock(ls,lY,nowY){
 function tvTieuHanBlock(ls,lY,nowY){
  try{
   var t=nowY-lY+1;
-  var thuan=ls.duongYNam;
-  var pos0=_tvChiPos(4);
+  var thuan=!!ls.nam;
+  var pos0=_tvChiPos(6);
   var pos=thuan?(pos0+(t-1))%12:(pos0-(t-1)+120)%12;
   var cn=_tvCungName(ls,pos);
   var maj=(ls.stars[pos]||[]).filter(function(s){return MAJORS.indexOf(s)>=0;});
@@ -5760,7 +5763,7 @@ function tvTieuHanBlock(ls,lY,nowY){
   var dhPos=-1;
   for(var i=0;i<12;i++){var d=ls.daiHan[i];if(t>=d.from&&t<=d.to){dhPos=d.pos;break;}}
   var h='<div class="tvsec"><h3>小限 · Tiểu Hạn Năm '+nowY+' (tuổi mụ '+t+')</h3>';
-  h+='<p class="dim">Cổ pháp: tiểu hạn an từ cung Thìn, mỗi năm đi một cung — '+(thuan?'nam dương / nữ âm thuận hành':'nam âm / nữ dương nghịch hành')+'. Tiểu hạn luận 1 năm, đối chiếu với Hạn Cung lưu niên (拾伍) để xem năm thuận lợi về lĩnh vực nào.</p>';
+  h+='<p class="dim">Cổ pháp: tiểu hạn an từ cung Ngọ (安小限訣: 從午宮起一歲), mỗi năm đi một cung — '+(thuan?'nam thuận hành':'nữ nghịch hành')+'. Đại hạn mới dùng phép dương nam/âm nữ — hai phép riêng, đừng trộn. Tiểu hạn luận 1 năm, đối chiếu với Hạn Cung lưu niên (拾伍) để xem năm thuận lợi về lĩnh vực nào.</p>';
   h+='<p style="margin-top:5px">Tiểu hạn năm '+nowY+' an tại <b class="st">'+cn+'</b>'+(maj.length?' — chính tinh: <b class="st">'+maj.join(' · ')+'</b>':' — <span class="dim">vô chính diệu, mượn sao cung đối</span>')+'.</p>';
   h+='<p style="margin-top:4px" class="dim">Tam phương tứ chính tiểu hạn: '+tpTxt.join(' · ')+'</p>';
   if(pos===ls.menh)h+='<p style="margin-top:5px;color:#e8c766"><b>Tiểu hạn trùng cung Mệnh 小限臨命:</b> khí của năm dội thẳng vào bản mệnh — việc làm năm nay có hậu quả kéo dài, chủ đề năm trùng với hướng đời lâu dài.</p>';
@@ -9425,7 +9428,7 @@ function tinhTuTru(d,m,y,h,zi23){
  if(!kdValidSolar(d,m,y)||!isFinite(h)||h<0||h>=24)throw new RangeError('Invalid date or hour / Ngày giờ không hợp lệ');var yy=y;if(m===1||(m===2&&kdSolarLongitude(d,m,y,h)<315))yy=y-1;
  var yCan=(yy+6)%10,yChi=(yy+8)%12;
  var mChi=thangChiTiet(d,m,y,h);
- var mCan=((yCan%5)*2+2+(mChi-2)+120)%10;
+ var mCan=((yCan%5)*2+2+((mChi-2+12)%12))%10;
  var dc=(zi23!==false&&h>=23)?dayCanChi(d+1,m,y):dayCanChi(d,m,y);
  var hIdx=Math.floor(((h+1)%24)/2);
  var hCan=((dc.can%5)*2+hIdx)%10;
@@ -10381,7 +10384,7 @@ function kmLap(dd,mm,yy,hh,ban){
  var homeR=(home===5)?(kc.don==='D'?8:2):home;
  var trucPhu=homeR, trucSu=homeR;
  var mChiT=selected.thang.chi;
- var mCanT=(((yy+6)%10%5)*2+mChiT)%10;
+ var mCanT=(((yy+6)%10%5)*2+2+((mChiT-2+12)%12))%10;
  var dayNgi=kmTuan(dc.can,dc.chi).ngi;
  var trucCan=pivot.can, trucNgi=ngi;
  /* Các bàn dùng tuần thủ và can của chính trụ được chọn. */
@@ -14251,7 +14254,7 @@ var oldDays=daysToTiet;daysToTiet=function(d,m,y,dir,h){var c=window.__KD_TIME_C
 var oldTT=tinhTuTru;tinhTuTru=function(d,m,y,h){var c=window.__KD_TIME_CONTEXT,r=oldTT(d,m,y,h);if(matches(c,d,m,y,h)){var yy=kdLongitudeJD(c.instantMs/86400000+2440587.5)>=315?y:y-1;
  // Longitude only determines the year near Li Chun; months after February belong to civil year.
  if(m>2)yy=y;if(m===1)yy=y-1;
- r.nam={can:(yy+6)%10,chi:(yy+8)%12};r.namAm=yy;r.thang.can=((r.nam.can%5)*2+2+(r.thang.chi-2)+120)%10;
+ r.nam={can:(yy+6)%10,chi:(yy+8)%12};r.namAm=yy;r.thang.can=((r.nam.can%5)*2+2+((r.thang.chi-2+12)%12))%10;
  if(c.input.dayBoundary==='midnight'&&h>=23){var dc=dayCanChi(d,m,y);r.ngay={can:dc.can,chi:dc.chi};r.gio.can=((dc.can%5)*2+r.hIdx)%10;}
  }return r;};
 function proof(c){if(!c)return '';return '<div class="card kd-time-proof"><h3>'+lab('Hồ sơ thời gian','Time profile')+'</h3><p>'+E(c.input.d+'/'+c.input.m+'/'+c.input.y+' '+clock(c.input.h)+' · '+c.input.tz)+'<br>UTC: '+E(new Date(c.instantMs).toISOString())+' · UTC offset: '+c.offsetMinutes+' min<br>'+lab('Giờ dùng để lập','Chart clock')+': '+E(c.chart.d+'/'+c.chart.m+'/'+c.chart.y+' '+clock(c.chart.h))+' · '+c.input.basis+' ('+c.correctionMinutes.toFixed(2)+' min)<br>'+lab('Đổi nhật trụ','Day pillar boundary')+': '+(c.input.dayBoundary==='zi23'?'23:00':'00:00')+'</p><p class="dim">'+lab('Âm lịch giữ quy ước Việt Nam UTC+7. Múi giờ lịch sử phụ thuộc dữ liệu trình duyệt.','Lunar calendar retains Vietnam UTC+7. Historical zones depend on browser data.')+'</p></div>';}
