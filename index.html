@@ -1095,69 +1095,15 @@ window.kdDownload95=function(name,mime,text){if(window.webkit&&window.webkit.mes
 // Native export adapter keeps existing HTML/PNG buttons usable in WKWebView.
 if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.kdShare){
  var nativeHTML=exportHTML;exportHTML=function(title,body){
- var doc='<!doctype html><html lang="'+(window.S_ICHING_LANGUAGE==='vi'?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>body{font:16px Georgia,serif;max-width:900px;margin:auto;padding:20px;line-height:1.6;color:#221d10;background:#fffdf5}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{padding:14px;border:1px solid #aaa;margin:10px 0}button{display:none}</style></head><body><h1>'+E(title)+'</h1>'+body+'</body></html>';
- kdDownload95('S_I_CHING_result.html','text/html;charset=utf-8',doc);
-};
- var blobs=new Map(),create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL);URL.createObjectURL=function(blob){var url=create(blob);blobs.set(url,blob);return url;};URL.revokeObjectURL=function(url){blobs.delete(url);return revoke(url);};
- function shareBlob(url,name){var blob=blobs.get(url);if(!blob)return false;var reader=new FileReader();reader.onload=function(){var value=String(reader.result||''),comma=value.indexOf(',');if(comma<0)return;window.webkit.messageHandlers.kdShare.postMessage({name:name||('S_I_CHING_export.'+(blob.type==='image/png'?'png':blob.type.includes('json')?'json':'html')),mime:blob.type,base64:value.slice(comma+1)});};reader.readAsDataURL(blob);return true;}
- var anchorClick=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(){if(shareBlob(this.href,this.download))return;return anchorClick.apply(this,arguments);};
- var nativeOpen=window.open;window.open=function(url){if(shareBlob(String(url||'')))return null;return nativeOpen.apply(window,arguments);};
-}
-
-var panel=document.createElement('div');panel.className='card';panel.id='kd-upgrade95';panel.innerHTML='<h2>'+lab('Chế độ đọc và bảo vệ dữ liệu','Reading mode and data protection')+'</h2><label>'+lab('Mức chi tiết','Detail level')+' <select id="kdMode95"><option value="deep">Deep / Chuyên sâu</option><option value="basic">Basic / Cơ bản</option></select></label><p class="dim">'+lab('Cơ bản giữ biểu đồ và kết quả chính, thu gọn phần luận giải dài. Có thể mở từng phần hoặc chuyển lại chuyên sâu.','Basic keeps charts and main results while collapsing long readings. Open any section or return to Deep.')+'</p><button class="btn" id="kdBackupExport95">'+lab('Xuất sao lưu có mã kiểm tra','Export backup with checksum')+'</button><label>'+lab('Kiểm tra và khôi phục sao lưu','Check and restore backup')+' <input type="file" id="kdBackupFile95" accept="application/json,.json"></label><div id="kdBackupPreview95" aria-live="polite"></div><p class="dim">'+lab('Mã kiểm tra phát hiện hỏng ngẫu nhiên; không mã hóa. Bản sao lưu chứa dữ liệu riêng tư.','Checksum detects accidental damage; it does not encrypt. Backups contain private data.')+'</p>'+trace('Registry 4.7')+'</div>';
-($('scr-kd')||document.body).prepend(panel);$('kdBackupExport95').onclick=function(){try{kdDownload95('S_I_CHING_backup.json','application/json',JSON.stringify(kdBackup95()));}catch(e){error($('kdBackupPreview95'),e);}};
-$('kdBackupFile95').onchange=async function(){var file=this.files&&this.files[0];if(!file)return;var out=$('kdBackupPreview95');try{if(file.size>25*1024*1024)fail('Backup exceeds 25 MiB / Bản sao lưu quá 25 MiB');var o=JSON.parse(await file.text());if(!o||o.app!=='kinh-dich'||![1,2,3].includes(o.v)||!o.data||Array.isArray(o.data))fail('Invalid backup / Bản sao lưu không hợp lệ');if(o.v===3&&(!o.integrity||digest(canonical(o.data))!==o.integrity.value))fail('Checksum mismatch / Sai mã kiểm tra');
- out.textContent=tr('Bản sao lưu v','Backup v')+o.v+' · '+Object.keys(o.data).filter(kdBackupKey).length+tr(' mục dữ liệu. Khôi phục thay thế các mục này.',' data keys. Restore replaces these keys.');var b=document.createElement('button');b.className='btn';b.textContent=tr('Khôi phục bản đã kiểm tra','Restore checked backup');b.onclick=function(){try{kdRestoreBackup(o);out.textContent=tr('Đã khôi phục. Tải lại app để áp dụng toàn bộ thiết lập.','Restored. Reload the app to apply all settings.');renderHis();}catch(e){error(out,e);}};out.append(b);
- }catch(e){error(out,e);}};
-var mode=$('kdMode95');mode.value=localStorage.getItem('kd_reading95')||'deep';function modeApply(){document.documentElement.dataset.kdReading=mode.value;document.querySelectorAll('#tvResult > .card, #btuResult > .card, #kmResult > .card, #kmResult .kd-km-view95 > .card, #lnResult > .card').forEach(function(card,i){if(card.classList.contains('kd-time-proof')||card.classList.contains('kd-method'))return;if(!card.parentElement||card.parentElement.children[0]===card)return;if(mode.value==='basic'&&!card.parentElement.classList.contains('kd-collapsed95')){var d=document.createElement('details'),s=document.createElement('summary');d.className='kd-collapsed95';s.textContent=(card.querySelector('h2,h3')||{}).textContent||tr('Đọc thêm','Read more');card.before(d);d.append(s,card);}});if(mode.value==='deep')document.querySelectorAll('details.kd-collapsed95').forEach(function(d){var c=d.querySelector('.card');if(c)d.before(c);d.remove();});}
-mode.onchange=function(){store('kd_reading95',mode.value);modeApply();};var scheduled=false;new MutationObserver(function(){if(scheduled)return;scheduled=true;setTimeout(function(){scheduled=false;modeApply();},50);}).observe(document.body,{childList:true,subtree:true});
-new MutationObserver(labels).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-var style=document.createElement('style');style.textContent='.kd-time-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:10px;margin:12px 0}.kd-time-grid label{display:flex;flex-direction:column;gap:5px}.kd-time-grid input,.kd-time-grid select{width:100%;box-sizing:border-box}details.kd-collapsed95{border:1px solid var(--line,#67582f);border-radius:12px;margin:10px 0;padding:12px}summary{cursor:pointer;min-height:28px}#kd-upgrade95 a{overflow-wrap:anywhere}';document.head.append(style);labels();modeApply();
-})();
-</script><script id="kd-upgrade-471">/* 4.7.1: per-chart context, stricter backup profiles, static bilingual export. */
-(function(){'use strict';
-window.KD_RELEASE='4.7.1';
-var E=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
-var oldValid=kdHistoryValid;
-kdHistoryValid=function(p,tv){
- if(!oldValid(p,tv))return false;if(!p.timeResolution)return true;
- try{var c=p.timeResolution,q=kdResolveMoment(c.input),x=c.chart;
-  if(c.v!==1||c.hostZoneData!==true||typeof c.instantMs!=='number'||typeof c.offsetMinutes!=='number'||!Number.isFinite(c.offsetMinutes)||c.offsetMinutes!==q.offsetMinutes||typeof c.correctionMinutes!=='number'||!Number.isFinite(c.correctionMinutes)||Math.abs(c.correctionMinutes-q.correctionMinutes)>1e-8)return false;
-  if(!x||!['d','m','y','h'].every(function(k){return typeof x[k]==='number'&&Number.isFinite(x[k]);})||x.d!==q.chart.d||x.m!==q.chart.m||x.y!==q.chart.y||Math.abs(x.h-q.chart.h)>1e-8)return false;
-  if(tv)return p.solar===true&&p.d===x.d&&p.m===x.m&&p.y===x.y&&p.h===Math.floor(((x.h+1)%24)/2);
-  if(p.mon==='tuvi'){var l=solar2lunar(x.d,x.m,x.y);return p.solar===true&&p.sd===x.d&&p.sm===x.m&&p.sy===x.y&&p.d===l.d&&p.m===l.m&&p.y===l.y&&p.h===Math.floor(((x.h+1)%24)/2);}
-  if(['battu','kymon','lucnham','ykmh'].includes(p.mon))return p.d===x.d&&p.m===x.m&&p.y===x.y&&Math.abs(p.h-x.h)<1e-8;
-  return false;
- }catch(e){return false;}
-};
-var oldTV=tvBuild;tvBuild=function(){window._lastLS=null;return oldTV.apply(this,arguments);};
-var priorRender=kmRender;
-function kdContext471(ctx,fn){
- var previous=window.__KD_TIME_CONTEXT;
- window.__KD_TIME_CONTEXT=ctx||null;
- try{return fn();}
- finally{window.__KD_TIME_CONTEXT=previous;}
-}
-function state(km,lv){return {dd:km.dd,mm:km.mm,yy:km.yy,hh:km.hh,when:km.when==null?null:km.when,ban:km.ban==null?3:km.ban,lv:lv||'Tổng quan',timeResolution:km.timeResolution||window.__KD_TIME_CONTEXT||null};}
-kmRender=function(km,lv){var html=priorRender.apply(this,arguments),s=state(km,lv);window.__KM_LAST=s;return '<div class="kd-km-view95" data-kd-chart="'+E(JSON.stringify(s))+'">'+html+'</div>';};
-function fromView(view){var s=JSON.parse(view.dataset.kdChart);if(!kdValidSolar(s.dd,s.mm,s.yy)||!Number.isFinite(s.hh)||s.hh<0||s.hh>=24||!Number.isInteger(s.ban)||s.ban<0||s.ban>3)throw Error('Invalid chart / Biểu đồ không hợp lệ');if(s.timeResolution&&!kdHistoryValid({mon:'kymon',d:s.dd,m:s.mm,y:s.yy,h:s.hh,timeResolution:s.timeResolution},false))throw Error('Invalid time profile / Hồ sơ giờ không hợp lệ');return s;}
-function calculate(s,ban){return kdContext471(s.timeResolution,function(){var k=kmLap(s.dd,s.mm,s.yy,s.hh,ban);k.when=s.when;if(s.timeResolution)k.timeResolution=s.timeResolution;return k;});}
-function changeBoard(s,i,view){if(!Number.isInteger(i)||i<0||i>3)return;var k=calculate(s,i),html=kdContext471(s.timeResolution,function(){return kmRender(k,s.lv);});if(view)view.outerHTML=html;else{var target=document.getElementById('kmResult');if(target)target.innerHTML=html;}}
-window.__kmBan=function(i){var s=window.__KM_LAST;if(s&&s.dd!==undefined)changeBoard(s,i,null);};
-document.addEventListener('click',function(e){var view=e.target.closest&&e.target.closest('.kd-km-view95');if(!view)return;var b=e.target.closest('button[onclick]'),m=b&&/^__kmBan\(([0-3])\)$/.exec(b.getAttribute('onclick')||'');
- if(m){e.preventDefault();e.stopImmediatePropagation();try{changeBoard(fromView(view),+m[1],view);}catch(err){alert(String(err.message||err));}return;}
- if(e.target.closest('.kmc-tap')){try{var s=fromView(view),k=calculate(s,s.ban);KM_LAST={km:k,linhVuc:s.lv};window.__KM_LV=s.lv;window.__KM_LAST=s;}catch(err){e.stopImmediatePropagation();alert(String(err.message||err));}}
-},true);
-exportHTML=function(title,body){
- try{var vi=window.S_ICHING_LANGUAGE==='vi',holder=document.createElement('div');holder.innerHTML=String(body||'');holder.querySelectorAll('script,iframe,object,embed,base,meta,link').forEach(function(e){e.remove();});holder.querySelectorAll('*').forEach(function(e){Array.from(e.attributes).forEach(function(a){if(/^on/i.test(a.name)||(a.name==='href'||a.name==='src')&&/^javascript:/i.test(a.value.replace(/[\x00-\x20]/g,'')))e.removeAttribute(a.name);});});
- var css='body{font:16px Georgia,serif;max-width:900px;margin:24px auto;padding:0 18px;color:#221d10;background:#fffdf5;line-height:1.65}h1{font-size:24px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{border:1px solid #c9b98a;border-radius:10px;padding:12px;margin:10px 0}button,input,select,textarea{display:none}details{margin:10px 0}a{overflow-wrap:anywhere}@media print{body{margin:0;max-width:none}.card{break-inside:avoid}}';
- var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+(vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.')+'</p>
-<!-- KD QIMEN V4.53: full-palace fixture schema + evidence lock -->
-<script id="kd-v453-qimen-full-palace-fixture-schema">\n(function(){'use strict'; if(window.KD_QIMEN_V453)return;\nfunction vi(){return !String(window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().startsWith('en')}\nfunction T(a,b){return vi()?a:b} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}\nvar LAYERS=['solarTerm','fuTou','yuan','dun','ju','earthPlate','xunHead','chiefStar','chiefGate','heavenPlate','nineStars','eightGates','eightSpirits','palaceMap'];\nvar FIX=[\n{id:'DY-XY-1597-XC-BS',source:'《遁甲演義》',expected:{solarTerm:'夏至中局',dun:'陰遁',ju:'三局',xunHead:'甲午旬',chiefStar:'天英',chiefGate:'景門',palaceMap:'景門→兌'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']},\n{id:'DY-XY-1597-RS-BW',source:'《遁甲演義》',expected:{solarTerm:'小滿中局',dun:'陽遁',ju:'二局',xunHead:'甲辰旬',chiefStar:'天心',chiefGate:'開門',palaceMap:'開門→艮'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']}];\nfunction norm(x){return String(x||'').replace(/\\s+/g,'').toLowerCase()}\nfunction status(f,k,txt){if(f.locks&&f.locks.indexOf(k)>=0)return 'SOURCE LOCK';var v=f.expected[k];if(!v)return 'NOT SOURCED';return txt.indexOf(norm(v))>=0?'PASS':'NOT TESTABLE'}\nfunction panel(root){var txt=norm((root&&root.innerText)||'');var rows=FIX.map(function(f){return '<div class="kd453fx"><b>'+E(f.id)+'</b> · '+E(f.source)+'<table><tbody>'+LAYERS.map(function(k){var st=status(f,k,txt), ex=f.expected[k]||'—';return '<tr><td>'+E(k)+'</td><td>'+E(ex)+'</td><td class="s-'+st.replace(/ /g,'-')+'">'+st+'</td></tr>'}).join('')+'</tbody></table></div>'}).join('');return '<details class="card kd-km-v453"><summary><b>🧭 '+T('Kỳ Môn V4.53 · Full-Palace Fixture Schema','Qi Men V4.53 · Full-Palace Fixture Schema')+'</b></summary><div class="kd453"><p>'+T('Kiểm theo 14 tầng. SOURCE LOCK nghĩa là cổ thư đang dùng chưa cung cấp đủ expected palace-level data trong fixture đã nhập; engine không được tự bịa để tạo PASS.','Validation across 14 layers. SOURCE LOCK means the imported classical fixture does not yet provide sufficient palace-level expected data; the engine must not invent values to manufacture a PASS.')+'</p>'+rows+'<p class="dim">'+T('V4.53 tách rõ: dữ liệu đã có expected, dữ liệu chưa trích nguồn, và dữ liệu không thể kiểm trên input hiện tại. Đây là bước chuẩn bị trước khi thêm fixture 9 cung đầy đủ.','V4.53 separates sourced expected values, source-locked values, and values not testable on the current input. This prepares the runner for a fully sourced nine-palace fixture.')+'</p></div></details>'}\nvar old=window.kmRender;if(typeof old==='function'){window.kmRender=function(){var h=old.apply(this,arguments);try{var d=document.createElement('div');d.innerHTML=h;return h+panel(d)}catch(e){return h}}}\nwindow.KD_QIMEN_V453={version:'4.53.0',layers:LAYERS.slice(),sourceLocked:true,noInventedExpected:true,fullPalaceFixtureReady:true};window.KD_RELEASE='4.53.0-qimen-full-palace-fixture-schema';\n})();
-</script>
-<style id="kd-v453-qimen-style">.kd-km-v453 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd453{padding-top:10px;line-height:1.65}.kd453 table{width:100%;border-collapse:collapse;margin:8px 0 14px}.kd453 td{padding:7px;border-bottom:1px solid var(--line,#55482a);vertical-align:top}.kd453 .s-PASS{font-weight:700}.kd453 .s-SOURCE-LOCK,.kd453 .s-NOT-SOURCED,.kd453 .s-NOT-TESTABLE{opacity:.72}.kd453 .dim{opacity:.72}</style>\n
-</body></html>';
- kdDownload95('S_I_CHING_result.html','text/html;charset=utf-8',doc);
+ try{
+  var vi=window.S_ICHING_LANGUAGE==='vi',holder=document.createElement('div');
+  holder.innerHTML=String(body||'');
+  holder.querySelectorAll('script,style,iframe,object,embed,base,meta,link').forEach(function(el){el.remove();});
+  holder.querySelectorAll('*').forEach(function(el){Array.from(el.attributes).forEach(function(a){var v=String(a.value||'').replace(/[\x00-\x20]/g,'');if(/^on/i.test(a.name)||((a.name==='href'||a.name==='src')&&/^javascript:/i.test(v)))el.removeAttribute(a.name);});});
+  var css='body{font:16px Georgia,serif;max-width:900px;margin:24px auto;padding:0 18px;color:#221d10;background:#fffdf5;line-height:1.65}h1{font-size:24px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{border:1px solid #c9b98a;border-radius:10px;padding:12px;margin:10px 0}button,input,select,textarea{display:none}details{margin:10px 0}a{overflow-wrap:anywhere}@media print{body{margin:0;max-width:none}.card{break-inside:avoid}}';
+  var note=vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.';
+  var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+note+'</p></body></html>';
+  kdDownload95('S_I_CHING_result.html','text/html;charset=utf-8',doc);
  }catch(e){alert(String(e.message||e));}
 };
 })();
@@ -6019,6 +5965,10 @@ window.KD_RELEASE='4.71.3-ui-raw-source-hard-fix';
 })();
 </script>
 <style id="kd-v4713-ui-raw-source-hard-style">body{overflow-wrap:anywhere}</style>
+
+<script id="kd-v4714-export-boundary-root-fix">
+(function(){'use strict';window.KD_UI_RAW_SOURCE_FIX='4.71.4';window.KD_RELEASE='4.71.4-export-boundary-root-fix';})();
+</script>
 </body></html>
 
 <script id="kd-classical-engine-5000">
