@@ -1134,8 +1134,47 @@ window.KD_RELEASE='4.41.0-qimen-palace-judgment-engine';
 </script>
 <style id="kd-v441-qimen-style">.kd-km-v441 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd441{padding-top:10px;line-height:1.68}.kd441 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd441 table{width:100%;border-collapse:collapse;min-width:760px}.kd441 th,.kd441 td{padding:8px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd441 td:nth-child(3){min-width:360px}.kd441 .dim{opacity:.74}</style>
 
-\n<!-- V4.49 QIMEN SCHOOL PROFILE / INTERCALATION PROVENANCE -->\n<section id="qimen-v449-school-profiles" style="margin:16px;padding:14px;border:1px solid currentColor;border-radius:12px">\n<h3>Kỳ Môn · Profile lập cục & nguồn / School Profiles & Provenance</h3>\n<p><b>Nguyên tắc:</b> không trộn các dị bản Chính thụ/Siêu thần/Trí nhuận/Tiếp khí/Sách bổ thành một “cổ pháp chuẩn”. Profile chỉ mô tả và kiểm chứng; chưa tự thay công thức lập bàn nếu engine nền chưa cung cấp đủ lịch pháp.</p>\n<div id="qimen-v449-profile-status"></div>\n</section>\n<script id="qimen-v449-school-profile-engine">\n(()=>{\n const profiles=[\n  {id:'zhengshou',vi:'Chính thụ 正授',en:'Regular alignment',status:'source-supported',rule:'Phù đầu và tiết khí đối ứng; dùng làm mốc cơ sở.'},\n  {id:'chaoshen',vi:'Siêu thần 超神',en:'Advance / Chao-shen',status:'source-supported',rule:'Phù đầu đến trước tiết khí; thuộc hệ siêu-tiếp.'},\n  {id:'zhirun',vi:'Trí nhuận 置閏',en:'Intercalation / Zhi-run',status:'source-supported',rule:'Cổ thư nêu đặt nhuận trong điều kiện siêu vượt ngưỡng, đặc biệt quanh Mang Chủng/Đại Tuyết; phải theo profile nguồn.'},\n  {id:'jieqi',vi:'Tiếp khí 接氣',en:'Receiving qi',status:'source-supported',rule:'Tiết khí đến trước/phù đầu đến sau; quan hệ với trí nhuận tùy hệ.'},\n  {id:'chaibu',vi:'Sách bổ 拆補',en:'Split-and-supplement',status:'variant-conflict',rule:'Độn Giáp Diễn Nghĩa có dùng/biện giải Sách Bổ; Ngự Định Kỳ Môn Bảo Giám phê bình việc lấy Sách Bổ làm chuẩn Tiếp Khí. Không đồng nhất hai hệ.'}\n ];\n window.QIMEN_SCHOOL_PROFILES_V449=profiles;\n function render(){let el=document.getElementById('qimen-v449-profile-status'); if(!el)return; el.innerHTML=profiles.map(p=>`<div style="margin:8px 0"><b>${p.vi}</b> · ${p.en}<br><small>${p.rule} <b>[${p.status}]</b></small></div>`).join('')+'<hr><small>V4.49: profile provenance layer only. Ứng Kỳ remains locked until a rule-specific, source-specific timing engine is implemented and tested.</small>'; }\n if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();\n})();\n</script>\n
-\n<!-- KD QIMEN V4.53: full-palace fixture schema + evidence lock -->\n<script id="kd-v453-qimen-full-palace-fixture-schema">\n(function(){'use strict'; if(window.KD_QIMEN_V453)return;\nfunction vi(){return !String(window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().startsWith('en')}\nfunction T(a,b){return vi()?a:b} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}\nvar LAYERS=['solarTerm','fuTou','yuan','dun','ju','earthPlate','xunHead','chiefStar','chiefGate','heavenPlate','nineStars','eightGates','eightSpirits','palaceMap'];\nvar FIX=[\n{id:'DY-XY-1597-XC-BS',source:'《遁甲演義》',expected:{solarTerm:'夏至中局',dun:'陰遁',ju:'三局',xunHead:'甲午旬',chiefStar:'天英',chiefGate:'景門',palaceMap:'景門→兌'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']},\n{id:'DY-XY-1597-RS-BW',source:'《遁甲演義》',expected:{solarTerm:'小滿中局',dun:'陽遁',ju:'二局',xunHead:'甲辰旬',chiefStar:'天心',chiefGate:'開門',palaceMap:'開門→艮'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']}];\nfunction norm(x){return String(x||'').replace(/\\s+/g,'').toLowerCase()}\nfunction status(f,k,txt){if(f.locks&&f.locks.indexOf(k)>=0)return 'SOURCE LOCK';var v=f.expected[k];if(!v)return 'NOT SOURCED';return txt.indexOf(norm(v))>=0?'PASS':'NOT TESTABLE'}\nfunction panel(root){var txt=norm((root&&root.innerText)||'');var rows=FIX.map(function(f){return '<div class="kd453fx"><b>'+E(f.id)+'</b> · '+E(f.source)+'<table><tbody>'+LAYERS.map(function(k){var st=status(f,k,txt), ex=f.expected[k]||'—';return '<tr><td>'+E(k)+'</td><td>'+E(ex)+'</td><td class="s-'+st.replace(/ /g,'-')+'">'+st+'</td></tr>'}).join('')+'</tbody></table></div>'}).join('');return '<details class="card kd-km-v453"><summary><b>🧭 '+T('Kỳ Môn V4.53 · Full-Palace Fixture Schema','Qi Men V4.53 · Full-Palace Fixture Schema')+'</b></summary><div class="kd453"><p>'+T('Kiểm theo 14 tầng. SOURCE LOCK nghĩa là cổ thư đang dùng chưa cung cấp đủ expected palace-level data trong fixture đã nhập; engine không được tự bịa để tạo PASS.','Validation across 14 layers. SOURCE LOCK means the imported classical fixture does not yet provide sufficient palace-level expected data; the engine must not invent values to manufacture a PASS.')+'</p>'+rows+'<p class="dim">'+T('V4.53 tách rõ: dữ liệu đã có expected, dữ liệu chưa trích nguồn, và dữ liệu không thể kiểm trên input hiện tại. Đây là bước chuẩn bị trước khi thêm fixture 9 cung đầy đủ.','V4.53 separates sourced expected values, source-locked values, and values not testable on the current input. This prepares the runner for a fully sourced nine-palace fixture.')+'</p></div></details>'}\nvar old=window.kmRender;if(typeof old==='function'){window.kmRender=function(){var h=old.apply(this,arguments);try{var d=document.createElement('div');d.innerHTML=h;return h+panel(d)}catch(e){return h}}}\nwindow.KD_QIMEN_V453={version:'4.53.0',layers:LAYERS.slice(),sourceLocked:true,noInventedExpected:true,fullPalaceFixtureReady:true};window.KD_RELEASE='4.53.0-qimen-full-palace-fixture-schema';\n})();\n</script>\n<style id="kd-v453-qimen-style">.kd-km-v453 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd453{padding-top:10px;line-height:1.65}.kd453 table{width:100%;border-collapse:collapse;margin:8px 0 14px}.kd453 td{padding:7px;border-bottom:1px solid var(--line,#55482a);vertical-align:top}.kd453 .s-PASS{font-weight:700}.kd453 .s-SOURCE-LOCK,.kd453 .s-NOT-SOURCED,.kd453 .s-NOT-TESTABLE{opacity:.72}.kd453 .dim{opacity:.72}</style>\n
+
+<!-- V4.49 QIMEN SCHOOL PROFILE / INTERCALATION PROVENANCE -->
+<section id="qimen-v449-school-profiles" style="margin:16px;padding:14px;border:1px solid currentColor;border-radius:12px">
+<h3>Kỳ Môn · Profile lập cục & nguồn / School Profiles & Provenance</h3>
+<p><b>Nguyên tắc:</b> không trộn các dị bản Chính thụ/Siêu thần/Trí nhuận/Tiếp khí/Sách bổ thành một “cổ pháp chuẩn”. Profile chỉ mô tả và kiểm chứng; chưa tự thay công thức lập bàn nếu engine nền chưa cung cấp đủ lịch pháp.</p>
+<div id="qimen-v449-profile-status"></div>
+</section>
+<script id="qimen-v449-school-profile-engine">
+(()=>{
+ const profiles=[
+  {id:'zhengshou',vi:'Chính thụ 正授',en:'Regular alignment',status:'source-supported',rule:'Phù đầu và tiết khí đối ứng; dùng làm mốc cơ sở.'},
+  {id:'chaoshen',vi:'Siêu thần 超神',en:'Advance / Chao-shen',status:'source-supported',rule:'Phù đầu đến trước tiết khí; thuộc hệ siêu-tiếp.'},
+  {id:'zhirun',vi:'Trí nhuận 置閏',en:'Intercalation / Zhi-run',status:'source-supported',rule:'Cổ thư nêu đặt nhuận trong điều kiện siêu vượt ngưỡng, đặc biệt quanh Mang Chủng/Đại Tuyết; phải theo profile nguồn.'},
+  {id:'jieqi',vi:'Tiếp khí 接氣',en:'Receiving qi',status:'source-supported',rule:'Tiết khí đến trước/phù đầu đến sau; quan hệ với trí nhuận tùy hệ.'},
+  {id:'chaibu',vi:'Sách bổ 拆補',en:'Split-and-supplement',status:'variant-conflict',rule:'Độn Giáp Diễn Nghĩa có dùng/biện giải Sách Bổ; Ngự Định Kỳ Môn Bảo Giám phê bình việc lấy Sách Bổ làm chuẩn Tiếp Khí. Không đồng nhất hai hệ.'}
+ ];
+ window.QIMEN_SCHOOL_PROFILES_V449=profiles;
+ function render(){let el=document.getElementById('qimen-v449-profile-status'); if(!el)return; el.innerHTML=profiles.map(p=>`<div style="margin:8px 0"><b>${p.vi}</b> · ${p.en}<br><small>${p.rule} <b>[${p.status}]</b></small></div>`).join('')+'<hr><small>V4.49: profile provenance layer only. Ứng Kỳ remains locked until a rule-specific, source-specific timing engine is implemented and tested.</small>'; }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
+})();
+</script>
+
+
+<!-- KD QIMEN V4.53: full-palace fixture schema + evidence lock -->
+<script id="kd-v453-qimen-full-palace-fixture-schema">
+(function(){'use strict'; if(window.KD_QIMEN_V453)return;
+function vi(){return !String(window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().startsWith('en')}
+function T(a,b){return vi()?a:b} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
+var LAYERS=['solarTerm','fuTou','yuan','dun','ju','earthPlate','xunHead','chiefStar','chiefGate','heavenPlate','nineStars','eightGates','eightSpirits','palaceMap'];
+var FIX=[
+{id:'DY-XY-1597-XC-BS',source:'《遁甲演義》',expected:{solarTerm:'夏至中局',dun:'陰遁',ju:'三局',xunHead:'甲午旬',chiefStar:'天英',chiefGate:'景門',palaceMap:'景門→兌'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']},
+{id:'DY-XY-1597-RS-BW',source:'《遁甲演義》',expected:{solarTerm:'小滿中局',dun:'陽遁',ju:'二局',xunHead:'甲辰旬',chiefStar:'天心',chiefGate:'開門',palaceMap:'開門→艮'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']}];
+function norm(x){return String(x||'').replace(/\\s+/g,'').toLowerCase()}
+function status(f,k,txt){if(f.locks&&f.locks.indexOf(k)>=0)return 'SOURCE LOCK';var v=f.expected[k];if(!v)return 'NOT SOURCED';return txt.indexOf(norm(v))>=0?'PASS':'NOT TESTABLE'}
+function panel(root){var txt=norm((root&&root.innerText)||'');var rows=FIX.map(function(f){return '<div class="kd453fx"><b>'+E(f.id)+'</b> · '+E(f.source)+'<table><tbody>'+LAYERS.map(function(k){var st=status(f,k,txt), ex=f.expected[k]||'—';return '<tr><td>'+E(k)+'</td><td>'+E(ex)+'</td><td class="s-'+st.replace(/ /g,'-')+'">'+st+'</td></tr>'}).join('')+'</tbody></table></div>'}).join('');return '<details class="card kd-km-v453"><summary><b>🧭 '+T('Kỳ Môn V4.53 · Full-Palace Fixture Schema','Qi Men V4.53 · Full-Palace Fixture Schema')+'</b></summary><div class="kd453"><p>'+T('Kiểm theo 14 tầng. SOURCE LOCK nghĩa là cổ thư đang dùng chưa cung cấp đủ expected palace-level data trong fixture đã nhập; engine không được tự bịa để tạo PASS.','Validation across 14 layers. SOURCE LOCK means the imported classical fixture does not yet provide sufficient palace-level expected data; the engine must not invent values to manufacture a PASS.')+'</p>'+rows+'<p class="dim">'+T('V4.53 tách rõ: dữ liệu đã có expected, dữ liệu chưa trích nguồn, và dữ liệu không thể kiểm trên input hiện tại. Đây là bước chuẩn bị trước khi thêm fixture 9 cung đầy đủ.','V4.53 separates sourced expected values, source-locked values, and values not testable on the current input. This prepares the runner for a fully sourced nine-palace fixture.')+'</p></div></details>'}
+var old=window.kmRender;if(typeof old==='function'){window.kmRender=function(){var h=old.apply(this,arguments);try{var d=document.createElement('div');d.innerHTML=h;return h+panel(d)}catch(e){return h}}}
+window.KD_QIMEN_V453={version:'4.53.0',layers:LAYERS.slice(),sourceLocked:true,noInventedExpected:true,fullPalaceFixtureReady:true};window.KD_RELEASE='4.53.0-qimen-full-palace-fixture-schema';
+})();
+</script>
+<style id="kd-v453-qimen-style">.kd-km-v453 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd453{padding-top:10px;line-height:1.65}.kd453 table{width:100%;border-collapse:collapse;margin:8px 0 14px}.kd453 td{padding:7px;border-bottom:1px solid var(--line,#55482a);vertical-align:top}.kd453 .s-PASS{font-weight:700}.kd453 .s-SOURCE-LOCK,.kd453 .s-NOT-SOURCED,.kd453 .s-NOT-TESTABLE{opacity:.72}.kd453 .dim{opacity:.72}</style>
+
 </body></html>');};
  var blobs=new Map(),create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL);URL.createObjectURL=function(blob){var url=create(blob);blobs.set(url,blob);return url;};URL.revokeObjectURL=function(url){blobs.delete(url);return revoke(url);};
  function shareBlob(url,name){var blob=blobs.get(url);if(!blob)return false;var reader=new FileReader();reader.onload=function(){var value=String(reader.result||''),comma=value.indexOf(',');if(comma<0)return;window.webkit.messageHandlers.kdShare.postMessage({name:name||('S_I_CHING_export.'+(blob.type==='image/png'?'png':blob.type.includes('json')?'json':'html')),mime:blob.type,base64:value.slice(comma+1)});};reader.readAsDataURL(blob);return true;}
@@ -5518,7 +5557,25 @@ window.QIMEN_CLASSICAL_FIXTURES_V451={version:'4.51',sources:SOURCES,fixtures:F,
 window.KD_RELEASE='4.51.0-qimen-classical-expected-fixtures';
 })();
 </script>
-\n<!-- KD QIMEN V4.53: full-palace fixture schema + evidence lock -->\n<script id="kd-v453-qimen-full-palace-fixture-schema">\n(function(){'use strict'; if(window.KD_QIMEN_V453)return;\nfunction vi(){return !String(window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().startsWith('en')}\nfunction T(a,b){return vi()?a:b} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}\nvar LAYERS=['solarTerm','fuTou','yuan','dun','ju','earthPlate','xunHead','chiefStar','chiefGate','heavenPlate','nineStars','eightGates','eightSpirits','palaceMap'];\nvar FIX=[\n{id:'DY-XY-1597-XC-BS',source:'《遁甲演義》',expected:{solarTerm:'夏至中局',dun:'陰遁',ju:'三局',xunHead:'甲午旬',chiefStar:'天英',chiefGate:'景門',palaceMap:'景門→兌'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']},\n{id:'DY-XY-1597-RS-BW',source:'《遁甲演義》',expected:{solarTerm:'小滿中局',dun:'陽遁',ju:'二局',xunHead:'甲辰旬',chiefStar:'天心',chiefGate:'開門',palaceMap:'開門→艮'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']}];\nfunction norm(x){return String(x||'').replace(/\\s+/g,'').toLowerCase()}\nfunction status(f,k,txt){if(f.locks&&f.locks.indexOf(k)>=0)return 'SOURCE LOCK';var v=f.expected[k];if(!v)return 'NOT SOURCED';return txt.indexOf(norm(v))>=0?'PASS':'NOT TESTABLE'}\nfunction panel(root){var txt=norm((root&&root.innerText)||'');var rows=FIX.map(function(f){return '<div class="kd453fx"><b>'+E(f.id)+'</b> · '+E(f.source)+'<table><tbody>'+LAYERS.map(function(k){var st=status(f,k,txt), ex=f.expected[k]||'—';return '<tr><td>'+E(k)+'</td><td>'+E(ex)+'</td><td class="s-'+st.replace(/ /g,'-')+'">'+st+'</td></tr>'}).join('')+'</tbody></table></div>'}).join('');return '<details class="card kd-km-v453"><summary><b>🧭 '+T('Kỳ Môn V4.53 · Full-Palace Fixture Schema','Qi Men V4.53 · Full-Palace Fixture Schema')+'</b></summary><div class="kd453"><p>'+T('Kiểm theo 14 tầng. SOURCE LOCK nghĩa là cổ thư đang dùng chưa cung cấp đủ expected palace-level data trong fixture đã nhập; engine không được tự bịa để tạo PASS.','Validation across 14 layers. SOURCE LOCK means the imported classical fixture does not yet provide sufficient palace-level expected data; the engine must not invent values to manufacture a PASS.')+'</p>'+rows+'<p class="dim">'+T('V4.53 tách rõ: dữ liệu đã có expected, dữ liệu chưa trích nguồn, và dữ liệu không thể kiểm trên input hiện tại. Đây là bước chuẩn bị trước khi thêm fixture 9 cung đầy đủ.','V4.53 separates sourced expected values, source-locked values, and values not testable on the current input. This prepares the runner for a fully sourced nine-palace fixture.')+'</p></div></details>'}\nvar old=window.kmRender;if(typeof old==='function'){window.kmRender=function(){var h=old.apply(this,arguments);try{var d=document.createElement('div');d.innerHTML=h;return h+panel(d)}catch(e){return h}}}\nwindow.KD_QIMEN_V453={version:'4.53.0',layers:LAYERS.slice(),sourceLocked:true,noInventedExpected:true,fullPalaceFixtureReady:true};window.KD_RELEASE='4.53.0-qimen-full-palace-fixture-schema';\n})();\n</script>\n<style id="kd-v453-qimen-style">.kd-km-v453 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd453{padding-top:10px;line-height:1.65}.kd453 table{width:100%;border-collapse:collapse;margin:8px 0 14px}.kd453 td{padding:7px;border-bottom:1px solid var(--line,#55482a);vertical-align:top}.kd453 .s-PASS{font-weight:700}.kd453 .s-SOURCE-LOCK,.kd453 .s-NOT-SOURCED,.kd453 .s-NOT-TESTABLE{opacity:.72}.kd453 .dim{opacity:.72}</style>\n
+
+<!-- KD QIMEN V4.53: full-palace fixture schema + evidence lock -->
+<script id="kd-v453-qimen-full-palace-fixture-schema">
+(function(){'use strict'; if(window.KD_QIMEN_V453)return;
+function vi(){return !String(window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().startsWith('en')}
+function T(a,b){return vi()?a:b} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
+var LAYERS=['solarTerm','fuTou','yuan','dun','ju','earthPlate','xunHead','chiefStar','chiefGate','heavenPlate','nineStars','eightGates','eightSpirits','palaceMap'];
+var FIX=[
+{id:'DY-XY-1597-XC-BS',source:'《遁甲演義》',expected:{solarTerm:'夏至中局',dun:'陰遁',ju:'三局',xunHead:'甲午旬',chiefStar:'天英',chiefGate:'景門',palaceMap:'景門→兌'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']},
+{id:'DY-XY-1597-RS-BW',source:'《遁甲演義》',expected:{solarTerm:'小滿中局',dun:'陽遁',ju:'二局',xunHead:'甲辰旬',chiefStar:'天心',chiefGate:'開門',palaceMap:'開門→艮'},locks:['fuTou','earthPlate','heavenPlate','nineStars','eightSpirits']}];
+function norm(x){return String(x||'').replace(/\\s+/g,'').toLowerCase()}
+function status(f,k,txt){if(f.locks&&f.locks.indexOf(k)>=0)return 'SOURCE LOCK';var v=f.expected[k];if(!v)return 'NOT SOURCED';return txt.indexOf(norm(v))>=0?'PASS':'NOT TESTABLE'}
+function panel(root){var txt=norm((root&&root.innerText)||'');var rows=FIX.map(function(f){return '<div class="kd453fx"><b>'+E(f.id)+'</b> · '+E(f.source)+'<table><tbody>'+LAYERS.map(function(k){var st=status(f,k,txt), ex=f.expected[k]||'—';return '<tr><td>'+E(k)+'</td><td>'+E(ex)+'</td><td class="s-'+st.replace(/ /g,'-')+'">'+st+'</td></tr>'}).join('')+'</tbody></table></div>'}).join('');return '<details class="card kd-km-v453"><summary><b>🧭 '+T('Kỳ Môn V4.53 · Full-Palace Fixture Schema','Qi Men V4.53 · Full-Palace Fixture Schema')+'</b></summary><div class="kd453"><p>'+T('Kiểm theo 14 tầng. SOURCE LOCK nghĩa là cổ thư đang dùng chưa cung cấp đủ expected palace-level data trong fixture đã nhập; engine không được tự bịa để tạo PASS.','Validation across 14 layers. SOURCE LOCK means the imported classical fixture does not yet provide sufficient palace-level expected data; the engine must not invent values to manufacture a PASS.')+'</p>'+rows+'<p class="dim">'+T('V4.53 tách rõ: dữ liệu đã có expected, dữ liệu chưa trích nguồn, và dữ liệu không thể kiểm trên input hiện tại. Đây là bước chuẩn bị trước khi thêm fixture 9 cung đầy đủ.','V4.53 separates sourced expected values, source-locked values, and values not testable on the current input. This prepares the runner for a fully sourced nine-palace fixture.')+'</p></div></details>'}
+var old=window.kmRender;if(typeof old==='function'){window.kmRender=function(){var h=old.apply(this,arguments);try{var d=document.createElement('div');d.innerHTML=h;return h+panel(d)}catch(e){return h}}}
+window.KD_QIMEN_V453={version:'4.53.0',layers:LAYERS.slice(),sourceLocked:true,noInventedExpected:true,fullPalaceFixtureReady:true};window.KD_RELEASE='4.53.0-qimen-full-palace-fixture-schema';
+})();
+</script>
+<style id="kd-v453-qimen-style">.kd-km-v453 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd453{padding-top:10px;line-height:1.65}.kd453 table{width:100%;border-collapse:collapse;margin:8px 0 14px}.kd453 td{padding:7px;border-bottom:1px solid var(--line,#55482a);vertical-align:top}.kd453 .s-PASS{font-weight:700}.kd453 .s-SOURCE-LOCK,.kd453 .s-NOT-SOURCED,.kd453 .s-NOT-TESTABLE{opacity:.72}.kd453 .dim{opacity:.72}</style>
+
 
 <script id="qimen-v454-nine-palace-fixture">
 (function(){
@@ -5698,7 +5755,8 @@ window.KD_RELEASE='4.61.0-qimen-typed-field-bridge';
 })();
 </script>
 <style id="kd-v461-qimen-style">.kd-km-v461 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd461{padding-top:10px;line-height:1.68}.kd461 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd461 table{width:100%;border-collapse:collapse;min-width:620px}.kd461 th,.kd461 td{padding:7px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd461 .dim{opacity:.72}</style>
-\n<!-- KD QIMEN V4.62: canonical typed export attached to kmLap output; no prose inference -->
+
+<!-- KD QIMEN V4.62: canonical typed export attached to kmLap output; no prose inference -->
 <script id="kd-v462-qimen-base-engine-typed-export">
 (function(){'use strict';if(window.KD_QIMEN_V462)return;
 var PAL=[1,2,3,4,5,6,7,8,9];
@@ -5722,7 +5780,8 @@ window.KD_QIMEN_V462={version:'4.62.0',schema:'KD.QIMEN.BASE.v1',canonical:canon
 })();
 </script>
 <style id="kd-v462-qimen-style">/* typed export is data-only; intentionally no visible panel */</style>
-\n<!-- KD QIMEN V4.63: typed contract validator; validates machine data only -->
+
+<!-- KD QIMEN V4.63: typed contract validator; validates machine data only -->
 <script id="kd-v463-qimen-typed-contract-validator">
 (function(){'use strict';if(window.KD_QIMEN_V463)return;
 function esc(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
@@ -5876,6 +5935,96 @@ window.KD_RELEASE='4.68.0-qimen-tomb-punishment-typed-engine';
 })();
 </script>
 <style id="kd-v468-qimen-style">.kd-km-v468 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd468{padding-top:10px;line-height:1.7}.kd468 .dim{opacity:.76}</style>
+
+
+<!-- KD QIMEN V4.71: typed Palace Diagnostic Synthesis -->
+<script id="kd-v471-qimen-palace-diagnostic-synthesis">
+(function(){'use strict';
+if(window.KD_QIMEN_V471)return;
+function bool(v){return v===true;}
+function arr(v){return Array.isArray(v)?v:[];}
+function norm(x){return String(x==null?'':x).trim();}
+function collect(p){
+ var evidence=[];
+ function push(code,label,value,source){if(value)evidence.push({code:code,label:label,source:source||null});}
+ push('VOID','旬空',bool(p.void),'V4.67');
+ push('HORSE','驛馬',bool(p.horse),'V4.67');
+ var tomb=p.tomb;
+ if(tomb&&typeof tomb==='object'){
+   push('SAN_QI_TOMB','三奇入墓',bool(tomb.sanQi)||bool(tomb.threeWonder)||bool(tomb.inTomb),'V4.68');
+   push('HOUR_STEM_TOMB','時干入墓',bool(tomb.hourStem)||bool(tomb.hourStemTomb),'V4.68');
+ } else push('TOMB','入墓',bool(tomb),'V4.68');
+ var pun=p.punishment;
+ if(pun&&typeof pun==='object') push('LIU_YI_PUNISHMENT','六儀擊刑',bool(pun.hit)||bool(pun.active)||bool(pun.liuYi),'V4.68');
+ else push('LIU_YI_PUNISHMENT','六儀擊刑',bool(pun),'V4.68');
+ push('GATE_PRESSURE','門克宮',bool(p.gatePressure),'V4.69');
+ if(p.fuFanYin&&p.fuFanYin.star){push('STAR_FU_YIN','星伏吟',bool(p.fuFanYin.star.fuYin),'V4.70');push('STAR_FAN_YIN','星反吟',bool(p.fuFanYin.star.fanYin),'V4.70');}
+ if(p.fuFanYin&&p.fuFanYin.gate){push('GATE_FU_YIN','門伏吟',bool(p.fuFanYin.gate.fuYin),'V4.70');push('GATE_FAN_YIN','門反吟',bool(p.fuFanYin.gate.fanYin),'V4.70');}
+ return evidence;
+}
+function missing(p){
+ var m=[];
+ if(typeof p.void!=='boolean')m.push('旬空');
+ if(typeof p.horse!=='boolean')m.push('驛馬');
+ if(p.tomb==null)m.push('入墓');
+ if(p.punishment==null)m.push('擊刑');
+ if(typeof p.gatePressure!=='boolean' && norm(p.gate))m.push('門↔宮');
+ if(!p.fuFanYin)m.push('伏吟/反吟');
+ return m;
+}
+function apply(km){
+ var c=km&&km.qimenTyped;if(!c||!Array.isArray(c.palaces))return {status:'SOURCE LOCK',reason:'qimenTyped unavailable'};
+ c.meta=c.meta||{};c.diagnostics=c.diagnostics||{};c.sources=c.sources||{};c.locks=c.locks||{};
+ var rows=[],totalEvidence=0,complete=0;
+ c.palaces.forEach(function(p){
+   var ev=collect(p),miss=missing(p);totalEvidence+=ev.length;if(!miss.length)complete++;
+   p.diagnosticSynthesis={status:miss.length?(ev.length?'PARTIAL':'SOURCE LOCK'):'PASS',evidence:ev,missing:miss,evidenceCount:ev.length,policy:'Evidence ledger only; no predictive probability or automatic good/bad score.'};
+   rows.push({palace:Number(p.palace),gate:p.gate||null,star:p.star||null,spirit:p.spirit||null,status:p.diagnosticSynthesis.status,evidence:ev,missing:miss});
+ });
+ var status=complete===c.palaces.length?'PASS':totalEvidence?'PARTIAL':'SOURCE LOCK';
+ var whole=c.diagnostics.fuFanYin&&c.diagnostics.fuFanYin.wholeChart||null;
+ c.diagnostics.palaceSynthesis={status:status,palaces:rows,completePalaces:complete,totalPalaces:c.palaces.length,totalEvidence:totalEvidence,wholeChartFuFanYin:whole,policy:'Do not collapse independent classical conditions into a fabricated numeric auspiciousness score.'};
+ c.meta.palaceDiagnosticSchema='KD.QIMEN.PALACE.DIAGNOSTIC.v1';
+ c.sources.palaceSynthesis='V4.71 synthesis of typed outputs from V4.67–V4.70; no new classical rule introduced.';
+ c.locks.palaceSynthesis=status==='SOURCE LOCK';window.__KD_QIMEN_LAST_TYPED=c;return c.diagnostics.palaceSynthesis;
+}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{r.qimenV471=apply(r);}catch(e){r.qimenV471={status:'REVIEW',reason:String(e)}}return r;};
+function vi(){return window.S_ICHING_LANGUAGE!=='en';}function T(a,b){return vi()?a:b;}function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function panel(km){var d=km&&km.qimenV471||apply(km||{}),rows=arr(d.palaces).map(function(r){var ev=arr(r.evidence).map(function(x){return E(x.label);}).join(' · ')||'—',ms=arr(r.missing).map(E).join(' · ')||'—';return '<tr><td>'+E(r.palace)+'</td><td>'+E(r.gate||'—')+'</td><td>'+E(r.star||'—')+'</td><td>'+E(r.spirit||'—')+'</td><td><b>'+E(r.status)+'</b></td><td>'+ev+'</td><td>'+ms+'</td></tr>';}).join('');return '<details class="card kd-km-v471"><summary><b>🧭 '+T('Kỳ Môn V4.71 · Palace Diagnostic Synthesis','Qi Men V4.71 · Palace Diagnostic Synthesis')+'</b></summary><div class="kd471"><p><b>Status:</b> '+E(d.status||'SOURCE LOCK')+' · <b>'+T('Cung đủ dữ liệu','Complete palaces')+':</b> '+E(d.completePalaces||0)+'/'+E(d.totalPalaces||0)+' · <b>'+T('Bằng chứng kích hoạt','Triggered evidence')+':</b> '+E(d.totalEvidence||0)+'</p><div class="scroll"><table><thead><tr><th>'+T('Cung','Palace')+'</th><th>'+T('Môn','Gate')+'</th><th>'+T('Tinh','Star')+'</th><th>'+T('Thần','Spirit')+'</th><th>Status</th><th>'+T('Bằng chứng typed','Typed evidence')+'</th><th>'+T('Còn khóa','Missing/locked')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+T('V4.71 chỉ hợp nhất dữ liệu đã được các engine V4.67–V4.70 xác lập: Tuần Không, Dịch Mã, Nhập Mộ, Kích Hình, Môn khắc Cung và Phục/Phản Ngâm. Mỗi điều kiện vẫn giữ bằng chứng riêng; không cộng điểm thành phần trăm cát/hung và không tạo quy tắc cổ pháp mới.','V4.71 only synthesizes typed outputs already established by V4.67–V4.70: Xun Void, Horse, Tomb, Punishment, Gate-controls-Palace and Fu/Fan-Yin. Every condition remains independently traceable; no fabricated auspiciousness percentage and no new classical rule is introduced.')+'</p></div></details>';}
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V471={version:'4.71.0',schema:'KD.QIMEN.PALACE.DIAGNOSTIC.v1',apply:apply,evidenceOnly:true,noNewClassicalRule:true,noHtmlInference:true,noPredictiveProbability:true};
+window.KD_RELEASE='4.71.0-qimen-palace-diagnostic-synthesis';
+})();
+</script>
+<style id="kd-v471-qimen-style">.kd-km-v471 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd471{padding-top:10px;line-height:1.7}.kd471 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd471 table{width:100%;border-collapse:collapse;min-width:940px}.kd471 th,.kd471 td{padding:7px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd471 .dim{opacity:.76}</style>
+
+\n<!-- V4.71.1 UI containment / raw-code display repair -->
+<script id="kd-v4711-ui-containment-fix">
+(function(){'use strict';
+function moveQimenPanels(){
+  var host=document.getElementById('kmResult')||document.getElementById('scr-km');
+  if(!host)return;
+  ['qimen-v449-school-profiles'].forEach(function(id){var el=document.getElementById(id);if(el&&el.parentNode!==host)host.appendChild(el);});
+}
+function removeRawEscapedText(root){
+  var w=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT);var nodes=[];
+  while(w.nextNode()){var n=w.currentNode,v=n.nodeValue||'';if(v.indexOf('\\n<!--')>=0||v.indexOf("panel=document.createElement('div')")>=0||v.indexOf('anchorClick=HTMLAnchorElement.prototype.click')>=0)nodes.push(n);}
+  nodes.forEach(function(n){
+    var v=n.nodeValue||'';
+    if(v.length>120 && (v.indexOf('<script')>=0||v.indexOf('panel=document.createElement')>=0||v.indexOf('anchorClick=')>=0)) n.nodeValue='';
+    else n.nodeValue=v.replace(/\\n/g,'\n');
+  });
+}
+function run(){moveQimenPanels();removeRawEscapedText(document.body);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+new MutationObserver(function(){run();}).observe(document.documentElement,{childList:true,subtree:true});
+window.KD_QIMEN_V4711={version:'4.71.1',uiContainmentFix:true,rawEscapedTextRepair:true};
+window.KD_RELEASE='4.71.1-ui-raw-code-fix';
+})();
+</script>
+<style id="kd-v4711-ui-containment-style">
+#qimen-v449-school-profiles{max-width:100%;box-sizing:border-box;overflow-wrap:anywhere}
+</style>
 </body></html>
 
 <script id="kd-classical-engine-5000">
@@ -9886,7 +10035,8 @@ window.KD_RELEASE='4.48.0-qimen-integrity-audit';
 })();
 </script>
 <style id="kd-v448-qimen-style">.kd-km-v448 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd448{padding-top:10px;line-height:1.68}.kd448 table{width:100%;border-collapse:collapse}.kd448 td{padding:8px;border-bottom:1px solid var(--line,#55482a);vertical-align:top}.kd448 .dim{opacity:.74}</style>
-\n<!-- KD QIMEN V4.52: classical fixture runner -->
+
+<!-- KD QIMEN V4.52: classical fixture runner -->
 <script id="kd-v452-qimen-classical-fixture-runner">
 (function(){'use strict';
 if(window.KD_QIMEN_V452)return;
