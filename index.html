@@ -1102,7 +1102,229 @@ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.k
   holder.querySelectorAll('*').forEach(function(el){Array.from(el.attributes).forEach(function(a){var v=String(a.value||'').replace(/[\x00-\x20]/g,'');if(/^on/i.test(a.name)||((a.name==='href'||a.name==='src')&&/^javascript:/i.test(v)))el.removeAttribute(a.name);});});
   var css='body{font:16px Georgia,serif;max-width:900px;margin:24px auto;padding:0 18px;color:#221d10;background:#fffdf5;line-height:1.65}h1{font-size:24px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{border:1px solid #c9b98a;border-radius:10px;padding:12px;margin:10px 0}button,input,select,textarea{display:none}details{margin:10px 0}a{overflow-wrap:anywhere}@media print{body{margin:0;max-width:none}.card{break-inside:avoid}}';
   var note=vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.';
-  var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+note+'</p></body></html>';
+  var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+note+'</p>
+<!-- KD QIMEN V4.75: Use-Spirit × Host/Guest Five-Phase Relation Engine -->
+<script id="kd-v475-qimen-use-spirit-host-guest-relation-engine">
+(function(){'use strict';
+if(window.KD_QIMEN_V475)return;
+var V='4.75.0';
+var STEM_EL={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+var PALACE_EL={1:'水',2:'土',3:'木',4:'木',5:'土',6:'金',7:'金',8:'土',9:'火'};
+var GEN={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+var CTRL={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+function arr(x){return Array.isArray(x)?x:[];}
+function esc(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function T(a,b){return vi()?a:b;}
+function first(o,names){for(var i=0;i<names.length;i++){var v=o&&o[names[i]];if(v!==undefined&&v!==null&&v!=='')return v;}return null;}
+function stem(v){var m=String(v||'').match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+function relation(a,b){if(!a||!b)return 'SOURCE_LOCK';if(a===b)return 'SAME';if(GEN[a]===b)return 'A_GENERATES_B';if(GEN[b]===a)return 'B_GENERATES_A';if(CTRL[a]===b)return 'A_CONTROLS_B';if(CTRL[b]===a)return 'B_CONTROLS_A';return 'UNKNOWN';}
+function relLabel(r,aName,bName){var A=aName||'A',B=bName||'B';var m={SAME:A+' '+T('đồng hành','same phase')+' '+B,A_GENERATES_B:A+' '+T('sinh','generates')+' '+B,B_GENERATES_A:B+' '+T('sinh','generates')+' '+A,A_CONTROLS_B:A+' '+T('khắc','controls')+' '+B,B_CONTROLS_A:B+' '+T('khắc','controls')+' '+A,SOURCE_LOCK:'SOURCE LOCK',UNKNOWN:'UNKNOWN'};return m[r]||r;}
+function pmap(km){var m={};arr(km&&km.qimenTyped&&km.qimenTyped.palaces).forEach(function(p){m[Number(p.palace)]=p;});return m;}
+function locateStem(km,s){if(!s)return null;var ps=arr(km&&km.qimenTyped&&km.qimenTyped.palaces),heaven=[],earth=[];ps.forEach(function(p){if(p&&p.heavenStem===s)heaven.push(Number(p.palace));if(p&&p.earthStem===s)earth.push(Number(p.palace));});if(heaven.length===1)return {palace:heaven[0],layer:'heavenStem'};if(heaven.length>1)return {palace:null,layer:'heavenStem',status:'REVIEW',reason:'duplicate heaven stem'};if(earth.length===1)return {palace:earth[0],layer:'earthStem-fallback'};return {palace:null,layer:null,status:'SOURCE LOCK'};}
+function axisPalaces(km){var u=km&&km.qimenV474;if(!u&&window.KD_QIMEN_V474&&window.KD_QIMEN_V474.apply)try{u=window.KD_QIMEN_V474.apply(km);}catch(e){};var out=[];arr(u&&u.roles).forEach(function(r){arr(r.palaces).forEach(function(p){if(p&&p.palace)out.push({kind:r.kind,value:r.value,role:r.role,palace:Number(p.palace)});});});var seen={};return out.filter(function(x){var k=x.kind+'|'+x.value+'|'+x.palace;if(seen[k])return false;seen[k]=1;return true;});}
+function apply(km){
+ var day=stem(first(km,['dayGan','dayStem','ngayCan','canNgay','dayPillar','ngay']));
+ var hour=stem(first(km,['hourGan','hourStem','gioCan','canGio','hourPillar','gio']));
+ var hostLoc=locateStem(km,day),guestLoc=locateStem(km,hour),pm=pmap(km),axes=axisPalaces(km);
+ var host=hostLoc&&hostLoc.palace?{stem:day,palace:hostLoc.palace,element:PALACE_EL[hostLoc.palace],layer:hostLoc.layer}:null;
+ var guest=guestLoc&&guestLoc.palace?{stem:hour,palace:guestLoc.palace,element:PALACE_EL[guestLoc.palace],layer:guestLoc.layer}:null;
+ var hg=(host&&guest)?relation(host.element,guest.element):'SOURCE_LOCK';
+ var rows=axes.map(function(a){var el=PALACE_EL[a.palace]||null;return {kind:a.kind,value:a.value,role:a.role,palace:a.palace,element:el,hostRelation:host?relation(host.element,el):'SOURCE_LOCK',guestRelation:guest?relation(guest.element,el):'SOURCE_LOCK'};});
+ var observed=rows.filter(function(r){return r.hostRelation!=='SOURCE_LOCK'||r.guestRelation!=='SOURCE_LOCK';}).length;
+ var status=(host&&guest&&rows.length&&observed===rows.length)?'PASS':((host||guest||observed)?'PARTIAL':'SOURCE LOCK');
+ var out={version:V,status:status,host:host,guest:guest,hostGuestRelation:hg,axes:rows,coverage:{axes:rows.length,observed:observed},policy:'Typed Five-Phase relations only. Host/Guest direction is preserved. No automatic auspicious/inauspicious verdict and no numeric prediction. Earth-stem fallback is explicitly marked when heaven-stem placement is unavailable.'};
+ if(km)km.qimenV475=out;return out;
+}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV475={version:V,status:'REVIEW',reason:String(e)}}return r;};
+function panel(km){var d=km&&km.qimenV475||apply(km||{});var hg=(d.host&&d.guest)?relLabel(d.hostGuestRelation,T('Chủ','Host'),T('Khách','Guest')):'SOURCE LOCK';var rows=arr(d.axes).map(function(r){return '<tr><td>'+esc(r.value)+'</td><td>'+esc(r.palace)+'</td><td>'+esc(r.element||'—')+'</td><td>'+esc(relLabel(r.hostRelation,T('Chủ','Host'),T('Dụng','Use')))+'</td><td>'+esc(relLabel(r.guestRelation,T('Khách','Guest'),T('Dụng','Use')))+'</td></tr>';}).join('')||'<tr><td colspan="5">SOURCE LOCK</td></tr>';
+ return '<details class="card kd-km-v475"><summary><b>◎ '+T('Kỳ Môn V4.75 · Dụng Thần × Chủ–Khách sinh khắc','Qi Men V4.75 · Use Spirit × Host–Guest Five-Phase Relations')+'</b></summary><div class="kd475"><p><b>Status:</b> '+esc(d.status)+' · <b>'+T('Chủ↔Khách','Host↔Guest')+':</b> '+esc(hg)+'</p><p>'+T('Chủ','Host')+': '+esc(d.host?d.host.stem+' · '+T('Cung ','Palace ')+d.host.palace+' · '+d.host.element+' · '+d.host.layer:'SOURCE LOCK')+'<br>'+T('Khách','Guest')+': '+esc(d.guest?d.guest.stem+' · '+T('Cung ','Palace ')+d.guest.palace+' · '+d.guest.element+' · '+d.guest.layer:'SOURCE LOCK')+'</p><div class="scroll"><table><thead><tr><th>'+T('Dụng thần','Use axis')+'</th><th>'+T('Cung','Palace')+'</th><th>'+T('Ngũ hành','Phase')+'</th><th>'+T('Chủ ↔ Dụng','Host ↔ Use')+'</th><th>'+T('Khách ↔ Dụng','Guest ↔ Use')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+T('V4.75 chỉ xác định quan hệ Ngũ hành từ dữ liệu cung typed. Chiều sinh/khắc được giữ nguyên để bước sau có thể luận theo đúng tình huống Chủ–Khách. Không tự chuyển quan hệ thành cát/hung hay phần trăm thành công.','V4.75 computes only typed Five-Phase relations. Generation/control direction is preserved for later source-profiled Host–Guest interpretation. Relations are not automatically converted into auspiciousness or success percentages.')+'</p></div></details>';
+}
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{var d=apply(km);return h+panel(Object.assign({},km,{qimenV475:d}));}catch(e){return h;}};
+window.KD_QIMEN_V475={version:V,apply:apply,relation:relation,palaceElement:PALACE_EL,stemElement:STEM_EL,directionalRelations:true,noAutomaticVerdict:true,noPredictiveProbability:true};
+window.KD_RELEASE='4.75.0-qimen-use-spirit-host-guest-five-phase-relations';
+})();
+</script>
+<style id="kd-v475-qimen-style">.kd-km-v475 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd475{padding-top:10px;line-height:1.7}.kd475 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd475 table{width:100%;border-collapse:collapse;min-width:760px}.kd475 th,.kd475 td{padding:7px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd475 .dim{opacity:.76}</style>
+
+
+
+
+<!-- KD QIMEN V4.81: sourced pattern engine -->
+<script id="kd-v481-qimen-sourced-pattern-engine">
+(function(){'use strict';
+if(window.KD_QIMEN_V481)return;
+var V='4.81.0';
+function A(x){return Array.isArray(x)?x:[];} function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function T(a,b){return vi()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function pals(km){return A(km&&km.qimenTyped&&km.qimenTyped.palaces);} function n(x){return String(x||'').replace(/门/g,'門').replace('腾蛇','騰蛇').replace('太阴','太陰').replace('勾陈','勾陳');}
+function has(p,key,val){return n(p&&p[key])===n(val);} function stem(p,s){return p&&(p.heavenStem===s||p.earthStem===s);} function qi(p){return ['乙','丙','丁'].some(function(s){return stem(p,s);});}
+function goodGate(p){return ['開門','休門','生門'].some(function(g){return has(p,'gate',g);});}
+function hit(id,label,p,source,note){return {id:id,label:label,palace:Number(p.palace)||null,status:'MATCH',source:source,note:note||''};}
+function detect(km){var out=[],ps=pals(km);ps.forEach(function(p){
+ if(qi(p)&&has(p,'spirit','九地'))out.push(hit('ZHONG_ZHA',T('重詐','Heavy Deception'),p,'元靈經·三詐五假',T('三奇加九地。','Three Wonders with Nine Earth.')));
+ if(qi(p)&&has(p,'spirit','太陰'))out.push(hit('ZHI_ZHA',T('直詐','Direct Deception'),p,'元靈經·三詐五假',T('三奇加太陰。','Three Wonders with Great Yin.')));
+ if(qi(p)&&goodGate(p)&&has(p,'spirit','六合'))out.push(hit('XIU_ZHA',T('休詐','Rest Deception'),p,'元靈經·三詐五假',T('三奇、吉門、六合同宮。','Three Wonders + auspicious gate + Six Harmony.')));
+ if(has(p,'gate','景門')&&(stem(p,'乙')||stem(p,'丙'))&&(has(p,'spirit','九地')||has(p,'spirit','九天')))out.push(hit('TIAN_JIA',T('天詐','Heavenly False'),p,'元靈經·三詐五假',T('原文有九地／一說九天異文，保留異本。','The text preserves a Nine-Earth / variant Nine-Heaven reading.')));
+ if(has(p,'gate','杜門')&&['丁','己','癸'].some(function(s){return stem(p,s);})&&['九地','太陰','六合'].some(function(s){return has(p,'spirit',s);}))out.push(hit('DI_JIA',T('地假','Earthly False'),p,'元靈經·三詐五假'));
+ if((stem(p,'丁')&&has(p,'spirit','太陰')&&has(p,'gate','杜門'))||(stem(p,'乙')&&has(p,'gate','傷門')&&has(p,'spirit','六合')))out.push(hit('WU_JIA',T('物假','Material False'),p,'元靈經·三詐五假',T('保留原文兩組條件，不合併為單一唯一式。','Both source conditions are retained rather than collapsed into one formula.')));
+ if((has(p,'gate','死門')&&has(p,'spirit','朱雀')&&stem(p,'己')&&Number(p.palace)===8)||(has(p,'gate','杜門')&&['丁','己','癸'].some(function(s){return stem(p,s);})&&has(p,'spirit','太陰')))out.push(hit('GUI_JIA',T('鬼假','Ghost False'),p,'元靈經·三詐五假'));
+ if(stem(p,'庚')&&has(p,'gate','傷門')&&Number(p.palace)===4)out.push(hit('SHEN_JIA',T('神假','Spirit False'),p,'元靈經·三詐五假'));
+ });
+ // 玉女守門: source definition is Earth-plate 丁 guarding the palace reached by 值使. We only assert when typed 值使 palace exists.
+ var zsp=null; try{zsp=Number(km&& (km.zhiShiPalace||km.zhishiPalace||km.valueMessengerPalace))||null;}catch(e){}
+ var yunu={status:'SOURCE LOCK',palace:null,source:'御定奇門寶鑑·釋玉女守門',note:T('需 typed 值使落宮；不以「丁 + 吉門」近似代替。','Requires a typed Value-Messenger palace; 丁 + auspicious gate is not used as a proxy.')};
+ if(zsp){var p=ps.filter(function(x){return Number(x.palace)===zsp;})[0]; if(p){yunu.palace=zsp;yunu.status=(p.earthStem==='丁')?'MATCH':'NO MATCH';}}
+ var nineEscapes={status:'SOURCE LOCK',source:'元靈經·九遁',note:T('已確認古籍把九遁列為上吉並載虎遁、鬼遁、神遁等條件；V4.81 不在未鎖齊九式前宣稱完整九遁。','The source ranks the Nine Escapes highly and preserves conditions for Tiger/Ghost/Spirit Escapes; V4.81 does not claim a complete nine-form engine until all nine are independently locked.')};
+ var d={schema:'KD.QIMEN.PATTERN.v1',matches:out,yuNuShouMen:yunu,nineEscapes:nineEscapes,noProbability:true,variantAware:true}; if(km)km.qimenV481=d; return d;
+}
+function panel(km){var d=detect(km),rows=A(d.matches).map(function(x){return '<tr><td>'+E(x.label)+'</td><td>'+E(x.palace||'—')+'</td><td>'+E(x.status)+'</td><td>'+E(x.note||'')+'</td></tr>';}).join('');if(!rows)rows='<tr><td colspan="4">'+T('Không có cách cục V4.81 nào được xác nhận từ typed data hiện tại.','No V4.81 pattern is confirmed by the current typed data.')+'</td></tr>';return '<details class="card kd-km-v481" open><summary><b>◎ '+T('Kỳ Môn V4.81 · Tam Trá Ngũ Giả · Ngọc Nữ · Cửu Độn','Qi Men V4.81 · Deceptions/Falses · Jade Maiden · Nine Escapes')+'</b></summary><div class="kd481"><div class="scroll"><table><thead><tr><th>'+T('Cách','Pattern')+'</th><th>'+T('Cung','Palace')+'</th><th>Status</th><th>'+T('Ghi chú','Note')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p><b>玉女守門:</b> '+E(d.yuNuShouMen.status)+(d.yuNuShouMen.palace?' · '+T('Cung ','Palace ')+E(d.yuNuShouMen.palace):'')+' — '+E(d.yuNuShouMen.note)+'</p><p><b>'+T('Cửu Độn','Nine Escapes')+':</b> '+E(d.nineEscapes.status)+' — '+E(d.nineEscapes.note)+'</p><p class="dim">'+T('Không dùng % dự đoán. Dị bản trong cổ thư được giữ thành source profile, không âm thầm hợp nhất.','No predictive percentage. Textual variants are retained as source profiles rather than silently merged.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{detect(r);}catch(e){}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V481={version:V,detect:detect,schema:'KD.QIMEN.PATTERN.v1',profiles:{deceptionsFalses:'奇門遁甲元靈經·三詐五假',yuNu:'御定奇門寶鑑·釋玉女守門',nineEscapes:'奇門遁甲元靈經·九遁'},noPredictiveProbability:true,variantAware:true,completeNineEscapes:false};
+window.KD_RELEASE='4.81.0-qimen-sourced-pattern-engine-phase1';
+})();
+
+</script>
+<style id="kd-v481-qimen-style">.kd481{padding-top:10px;line-height:1.68}.kd481 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd481 table{width:100%;border-collapse:collapse;min-width:720px}.kd481 th,.kd481 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.24);vertical-align:top;text-align:left}.kd481 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.83: source-profiled pattern conflict resolver -->
+<script id="kd-v483-qimen-pattern-conflict-resolver">
+(function(){'use strict';
+if(window.KD_QIMEN_V483)return;
+var V='4.83.0';
+function A(x){return Array.isArray(x)?x:[];} function vi(){return window.S_ICHING_LANGUAGE!=='en';} function T(a,b){return vi()?a:b;}
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function pal(km){return A(km&&km.qimenTyped&&km.qimenTyped.palaces);} function norm(x){return String(x||'').replace(/门/g,'門').replace('太阴','太陰').replace('腾蛇','騰蛇').trim();}
+function push(a,kind,code,label,source,palace,note){a.push({kind:kind,code:code,label:label,source:source,palace:palace==null?null:Number(palace),note:note||''});}
+function palaceEvidence(km){var support=[],caution=[],context=[];pal(km).forEach(function(p){var d=p&&p.diagnosticSynthesis||{},ev=A(d.evidence);ev.forEach(function(x){var c=String(x.code||''),lab=x.label||c,src=x.source||'typed diagnostic';
+  if(/TOMB|PUNISH|GATE_PRESSURE|GATE_CONTROLS|FU_YIN|FAN_YIN/i.test(c))push(caution,'caution',c,lab,src,p.palace,'typed palace diagnostic');
+  else if(/VOID/i.test(c))push(context,'context',c,lab,src,p.palace,T('Không vong được giữ là điều kiện ngữ cảnh; không tự động coi là tuyệt đối vô hiệu.','Void remains a contextual condition and is not automatically treated as absolute nullification.'));
+  else if(/HORSE/i.test(c))push(context,'context',c,lab,src,p.palace,T('Dịch Mã biểu thị động/chuyển; không tự động cát hay hung.','Horse denotes movement/change and is not automatically auspicious or inauspicious.'));
+  else push(context,'context',c,lab,src,p.palace,'typed evidence');
+ });
+ if(p.gatePressure===true)push(caution,'caution','GATE_CONTROLS_PALACE',(p.gate||'門')+'克宮','遁甲演義·門迫宮迫',p.palace,T('Cát môn bị迫: việc cát khó thành; hung môn bị迫: hung tăng.','An auspicious gate under pressure impedes the favorable matter; an inauspicious gate under pressure intensifies the adverse indication.'));
+ });return {support:support,caution:caution,context:context};}
+function patterns(km){var support=[],caution=[],context=[];var v482=(km&&km.qimenV482)||(window.KD_QIMEN_V482&&window.KD_QIMEN_V482.apply?window.KD_QIMEN_V482.apply(km):null)||{};
+ A(v482.nineEscapes&&v482.nineEscapes.matches).forEach(function(x){push(support,'support','NINE_ESCAPE_'+x.id,x.label||x.id,x.profile||'遁甲演義',x.palace,x.note);});
+ A(v482.sanQiDeShi&&v482.sanQiDeShi.matches).forEach(function(x){push(support,'support','SAN_QI_DE_SHI','三奇得使 '+(x.qi||''),x.source||'遁甲演義·三奇得使',x.palace,T('Đắc Sứ là trợ lực nhưng nguồn cũng cảnh báo có thể đồng thời gặp cách xấu.','De-Shi is supportive, while the source also warns that adverse patterns may coexist.'));});
+ if(v482.wuBuYuShi&&v482.wuBuYuShi.status==='MATCH')push(caution,'caution','WU_BU_YU_SHI','五不遇時','遁甲演義·五不遇',null,T('Nguồn nói dù có Kỳ/Môn cũng không nên dùng việc; vì vậy đây là xung đột mạnh với dấu hiệu thuận.','The source says that even with auspicious Qi/Gates, actions should not be undertaken; this is therefore a strong conflict with supportive signs.'));
+ var v481=km&&km.qimenV481;if(v481){A(v481.matches||v481.patterns).forEach(function(x){push(support,'support',x.id||x.code||'V481_PATTERN',x.label||x.name||x.id||'V4.81 pattern',x.source||'V4.81 sourced pattern',x.palace,x.note);});}
+ return {support:support,caution:caution,context:context,v482:v482};}
+function dedupe(a){var seen={};return a.filter(function(x){var k=[x.kind,x.code,x.palace,x.label].join('|');if(seen[k])return false;seen[k]=1;return true;});}
+function apply(km){if(!km)return {status:'SOURCE LOCK',reason:'chart unavailable'};var pe=palaceEvidence(km),pt=patterns(km),support=dedupe(pe.support.concat(pt.support)),caution=dedupe(pe.caution.concat(pt.caution)),context=dedupe(pe.context.concat(pt.context));
+ var severe=caution.filter(function(x){return /WU_BU_YU|TOMB|PUNISH|FU_YIN|FAN_YIN/i.test(x.code);});
+ var verdict='OBSERVED';if(!pal(km).length)verdict='SOURCE LOCK';else if(severe.length&&support.length)verdict='SUPPORT_PRESENT_BUT_CONFLICTED';else if(severe.length)verdict='CAUTION_DOMINANT';else if(support.length&&caution.length)verdict='MIXED';else if(support.length)verdict='SUPPORTIVE_WITHOUT_MAJOR_CONFLICT';else if(caution.length)verdict='CAUTION_PRESENT';
+ var d={schema:'KD.QIMEN.CONFLICT.v1',version:V,status:pal(km).length?'PASS':'SOURCE LOCK',verdict:verdict,support:support,caution:caution,context:context,severeConflicts:severe,policy:{noNumericScore:true,noProbability:true,noAutomaticCancellation:true,sourceProfiled:true,rule:T('Không dùng phép cộng/trừ điểm. Dấu thuận không tự xóa Ngũ Bất Ngộ, Nhập Mộ, Kích Hình hay Phục/Phản Ngâm; đồng thời dấu xấu cũng không xóa dữ liệu thuận. Kết quả giữ cả hai phía để luận theo phép và chủ đề.','No additive/subtractive score is used. Supportive patterns do not automatically cancel Wu-Bu-Yu, Tomb, Punishment or Fu/Fan-Yin, and adverse patterns do not erase supportive evidence. Both sides remain visible for method- and topic-specific judgment.')}};
+ km.qimenV483=d;km.qimenTyped=km.qimenTyped||{};km.qimenTyped.diagnostics=km.qimenTyped.diagnostics||{};km.qimenTyped.diagnostics.patternConflict=d;return d;}
+function rows(a){return A(a).map(function(x){return '<tr><td>'+E(x.label)+'</td><td>'+E(x.palace==null?'—':x.palace)+'</td><td>'+E(x.source)+'</td><td>'+E(x.note||'')+'</td></tr>';}).join('')||'<tr><td colspan="4">—</td></tr>';}
+function panel(km){var d=apply(km||{});return '<details class="card kd-km-v483" open><summary><b>⚖ '+T('Kỳ Môn V4.83 · Hòa giải xung đột cách cục','Qi Men V4.83 · Pattern Conflict Resolver')+'</b></summary><div class="kd483"><p><b>'+T('Kết luận cấu trúc','Structural verdict')+':</b> '+E(d.verdict)+' · <b>'+T('Thuận','Support')+':</b> '+d.support.length+' · <b>'+T('Thận trọng','Caution')+':</b> '+d.caution.length+'</p><h4>'+T('Bằng chứng thuận','Supportive evidence')+'</h4><div class="scroll"><table><tbody>'+rows(d.support)+'</tbody></table></div><h4>'+T('Bằng chứng xung đột / thận trọng','Conflicting / caution evidence')+'</h4><div class="scroll"><table><tbody>'+rows(d.caution)+'</tbody></table></div><h4>'+T('Điều kiện ngữ cảnh','Contextual conditions')+'</h4><div class="scroll"><table><tbody>'+rows(d.context)+'</tbody></table></div><p class="dim">'+E(d.policy.rule)+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV483={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V483={version:V,apply:apply,schema:'KD.QIMEN.CONFLICT.v1',sourceProfiles:['遁甲演義·五不遇','遁甲演義·三奇入墓','遁甲演義·六儀擊刑','遁甲演義·伏吟反吟','遁甲演義·門迫宮迫','遁甲演義·三奇得使','遁甲演義·九遁'],noNumericScore:true,noPredictiveProbability:true,noAutomaticCancellation:true};
+window.KD_RELEASE='4.83.0-qimen-pattern-conflict-resolver';
+})();
+</script>
+<style id="kd-v483-qimen-style">.kd483{padding-top:10px;line-height:1.68}.kd483 h4{margin:12px 0 5px}.kd483 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd483 table{width:100%;border-collapse:collapse;min-width:700px}.kd483 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.22);vertical-align:top}.kd483 .dim{opacity:.76}</style>
+<!-- KD QIMEN V4.86: expanded sourced stem-response + final judgment integration -->
+<script id="kd-v486-qimen-stem-response-expanded">
+(function(){'use strict';
+if(window.KD_QIMEN_V486)return;
+var SRC='《奇門法竅》卷三 · 十干加時斷';
+function vi(){return (window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return vi()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function N(x){var m=String(x==null?'':x).match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+var C={};
+function add(a,b,name,v,e,tone){C[a+b]={heaven:a,earth:b,name:name||'',vi:v,en:e||v,tone:tone||'CONTEXT',source:SRC,status:'SOURCE VERIFIED'};}
+/* Only entries independently locked from the cited source profile are encoded. */
+add('戊','戊','伏吟／青龍入地','Việc dễ trì trệ; thiên về giữ cũ, dưỡng thế.','Affairs tend to stall; conserving position is favored.','CAUTION');
+add('戊','乙','青龍合靈','Môn cát thì việc cát, Môn hung thì việc hung; cần phối hợp Môn.','Outcome follows the Gate; favorable Gate supports, adverse Gate weakens.','CONTEXT');
+add('戊','丙','青龍返首','Có lợi cho hành động và danh lợi, nhưng gặp Mộ/迫/Kích Hình có thể chuyển xấu.','Supports action and advancement, but Tomb/pressure/punishment can reverse it.','SUPPORT');
+add('戊','丁','青龍耀明','Thuận yết quý/cầu danh lợi; gặp tử/mộ thì dễ sinh thị phi.','Supports audience/reputation/gain; death/tomb conditions add dispute risk.','SUPPORT');
+add('戊','己','龍神相親','Nguồn xem là có trợ lực; vẫn phải xét Môn và toàn cung.','The source treats it as assisted; Gate and whole-palace context still govern.','SUPPORT');
+add('戊','庚','值符飛宮','Cát sự giảm cát; hung sự không nhất thiết tăng hung; phải phân chủ khách và vượng suy.','Favorable matters are weakened; adverse matters are not simply intensified; host/guest and strength matter.','MIXED');
+add('戊','辛','青龍折足','Có Cát Môn sinh trợ còn có thể mưu; gặp Hung Môn dễ thất tài/trở ngại.','A favorable Gate may preserve action; an adverse Gate points to loss/obstruction.','CAUTION');
+add('戊','壬','龍入天牢','Đại thể bất lợi; Môn chế càng nặng, Tam Cát Môn có thể giảm.','Generally adverse; Gate control worsens it, Three Auspicious Gates may mitigate.','CAUTION');
+add('戊','癸','青龍入華蓋','Lợi làm khách; Môn cát thêm phúc, Môn chế tăng tổn.','Can favor the guest side; favorable Gate helps, controlling Gate increases harm.','MIXED');
+add('丁','戊','玉女乘龍','Quan chức có tượng thăng chuyển; thường nhân cũng thiên thuận.','Associated with advancement for officials and generally favorable movement.','SUPPORT');
+add('丁','乙','人遁／玉女奇生','Thuận cho tiến chức, hôn nhân/tài hỷ và mưu sự.','Supports advancement, marriage/financial joy and planning.','SUPPORT');
+add('丁','丙','星隨月轉','Nguồn thiên thuận cho thăng tiến và mưu sự; cần xét Môn.','Source leans favorable for advancement and plans; Gate context remains necessary.','SUPPORT');
+add('丁','己','火入勾陳','Có dị văn trái chiều; một nhánh bất lợi việc âm tư, nhánh khác xem có trợ lực.','The source preserves conflicting variants; one is adverse for hidden/private matters, another is supportive.','MIXED');
+add('丁','癸','朱雀投江','Văn thư/tin tức dễ chìm trễ; mưu sự bất lợi, nhưng một số chủ đề có ngoại lệ.','Documents/messages may be lost or delayed; plans are weakened, with topic-specific exceptions.','CAUTION');
+add('己','戊','明堂合青龍','Mưu sự thiên thuận; Môn cát tăng cát, Môn hung đảo chiều.','Plans tend favorable; Gate quality can strengthen or reverse the reading.','SUPPORT');
+add('己','乙','奇入地戶','Việc dễ mờ ám, khó hoạch định.','Affairs become obscure and difficult to plan.','CAUTION');
+add('己','丙','火孛入地戶','Nguồn thiên bất lợi; gặp cách hồi thủ có thể giảm.','Source leans adverse; a returning-head pattern may mitigate.','CAUTION');
+add('己','丁','星奇入墓','Nên chậm mưu; kiện tụng có thể trước thuận sau bất lợi.','Proceed slowly; litigation may begin favorably and later turn adverse.','CAUTION');
+add('己','己','玉堂臨地戶','Dễ tiến thoái bất quyết; thiên về cố thủ.','Indecision/stagnation; holding position is favored.','CAUTION');
+add('己','庚','玉堂逢太白','Mưu sự dễ gặp họa; thiên về dừng và giữ.','Plans may attract trouble; stopping/holding is favored.','CAUTION');
+add('己','辛','游魂入墓／玉堂入天庭','Có dị văn: cần thận trọng nhưng một nhánh lại cho tiến ích; giữ MIXED.','Variant readings conflict: caution in one line, progress in another; retained as MIXED.','MIXED');
+add('己','壬','地網高張','Đại thể bất lợi, nên giữ.','Generally adverse; holding is favored.','CAUTION');
+add('己','癸','玉堂逢天網','Nên thủ cựu; kiện tụng có cảnh báo lao ngục.','Keep to the old course; litigation carries confinement symbolism.','CAUTION');
+add('庚','乙','太白和合','Nguồn thiên thuận cho mưu sự; binh sự có ngữ cảnh riêng.','Source leans favorable for planning; military context is separate.','SUPPORT');
+add('庚','丙','太白入熒','Đại thể bất lợi, dễ phá tài/tranh động; cần xét vượng suy.','Generally adverse, with loss/conflict symbolism; strength matters.','CAUTION');
+add('庚','丁','太白受制','Mưu sự khó thành; thiên về thủ.','Plans are difficult to complete; holding is favored.','CAUTION');
+add('庚','己','刑格','Quan tụng/hình phạt và trở ngại tăng; Tam Cát Môn không đủ để coi là toàn cát.','Litigation/punishment and obstruction increase; auspicious Gates do not make it unconditionally favorable.','CAUTION');
+add('庚','庚','太白同宮／重刑','Nguồn xem là hung, không lợi mưu sự.','Source treats it as adverse and unfavorable for plans.','CAUTION');
+add('壬','戊','小蛇化龍／青龍入獄','Dễ hao tán, có đầu không cuối; Tam Cát Môn có thể giảm.','Tends to dissipation/incompletion; auspicious Gates may mitigate.','CAUTION');
+add('壬','乙','奇神遊海','Việc thiếu định, gặp Không Vong càng bất lợi.','Affairs lack stability; Void worsens the condition.','CAUTION');
+add('壬','丙','水蛇入火宮','Hình cấm/trở ngại tăng; gặp Thanh Long Phản Thủ có thể chuyển.','Punitive/obstructive symbolism rises; Green Dragon Returning Head may reverse it.','CAUTION');
+add('壬','丁','玉女合獄神','Có trợ lực quý nhân nhưng dị văn cũng ghi trở ngại; giữ MIXED.','May indicate noble assistance, while a variant records obstruction; retained as MIXED.','MIXED');
+add('壬','己','天獄入地戶','Phá bại và xung hình; nên tránh vọng động.','Loss and clash/punishment; avoid rash action.','CAUTION');
+add('壬','庚','太白犯格','Khó tiến, hao phí; kiện tụng có ngữ cảnh riêng.','Difficult progress and expense; litigation has a separate contextual reading.','CAUTION');
+add('壬','辛','白虎犯格','Môn khắc thì họa nhanh, Môn sinh có thể giải giảm.','A controlling Gate worsens it quickly; a generating Gate may mitigate.','CAUTION');
+add('壬','壬','天獄自刑','Mưu sự khó thành, dễ có nội bộ bất an.','Plans are difficult to complete; internal disturbance is indicated.','CAUTION');
+add('壬','癸','天獄逢天網','Nguồn khuyên không nên vọng tác.','The source advises against forcing action.','CAUTION');
+add('癸','戊','天乙會合／青龍入地','Có tài hỷ/hôn nhân trợ lực nhưng gặp Hung Môn, Hình, 迫 có thể đảo xấu.','Can support gain/marriage, but adverse Gate, punishment or pressure can reverse it.','SUPPORT');
+add('癸','乙','蓬星華蓋','Thiên thuận nhưng thường ứng chậm; giữ điều kiện chủ đề.','Leans favorable but often delayed; topic context remains necessary.','SUPPORT');
+add('癸','丙','華蓋孛師','Nguồn có dị văn thuận và nghịch; giữ MIXED.','The source contains favorable and adverse variants; retained as MIXED.','MIXED');
+add('癸','丁','騰蛇妖蹻','Văn thư/quan tụng có cảnh báo; Tam Cát Môn có thể giảm một phần.','Warnings for documents/litigation; auspicious Gates may partially mitigate.','CAUTION');
+add('癸','己','明堂入天藏','Tin tức trì trệ, mưu sự dễ phá; Cát Môn có thể cứu.','Messages stall and plans may fail; a favorable Gate can mitigate.','CAUTION');
+add('癸','庚','大格','Mưu sự khó thành, việc cát dễ hóa không.','Plans are difficult to complete; favorable matters may be nullified.','CAUTION');
+add('癸','辛','網蓋天牢','Bệnh/tụng thiên bất lợi; Môn cát có thể giảm, Môn hung tăng nặng.','Illness/litigation lean adverse; favorable Gate may mitigate, adverse Gate worsens it.','CAUTION');
+function apply(km){var q=km&&km.qimenTyped;if(!q||!Array.isArray(q.palaces))return {status:'SOURCE LOCK',rows:[]};var rows=[],hit=0;
+ q.palaces.forEach(function(p){var h=N(p.heavenStem),e=N(p.earthStem);if(!h||!e)return;var x=C[h+e]||null;if(x){hit++;p.stemResponseExpanded={key:h+e,classical:x,status:'SOURCE VERIFIED'};rows.push({palace:Number(p.palace),heaven:h,earth:e,classical:x});}});
+ var out={schema:'KD.QIMEN.STEM_RESPONSE.v1.1',version:'4.86.0',status:rows.length?'PARTIAL':'SOURCE LOCK',rows:rows,sourceVerified:hit,catalogPairs:Object.keys(C).length,source:SRC,guards:{sourceProfileSeparated:true,noInventedMissingPairs:true,noProbability:true}};
+ q.diagnostics=q.diagnostics||{};q.diagnostics.stemResponseExpanded=out;km.qimenV486=out;
+ /* Feed sourced pair evidence into final judgment without silently changing verdict. */
+ if(km.qimenV484&&Array.isArray(km.qimenV484.items)){km.qimenV484.items.forEach(function(it){var ps=[];var nums=[];if(it.palace)nums.push(Number(it.palace));if(Array.isArray(it.palaces))it.palaces.forEach(function(n){nums.push(Number(n));});nums.forEach(function(n){var r=rows.filter(function(z){return z.palace===n;});r.forEach(function(z){ps.push({type:'STEM_RESPONSE',key:z.heaven+z.earth,tone:z.classical.tone,name:z.classical.name,source:z.classical.source});});});it.stemResponseEvidence=ps;});km.qimenV484.stemResponseIntegrated=true;}
+ return out;}
+function panel(km){var d=km&&km.qimenV486||apply(km||{});var rr=(d.rows||[]).map(function(r){var c=r.classical;return '<tr><td>'+r.palace+'</td><td><b>'+E(r.heaven)+' / '+E(r.earth)+'</b></td><td>'+E(c.name||'—')+'</td><td>'+E(vi()?c.vi:c.en)+'</td><td>'+E(c.tone)+'</td></tr>';}).join('');if(!rr)rr='<tr><td colspan="5">'+T('Bàn hiện tại chưa có cặp mới V4.86 đã khóa nguồn.','Current chart has no newly source-locked V4.86 pair.')+'</td></tr>';return '<details class="card kd-km-v486"><summary><b>十干克應 · '+T('V4.86 mở rộng & nối kết luận','V4.86 Expanded + Judgment Integration')+'</b></summary><div class="kd486"><p>'+T('V4.86 mở rộng catalog bằng profile 《奇門法竅》, nhưng không ghi đè V4.85/《元靈經》. Khi hai nguồn khác nhau, chúng được giữ như hai source profile thay vì hòa thành một “cổ pháp chuẩn”.','V4.86 expands the catalog with a Qi Men Fa Qiao profile without overwriting V4.85/Yuan Ling Jing. Differences remain separate source profiles rather than being merged into one supposed standard.')+'</p><p><b>'+T('Cặp khóa thêm trong catalog','Additional source-locked catalog pairs')+':</b> '+E(d.catalogPairs)+' · <b>'+T('cặp đang trúng bàn','live matches')+':</b> '+E(d.sourceVerified)+'</p><div class="scroll"><table><thead><tr><th>'+T('Cung','Palace')+'</th><th>'+T('Thiên/Địa','Heaven/Earth')+'</th><th>'+T('Cách','Pattern')+'</th><th>'+T('Văn nghĩa rút gọn','Condensed reading')+'</th><th>Tone</th></tr></thead><tbody>'+rr+'</tbody></table></div><p class="dim">'+T('Các cặp chưa đối chiếu trực tiếp vẫn SOURCE LOCK; không tự điền lời đoán. Evidence được gắn vào Final Judgment như một lớp chứng cứ, chưa tự thay đổi verdict.','Unverified pairs remain SOURCE LOCK; no wording is invented. Evidence is attached to Final Judgment as an evidence layer and does not silently change the verdict.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV486={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km,lv){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V486={version:'4.86.0',schema:'KD.QIMEN.STEM_RESPONSE.v1.1',source:SRC,catalog:C,apply:apply,guards:{sourceProfileSeparated:true,noInventedMissingPairs:true,noPredictiveProbability:true}};
+window.KD_RELEASE='4.86.0-qimen-stem-response-expanded-integration';
+})();
+</script>
+<style id="kd-v486-qimen-style">.kd-km-v486 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd486{padding-top:10px;line-height:1.7}.kd486 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd486 table{width:100%;border-collapse:collapse;min-width:720px}.kd486 th,.kd486 td{padding:8px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd486 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.89: final interpretation composer -->
+<script id="kd-v489-qimen-final-interpretation-composer">
+(function(){'use strict';
+if(window.KD_QIMEN_V489)return;
+var V='4.89.0';
+function vi(){return (window.S_ICHING_LANGUAGE||window.KD_LANG||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return vi()?a:b;}
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function A(x){return Array.isArray(x)?x:[];}
+function uniq(a){var o={},r=[];A(a).forEach(function(x){var k=typeof x==='string'?x:JSON.stringify(x);if(!o[k]){o[k]=1;r.push(x)}});return r;}
+function ensure(km,key,mod){if(km&&km[key])return km[key];try{return mod&&typeof mod.apply==='function'?mod.apply(km):null}catch(e){return null}}
+function labelVerdict(v){var m={SUPPORTIVE_WITH_CONDITIONS:["Thuận nhưng có điều kiện","Supportive with conditions"],SUPPORTIVE_WITHOUT_MAJOR_CONFLICT:["Thuận, chưa thấy xung đột lớn","Supportive without major conflict"],MIXED_CONFLICT:["Cát–hung đan xen, có xung đột","Mixed with material conflict"],MIXED:["Bằng chứng hỗn hợp","Mixed evidence"],CAUTION:["Nên thận trọng","Caution"],CAUTION_DOMINANT:["Trở lực đang chiếm ưu thế","Caution dominant"],OBSERVED:["Đã có dữ liệu nhưng chưa đủ để quyết đoán","Observed, not decisive"],SOURCE_LOCK:["Chưa đủ nguồn/dữ liệu để kết luận","Source/data locked"]};return (m[v]||[v||'—',v||'—'])[vi()?0:1];}
+function sourceLabel(x){var m={MULTI_SOURCE_AGREEMENT:["Nhiều nguồn đã mã hóa đồng thuận","Multiple encoded sources agree"],AGREEMENT_WITH_SINGLE_SOURCE_ITEMS:["Có đồng thuận và có mục đơn nguồn","Agreement plus single-source items"],SOURCE_VARIANT_PRESENT:["Có dị bản giữa các cổ bản","Classical source variants present"],SINGLE_SOURCE_ONLY:["Hiện chủ yếu dựa trên một nguồn","Currently single-source"],NO_LIVE_STEM_EVIDENCE:["Chưa có Khắc Ứng sống để so nguồn","No live stem-response evidence"]};return (m[x]||[x||'—',x||'—'])[vi()?0:1];}
+function textOf(x){if(x==null)return '';if(typeof x==='string')return x;if(typeof x==='number'||typeof x==='boolean')return String(x);return x.label||x.text||x.name||x.vi||x.en||x.reason||x.kind||x.type||x.status||'';}
+function collectEvidence(arr,limit){var r=[];A(arr).forEach(function(x){var t=textOf(x);if(t)r.push(t)});return uniq(r).slice(0,limit||8);}
+function timingText(tm){if(!tm)return T('Chưa có Ứng Kỳ typed cho chủ đề này.','No typed timing method is available for this topic.');var bits=[];['window','timing','period','branch','targetBranch','speed','note','reason'].forEach(function(k){if(tm[k])bits.push(textOf(tm[k]))});if(tm.source)bits.push(T('Nguồn: ','Source: ')+tm.source);return uniq(bits).join(' · ')||T('Có module Ứng Kỳ nhưng chưa đủ dữ liệu để quy ra mốc cụ thể.','Timing module exists but data are insufficient for a specific window.');}
+function hostGuestText(km){var h=km&&km.qimenV476||km&&km.qimenV475||null;if(!h)return T('Chủ–Khách chưa đủ dữ liệu typed để diễn giải.','Host–Guest typed data are not sufficient for interpretation.');var bits=[];if(h.profile)bits.push(T('Profile: ','Profile: ')+h.profile);if(h.status)bits.push('Status: '+h.status);if(h.judgment)bits.push(textOf(h.judgment));if(h.relation)bits.push(textOf(h.relation));if(h.note)bits.push(textOf(h.note));return uniq(bits).join(' · ')||T('Đã có lớp Chủ–Khách nhưng chưa có kết luận văn bản đủ chắc.','Host–Guest layer exists but has no sufficiently grounded textual conclusion.');}
+function action(verdict){if(verdict==='CAUTION'||verdict==='CAUTION_DOMINANT')return T('Ưu tiên giảm rủi ro, tránh quyết định gấp; kiểm lại thời điểm và điều kiện bất lợi trước khi hành động.','Prioritize risk reduction; avoid rushed decisions and re-check timing and adverse conditions before acting.');if(verdict==='MIXED'||verdict==='MIXED_CONFLICT')return T('Không nên chỉ nhìn một cách cát hoặc một cách hung. Chỉ hành động khi yếu tố thuận có thể khai thác mà các trở lực chính đã có phương án xử lý.','Do not rely on a single favorable or adverse pattern. Act only when supportive factors are usable and major obstacles have mitigation.');if(/^SUPPORTIVE/.test(verdict||''))return T('Có thể tiến hành có điều kiện, nhưng vẫn phải giữ các cảnh báo đang hiện trên cung Dụng Thần và không coi đây là bảo đảm kết quả.','Proceed conditionally while respecting warnings on the Use-Spirit palace; this is not a guarantee of outcome.');return T('Dùng kết quả như khung diễn giải cổ pháp; chưa đủ căn cứ để đưa ra khuyến nghị mạnh.','Use this as a classical interpretive framework; evidence is insufficient for a strong recommendation.');}
+function apply(km){if(!km)return {version:V,status:'SOURCE LOCK',reason:'chart unavailable'};var f=ensure(km,'qimenV484',window.KD_QIMEN_V484)||{};var sa=ensure(km,'qimenV488',window.KD_QIMEN_V488)||{};var tm=ensure(km,'qimenV480',window.KD_QIMEN_V480)||null;var topic=f.topic||{};var support=collectEvidence(f.support,8),caution=collectEvidence(f.caution,8);var title=topic.label||topic.topic||(f.sourcedMethod&&f.sourcedMethod.label)||T('Câu hỏi hiện tại','Current question');var verdict=f.verdict||'SOURCE LOCK';var summary=labelVerdict(verdict);var why=[];if(f.headline)why.push(f.headline);if(support.length)why.push(T('Yếu tố thuận: ','Support: ')+support.slice(0,3).join('; '));if(caution.length)why.push(T('Trở lực: ','Caution: ')+caution.slice(0,3).join('; '));var out={schema:'KD.QIMEN.INTERPRETATION.v1',version:V,status:f.status||'PASS',topic:title,verdict:verdict,summary:summary,why:uniq(why),support:support,caution:caution,hostGuest:hostGuestText(km),timing:timingText(tm),sourceConfidence:sourceLabel(sa.sourceConfidence),sourceNotes:A(sa.notes),action:action(verdict),relevantPalaces:A(f.relevantPalaces),guards:{evidenceFirst:true,noNewClassicalClaims:true,noProbability:true,noGuaranteedOutcome:true,sourceVariantsPreserved:true}};km.qimenV489=out;return out;}
+function lis(a){return A(a).map(function(x){return '<li>'+E(x)+'</li>'}).join('')||'<li>—</li>';}
+function panel(km){var d=km&&km.qimenV489||apply(km||{});return '<details class="card kd-km-v489" open><summary><b>☯ '+T('Kỳ Môn V4.89 · Luận giải tổng hợp','Qi Men V4.89 · Final Interpretation')+'</b></summary><div class="kd489"><div class="hero"><div class="topic">'+E(d.topic)+'</div><div class="verdict">'+E(d.summary)+'</div></div><h4>'+T('Kết luận','Conclusion')+'</h4><p>'+E(d.why[0]||d.summary)+'</p><div class="grid"><section><h4>'+T('Yếu tố hỗ trợ','Supporting evidence')+'</h4><ul>'+lis(d.support)+'</ul></section><section><h4>'+T('Yếu tố cản trở','Caution / obstacles')+'</h4><ul>'+lis(d.caution)+'</ul></section></div><h4>'+T('Chủ–Khách','Host–Guest')+'</h4><p>'+E(d.hostGuest)+'</p><h4>'+T('Ứng Kỳ','Timing / Ying Qi')+'</h4><p>'+E(d.timing)+'</p><h4>'+T('Độ chắc của nguồn','Source confidence')+'</h4><p>'+E(d.sourceConfidence)+'</p>'+(d.sourceNotes.length?'<p class="dim">'+E(d.sourceNotes.join(' '))+'</p>':'')+'<h4>'+T('Hướng hành động','Action guidance')+'</h4><p>'+E(d.action)+'</p><p class="dim">'+T('V4.89 chỉ biên soạn lại evidence đã được các module trước tạo ra. Nó không tự thêm quy tắc cổ pháp mới, không tạo phần trăm dự đoán và không bảo đảm kết quả.','V4.89 composes evidence produced by prior modules only. It adds no new classical rule, predictive percentage, or guaranteed outcome.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r)}catch(e){r.qimenV489={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km)}catch(e){return h;}};
+window.KD_QIMEN_V489={version:V,schema:'KD.QIMEN.INTERPRETATION.v1',apply:apply,guards:{evidenceFirst:true,noNewClassicalClaims:true,noProbability:true,noGuaranteedOutcome:true,sourceVariantsPreserved:true}};window.KD_RELEASE='4.89.0-qimen-final-interpretation-composer';
+})();
+</script>
+<style id="kd-v489-qimen-style">.kd-km-v489 summary{cursor:pointer;min-height:46px;display:flex;align-items:center}.kd489{padding-top:10px;line-height:1.7}.kd489 .hero{border:1px solid var(--line,#55482a);border-radius:12px;padding:12px;margin-bottom:12px}.kd489 .topic{font-weight:700;opacity:.8}.kd489 .verdict{font-size:1.18em;font-weight:800;margin-top:3px}.kd489 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.kd489 section{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px}.kd489 h4{margin:12px 0 5px}.kd489 ul{margin:5px 0;padding-left:20px}.kd489 .dim{opacity:.74}@media(max-width:680px){.kd489 .grid{grid-template-columns:1fr}}</style>
+</body></html>';
   kdDownload95('S_I_CHING_result.html','text/html;charset=utf-8',doc);
  }catch(e){alert(String(e.message||e));}
 };
@@ -5969,6 +6191,545 @@ window.KD_RELEASE='4.71.3-ui-raw-source-hard-fix';
 <script id="kd-v4714-export-boundary-root-fix">
 (function(){'use strict';window.KD_UI_RAW_SOURCE_FIX='4.71.4';window.KD_RELEASE='4.71.4-export-boundary-root-fix';})();
 </script>
+
+<script id="kd-v472-qimen-use-spirit-host-guest">
+(function(){'use strict';
+var V='4.72.0';
+var TOPICS=[
+ {id:'finance',vi:'Tài lộc / kinh doanh',en:'Finance / business',re:/tài|tiền|kinh doanh|đầu tư|lợi nhuận|doanh thu|money|finance|business|invest/i},
+ {id:'career',vi:'Công việc / thăng tiến',en:'Career / promotion',re:/công việc|việc làm|thăng|chức|career|job|promotion|work/i},
+ {id:'love',vi:'Tình cảm / hôn nhân',en:'Relationship / marriage',re:/tình|yêu|hôn nhân|vợ|chồng|love|relationship|marriage/i},
+ {id:'health',vi:'Sức khỏe',en:'Health',re:/sức khỏe|bệnh|điều trị|health|ill|medical/i},
+ {id:'exam',vi:'Học tập / thi cử',en:'Study / examination',re:/thi|học|điểm|trường|exam|study|school/i},
+ {id:'legal',vi:'Kiện tụng / tranh chấp',en:'Legal / dispute',re:/kiện|tranh chấp|tòa|pháp lý|legal|court|lawsuit|dispute/i},
+ {id:'travel',vi:'Đi lại / xuất hành',en:'Travel / movement',re:/đi lại|xuất hành|du lịch|chuyến đi|travel|trip|journey/i},
+ {id:'lost',vi:'Tìm người / vật thất lạc',en:'Missing person / lost item',re:/thất lạc|mất đồ|tìm người|lost|missing|find/i},
+ {id:'property',vi:'Nhà cửa / chuyển chỗ',en:'Property / relocation',re:/nhà|đất|chuyển nhà|bất động sản|house|property|move|relocat/i},
+ {id:'general',vi:'Tổng quát',en:'General',re:/.*/}
+];
+function lang(){return window.S_ICHING_LANGUAGE==='en'?'en':'vi';}
+function topic(q){q=String(q||'').trim();for(var i=0;i<TOPICS.length;i++)if(TOPICS[i].re.test(q))return TOPICS[i];return TOPICS[TOPICS.length-1];}
+function first(o,names){for(var i=0;i<names.length;i++){var v=o&&o[names[i]];if(v!==undefined&&v!==null&&v!=='')return v;}return null;}
+function stem(v){var m=String(v||'').match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+function extract(km){var day=stem(first(km,['dayGan','dayStem','ngayCan','canNgay','dayPillar','ngay']));var hour=stem(first(km,['hourGan','hourStem','gioCan','canGio','hourPillar','gio']));return {dayStem:day,hourStem:hour,host:day,guest:hour,status:(day&&hour)?'TYPED':'SOURCE LOCK'};}
+function question(){var el=document.getElementById('q');return el?el.value:'';}
+function palaceByStem(km,st){var a=km&&km.qimenTyped&&km.qimenTyped.palaces;if(!Array.isArray(a)||!st)return null;for(var i=0;i<a.length;i++){if(a[i]&&(a[i].heavenStem===st||a[i].earthStem===st))return a[i].palace||a[i].number||null;}return null;}
+function build(km){var q=question(),t=topic(q),r=extract(km),lp=lang(),hp=palaceByStem(km,r.host),gp=palaceByStem(km,r.guest);var title=lp==='vi'?'Kỳ Môn V4.72 · Dụng Thần & Chủ–Khách':'Qi Men V4.72 · Use Spirit & Host–Guest';var note=lp==='vi'?'Bản này chỉ khóa vai trò có dữ liệu typed: Nhật can = trục người hỏi/Chủ, Thời can = trục sự việc/Khách. Dụng Thần chuyên đề chưa được gán thành một Môn/Tinh/Thần duy nhất nếu chưa có profile nguồn độc lập; vì vậy không tạo kết luận giả.':'This layer only locks roles supported by typed data: day stem as querent/Host axis and hour stem as event/Guest axis. Topic-specific Use Spirit is not forced to a single Gate/Star/Spirit without an independent sourced profile.';return '<details class="card kd-km-v472"><summary><b>'+title+'</b></summary><div class="kd472"><p><b>'+(lp==='vi'?'Chủ đề nhận diện':'Detected topic')+':</b> '+(lp==='vi'?t.vi:t.en)+'</p><div class="grid"><div><b>'+(lp==='vi'?'Chủ / Nhật can':'Host / Day stem')+'</b><br>'+(r.host||'SOURCE LOCK')+(hp?' · '+(lp==='vi'?'Cung ':'Palace ')+hp:'')+'</div><div><b>'+(lp==='vi'?'Khách / Thời can':'Guest / Hour stem')+'</b><br>'+(r.guest||'SOURCE LOCK')+(gp?' · '+(lp==='vi'?'Cung ':'Palace ')+gp:'')+'</div></div><p class="dim">'+note+'</p><p class="dim"><b>Status:</b> '+r.status+' · '+(lp==='vi'?'Không dùng phần trăm dự đoán.':'No predictive probability.')+'</p></div></details>';}
+var old=window.kmRender;if(typeof old==='function'){window.kmRender=function(km,lv){var h=old.apply(this,arguments);try{return h+build(km);}catch(e){return h;}};}
+window.KD_QIMEN_V472={version:V,topicClassifier:true,hostGuestTyped:true,useSpiritProfile:'SOURCE LOCK until independently sourced',noPredictiveProbability:true};window.KD_RELEASE='4.72.0-qimen-use-spirit-host-guest';
+})();
+</script>
+<style id="kd-v472-qimen-style">.kd-km-v472 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd472{padding-top:10px;line-height:1.7}.kd472 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kd472 .grid>div{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px}.kd472 .dim{opacity:.76}@media(max-width:620px){.kd472 .grid{grid-template-columns:1fr}}</style>
+<!-- KD QIMEN V4.73: source-profiled Use-Spirit Matrix -->
+<script id="kd-v473-qimen-use-spirit-matrix">
+(function(){'use strict';
+if(window.KD_QIMEN_V473)return;
+var V='4.73.0';
+var MATRIX={
+ finance:{labelVI:'Tài lộc / kinh doanh',labelEN:'Finance / business',primary:[{kind:'gate',value:'生門',role:'財門 / trục cầu tài'}],secondary:[{kind:'stem',value:'戊',role:'甲子戊 / tài vật trong phép thất vật, đắc tài'},{kind:'relation',value:'主客',role:'xét sinh-khắc chủ/khách khi mưu cầu'}],source:'奇門遁甲元靈經·卷十六/十七',status:'SOURCED'},
+ career:{labelVI:'Công việc / thăng tiến',labelEN:'Career / promotion',primary:[{kind:'gate',value:'開門',role:'官 / thăng thiên'}],secondary:[{kind:'relation',value:'太歲/月建',role:'phụ trợ riêng phép thăng thiên'}],source:'奇門遁甲元靈經·卷九',status:'SOURCED'},
+ love:{labelVI:'Tình cảm / hôn nhân',labelEN:'Relationship / marriage',primary:[{kind:'stem',value:'乙',role:'nữ / vợ'},{kind:'stem',value:'庚',role:'nam / chồng'}],secondary:[{kind:'spirit',value:'六合',role:'mai mối / môi giới hôn nhân'}],source:'古今圖書集成·藝術典707·占婚姻',status:'SOURCED'},
+ health:{labelVI:'Sức khỏe',labelEN:'Health',primary:[{kind:'star',value:'天芮',role:'病神'},{kind:'gate',value:'生門',role:'sinh'},{kind:'gate',value:'死門',role:'khó lành'}],secondary:[{kind:'stem',value:'年干',role:'cung năm sinh người bệnh'}],source:'奇門遁甲元靈經·卷十二·占疾病',status:'SOURCED'},
+ exam:{labelVI:'Học tập / thi cử',labelEN:'Study / examination',primary:[{kind:'star',value:'天輔',role:'文宗'},{kind:'stem',value:'日干',role:'士子'},{kind:'stem',value:'丁',role:'文章'}],secondary:[{kind:'gate',value:'開/休/生/景',role:'tứ cát môn trong phép khảo thí'}],source:'奇門遁甲元靈經·卷八·占歲考等第',status:'SOURCED'},
+ lost:{labelVI:'Tìm người / vật thất lạc',labelEN:'Missing person / lost item',primary:[{kind:'stem',value:'時干',role:'失主 / người mất'},{kind:'spirit',value:'六合',role:'người/vật chạy mất trong phép 走失'},{kind:'stem',value:'戊',role:'甲子戊 / tài vật trong phép 失物'}],secondary:[{kind:'spirit',value:'玄武',role:'dấu hiệu trộm trong phép thất vật'}],source:'奇門遁甲元靈經·卷十八',status:'SOURCED'},
+ legal:{labelVI:'Kiện tụng / tranh chấp',labelEN:'Legal / dispute',primary:[],secondary:[],source:'SOURCE LOCK: cần khóa đúng tiểu mục tố tụng trước khi gán Dụng Thần',status:'SOURCE LOCK'},
+ travel:{labelVI:'Đi lại / xuất hành',labelEN:'Travel / movement',primary:[],secondary:[],source:'SOURCE LOCK: nhiều phép xuất hành khác nhau; không gộp thành một Dụng Thần',status:'SOURCE LOCK'},
+ property:{labelVI:'Nhà cửa / chuyển chỗ',labelEN:'Property / relocation',primary:[],secondary:[],source:'SOURCE LOCK: cần tách điền trạch, tạo tác, thiên di',status:'SOURCE LOCK'},
+ general:{labelVI:'Câu hỏi tổng quát',labelEN:'General question',primary:[{kind:'relation',value:'主客',role:'người đến cầu ta / ta đi cầu người phải đổi chủ-khách theo tình huống'}],secondary:[],source:'奇門遁甲元靈經·卷十六·占事成否',status:'SOURCED'}
+};
+function lang(){return window.S_ICHING_LANGUAGE==='en'?'en':'vi';}
+function topic(km){var t=km&&km.qimenV472&&km.qimenV472.topic; if(t&&MATRIX[t])return t; try{var q=(window.KD_QIMEN_V472&&window.KD_QIMEN_V472.classify)?window.KD_QIMEN_V472.classify():null;if(q&&MATRIX[q.id])return q.id;}catch(e){} return 'general';}
+function n(x){return String(x==null?'':x).trim();}
+function normGate(x){x=n(x);return x.replace(/门/g,'門');}
+function normStar(x){x=n(x);return x.replace('天冲','天沖').replace('天辅','天輔');}
+function normSpirit(x){x=n(x);return x.replace('腾蛇','騰蛇').replace('太阴','太陰').replace('六合','六合').replace('勾陈','勾陳').replace('朱雀','朱雀').replace('九地','九地').replace('九天','九天').replace('白虎','白虎').replace('玄武','玄武');}
+function locate(c,item,km){var hits=[];if(!c||!Array.isArray(c.palaces))return hits;
+ if(item.kind==='gate'){var vals=item.value.split('/').map(function(v){return v+'門';});c.palaces.forEach(function(p){var g=normGate(p.gate);if(vals.some(function(v){return g===v||g===v.replace('門','');}))hits.push(Number(p.palace));});}
+ else if(item.kind==='star'){c.palaces.forEach(function(p){if(normStar(p.star)===normStar(item.value))hits.push(Number(p.palace));});}
+ else if(item.kind==='spirit'){c.palaces.forEach(function(p){if(normSpirit(p.spirit)===normSpirit(item.value))hits.push(Number(p.palace));});}
+ else if(item.kind==='stem'){
+   if(item.value==='日干'||item.value==='年干')return hits; var s=item.value==='戊'?'戊':item.value;c.palaces.forEach(function(p){if(n(p.heavenStem)===s||n(p.earthStem)===s)hits.push(Number(p.palace));});
+ }
+ return hits.filter(function(v,i,a){return v&&a.indexOf(v)===i;});}
+function apply(km){var id=topic(km),p=MATRIX[id]||MATRIX.general,c=km&&km.qimenTyped;var roles=[];p.primary.concat(p.secondary).forEach(function(x){roles.push({kind:x.kind,value:x.value,role:x.role,palaces:locate(c,x,km)});});var out={version:V,topic:id,label:lang()==='vi'?p.labelVI:p.labelEN,status:p.status,source:p.source,roles:roles,policy:'Source-profiled roles only; no forced single Use Spirit; no predictive probability.'};if(km)km.qimenV473=out;return out;}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV473={status:'REVIEW',reason:String(e)}}return r;};
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function panel(km){var d=km&&km.qimenV473||apply(km||{}),vi=lang()==='vi';var rows=d.roles.map(function(r){return '<tr><td>'+E(r.value)+'</td><td>'+E(r.role)+'</td><td>'+E(r.palaces.length?r.palaces.join(', '):'—')+'</td></tr>';}).join('')||'<tr><td colspan="3">SOURCE LOCK</td></tr>';return '<details class="card kd-km-v473"><summary><b>◎ '+(vi?'Kỳ Môn V4.73 · Dụng Thần Matrix có nguồn':'Qi Men V4.73 · Sourced Use-Spirit Matrix')+'</b></summary><div class="kd473"><p><b>'+(vi?'Chủ đề':'Topic')+':</b> '+E(d.label)+' · <b>Status:</b> '+E(d.status)+'</p><div class="scroll"><table><thead><tr><th>'+(vi?'Trục':'Axis')+'</th><th>'+(vi?'Vai trò cổ pháp':'Classical role')+'</th><th>'+(vi?'Cung typed':'Typed palace')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p><b>'+(vi?'Nguồn profile':'Profile source')+':</b> '+E(d.source)+'</p><p class="dim">'+(vi?'V4.73 không ép mọi câu hỏi về một Dụng Thần duy nhất. Một phép có thể dùng đồng thời nhiều trục (ví dụ hôn nhân: 乙–庚–六合; bệnh: 天芮–生/死門–năm sinh). Trường chưa khóa nguồn vẫn SOURCE LOCK.':'V4.73 does not force every question into one universal Use Spirit. A method may require multiple axes. Unlocked topics remain SOURCE LOCK.')+'</p></div></details>';}
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V473={version:V,matrix:MATRIX,apply:apply,sourceProfiled:true,multiAxis:true,noPredictiveProbability:true,noUniversalUseSpirit:true};window.KD_RELEASE='4.73.0-qimen-sourced-use-spirit-matrix';
+})();
+</script>
+<style id="kd-v473-qimen-style">.kd-km-v473 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd473{padding-top:10px;line-height:1.7}.kd473 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd473 table{width:100%;border-collapse:collapse;min-width:560px}.kd473 th,.kd473 td{padding:7px;border-bottom:1px solid var(--line,#55482a);text-align:left}.kd473 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.74: Evidence Judgment Engine -->
+<script id="kd-v474-qimen-evidence-judgment-engine">
+(function(){'use strict';
+if(window.KD_QIMEN_V474)return;
+var V='4.74.0';
+function arr(x){return Array.isArray(x)?x:[];}
+function esc(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function t(a,b){return vi()?a:b;}
+function palaceMap(km){var m={};arr(km&&km.qimenTyped&&km.qimenTyped.palaces).forEach(function(p){m[Number(p.palace)]=p;});return m;}
+function roleState(role,pmap){var ps=arr(role.palaces),rows=[];ps.forEach(function(no){var p=pmap[Number(no)]||{},d=p.diagnosticSynthesis||{},ev=arr(d.evidence).map(function(e){return {code:e.code||'',label:e.label||'',source:e.source||''};});rows.push({palace:Number(no),gate:p.gate||null,star:p.star||null,spirit:p.spirit||null,earthStem:p.earthStem||null,heavenStem:p.heavenStem||null,diagnosticStatus:d.status||'SOURCE LOCK',evidence:ev,missing:arr(d.missing)});});return {kind:role.kind,value:role.value,role:role.role,palaces:rows,status:ps.length?(rows.some(function(x){return x.diagnosticStatus==='SOURCE LOCK';})?'PARTIAL':'OBSERVED'):'SOURCE LOCK'};}
+function apply(km){var u=km&&km.qimenV473;if(!u&&window.KD_QIMEN_V473&&window.KD_QIMEN_V473.apply)try{u=window.KD_QIMEN_V473.apply(km);}catch(e){};if(!u)return {version:V,status:'SOURCE LOCK',reason:'V4.73 Use-Spirit Matrix unavailable'};var pmap=palaceMap(km),roles=arr(u.roles).map(function(r){return roleState(r,pmap);});var observed=roles.filter(function(r){return r.status==='OBSERVED';}).length,partial=roles.filter(function(r){return r.status==='PARTIAL';}).length,locked=roles.filter(function(r){return r.status==='SOURCE LOCK';}).length;var status=locked===roles.length?'SOURCE LOCK':(locked||partial?'PARTIAL':'PASS');var out={version:V,topic:u.topic,label:u.label,status:status,sourceProfile:u.source,roles:roles,coverage:{observed:observed,partial:partial,locked:locked,total:roles.length},policy:'Evidence judgment only. Preserve each classical condition separately; no numeric auspiciousness, no automatic success/failure prediction, no invented conflict-resolution rule.'};if(km)km.qimenV474=out;return out;}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV474={version:V,status:'REVIEW',reason:String(e)}}return r;};
+function evidenceText(r){var parts=[];arr(r.palaces).forEach(function(p){var e=arr(p.evidence).map(function(x){return x.label;}).join(' · ');parts.push(t('Cung ','Palace ')+p.palace+': '+(e||t('không có điều kiện đặc biệt đã kích hoạt','no triggered special condition'))+(p.missing.length?' ['+t('còn khóa: ','locked: ')+p.missing.join(', ')+']':''));});return parts.join('<br>')||'SOURCE LOCK';}
+function panel(km){var d=km&&km.qimenV474||apply(km||{});var rows=arr(d.roles).map(function(r){return '<tr><td>'+esc(r.value)+'</td><td>'+esc(r.role)+'</td><td><b>'+esc(r.status)+'</b></td><td>'+evidenceText(r)+'</td></tr>';}).join('')||'<tr><td colspan="4">SOURCE LOCK</td></tr>';return '<details class="card kd-km-v474"><summary><b>◎ '+t('Kỳ Môn V4.74 · Evidence Judgment Engine','Qi Men V4.74 · Evidence Judgment Engine')+'</b></summary><div class="kd474"><p><b>'+t('Chủ đề','Topic')+':</b> '+esc(d.label||d.topic||'—')+' · <b>Status:</b> '+esc(d.status||'SOURCE LOCK')+'</p><p><b>'+t('Độ phủ','Coverage')+':</b> '+esc(d.coverage?d.coverage.observed:0)+' '+t('đã quan sát','observed')+' / '+esc(d.coverage?d.coverage.total:0)+' · '+esc(d.coverage?d.coverage.locked:0)+' SOURCE LOCK</p><div class="scroll"><table><thead><tr><th>'+t('Dụng thần/trục','Use-spirit axis')+'</th><th>'+t('Vai trò','Role')+'</th><th>Status</th><th>'+t('Bằng chứng tại cung','Palace evidence')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+t('V4.74 nối Dụng Thần V4.73 với dữ liệu cung V4.71. Mỗi Không, Mã, Mộ, Hình, Môn khắc Cung và Phục/Phản Ngâm vẫn được giữ thành bằng chứng riêng. Engine chưa tự phán “thành/bại” khi chưa có quy tắc giải xung đột được khóa nguồn.','V4.74 connects V4.73 Use-Spirit axes to V4.71 palace diagnostics. Void, Horse, Tomb, Punishment, Gate-controls-Palace and Fu/Fan-Yin remain separate evidence. It does not auto-declare success/failure without a source-locked conflict-resolution rule.')+'</p></div></details>';}
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{var d=apply(km);return h+panel(Object.assign({},km,{qimenV474:d}));}catch(e){return h;}};
+window.KD_QIMEN_V474={version:V,apply:apply,evidenceJudgment:true,sourceProfilePreserved:true,noNumericAuspiciousness:true,noAutomaticSuccessFailure:true,noInventedConflictResolution:true};
+window.KD_RELEASE='4.74.0-qimen-evidence-judgment-engine';
+})();
+</script>
+<style id="kd-v474-qimen-style">.kd-km-v474 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd474{padding-top:10px;line-height:1.7}.kd474 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd474 table{width:100%;border-collapse:collapse;min-width:680px}.kd474 th,.kd474 td{padding:7px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd474 .dim{opacity:.76}</style>
+
+\n<!-- KD QIMEN V4.76: Source-profiled Host–Guest Judgment -->
+<script id="kd-v476-qimen-source-profiled-host-guest-judgment">
+(function(){'use strict';
+var V='4.76.0';
+function arr(x){return Array.isArray(x)?x:[];}
+function esc(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function T(a,b){return vi()?a:b;}
+var PROFILES={
+ general:{id:'yuanling-contextual',source:'奇門遁甲元靈經',scope:'contextual-host-guest',rule:'Host/guest identity depends on the divination context; preserve direction and do not force a universal day-stem/hour-stem verdict.',locked:true},
+ military:{id:'tongzong-palace-star-gate',source:'奇門遁甲統宗',scope:'military',rule:'宮為主，星門為客；星門克宮利客，宮克星門利主；星門生宮利主；比和勢均；一克一生互傷。',locked:true},
+ exam:{id:'yuanling-exam-context',source:'奇門遁甲元靈經·占功名',scope:'exam',rule:'Official/student host–guest assignment changes with the examination setting; mutual generation/equality plus favorable configurations supports ease, while controlling relations can obstruct according to which side is host.',locked:true},
+ avoidance:{id:'yuanling-first-later-motion',source:'奇門遁甲元靈經·占逃避',scope:'avoidance',rule:'先動者為客、後動者為主; 六丙/六庚 are used for this specific method.',locked:true},
+ battle:{id:'yuanling-zhifu-geng',source:'奇門遁甲元靈經·占勝敗',scope:'battle',rule:'值符落宮為主，六庚落宮為客; compare palace control and strength.',locked:true}
+};
+function topic(km){var u=km&&km.qimenV475;var v=km&&km.qimenV474;var x=(v&&v.topic)||(km&&km.qimenV473&&km.qimenV473.topic)||(u&&u.topic)||'';return String(x||'general').toLowerCase();}
+function profileFor(t){if(/exam|study|education|career_exam/.test(t))return PROFILES.exam;if(/battle|war|military|combat/.test(t))return PROFILES.battle;if(/avoid|escape|evade/.test(t))return PROFILES.avoidance;return PROFILES.general;}
+function relationMeaning(r){var m={
+ SAME:{vi:'Hai bên đồng hành: thế cân bằng hơn; tự nó chưa đủ để kết luận cát/hung.',en:'Same phase: relatively balanced; this alone does not establish auspiciousness.'},
+ A_GENERATES_B:{vi:'A sinh B: khí từ A chuyển sang B; bên A có xu hướng sinh/trợ hoặc bị tiết cho B.',en:'A generates B: qi flows from A to B; A tends to support or expend toward B.'},
+ B_GENERATES_A:{vi:'B sinh A: khí từ B chuyển sang A; A nhận sinh/trợ từ B.',en:'B generates A: qi flows from B to A; A receives support from B.'},
+ A_CONTROLS_B:{vi:'A khắc B: A có thế chế ước B trong quan hệ Ngũ hành; ý nghĩa thắng/thua còn tùy phép chiêm cụ thể.',en:'A controls B: A constrains B in Five-Phase terms; win/loss still depends on the specific divination method.'},
+ B_CONTROLS_A:{vi:'B khắc A: A chịu chế ước từ B; không tự động đồng nghĩa thất bại.',en:'B controls A: A is constrained by B; this is not automatically failure.'},
+ SOURCE_LOCK:{vi:'Thiếu dữ liệu typed để luận quan hệ.',en:'Typed data is insufficient for relation judgment.'}
+ };return m[r]||{vi:'Quan hệ chưa được khóa.',en:'Relation not source-locked.'};}
+function militaryVerdict(rel){var m={
+ A_CONTROLS_B:{vi:'Theo profile binh sự: Cung (chủ) khắc Tinh/Môn (khách) → lợi chủ.',en:'Military profile: Palace (host) controls Star/Gate (guest) → favors host.'},
+ B_CONTROLS_A:{vi:'Theo profile binh sự: Tinh/Môn (khách) khắc Cung (chủ) → lợi khách.',en:'Military profile: Star/Gate (guest) controls Palace (host) → favors guest.'},
+ B_GENERATES_A:{vi:'Theo profile binh sự: Tinh/Môn sinh Cung → lợi chủ.',en:'Military profile: Star/Gate generates Palace → favors host.'},
+ SAME:{vi:'Theo profile binh sự: chủ khách thế quân bình.',en:'Military profile: host and guest are relatively even.'}
+ };return m[rel]||null;}
+function apply(km){
+ var d=km&&km.qimenV475;if(!d&&window.KD_QIMEN_V475&&window.KD_QIMEN_V475.apply)try{d=window.KD_QIMEN_V475.apply(km);}catch(e){}
+ if(!d)return {version:V,status:'SOURCE LOCK',reason:'V4.75 unavailable'};
+ var t=topic(km),p=profileFor(t),hg=relationMeaning(d.hostGuestRelation),rows=[];
+ arr(d.axes).forEach(function(a){rows.push({value:a.value,palace:a.palace,hostRelation:a.hostRelation,guestRelation:a.guestRelation,hostMeaning:relationMeaning(a.hostRelation),guestMeaning:relationMeaning(a.guestRelation)});});
+ var status=(d.host&&d.guest)?(p.id==='yuanling-contextual'?'PARTIAL':'PASS'):'SOURCE LOCK';
+ var out={version:V,status:status,topic:t,profile:p,host:d.host,guest:d.guest,hostGuestRelation:d.hostGuestRelation,hostGuestMeaning:hg,axes:rows,militaryDirectRule:(p.scope==='military'?militaryVerdict(d.hostGuestRelation):null),policy:'Source-profiled interpretation only. No universal conversion of day/hour stem relations into victory/defeat. Context-specific classical host/guest rules remain separate; no numeric prediction.'};
+ if(km)km.qimenV476=out;return out;
+}
+function panel(km){var d=km&&km.qimenV476||apply(km||{});var rows=arr(d.axes).map(function(r){return '<tr><td>'+esc(r.value)+'</td><td>'+esc(r.palace)+'</td><td>'+esc((vi()?r.hostMeaning.vi:r.hostMeaning.en))+'</td><td>'+esc((vi()?r.guestMeaning.vi:r.guestMeaning.en))+'</td></tr>';}).join('')||'<tr><td colspan="4">SOURCE LOCK</td></tr>';
+ var profile=d.profile||{};var direct=d.militaryDirectRule?(vi()?d.militaryDirectRule.vi:d.militaryDirectRule.en):T('Không áp dụng quy tắc thắng/thua phổ quát cho profile này.','No universal win/loss rule is applied to this profile.');
+ return '<details class="card kd-km-v476"><summary><b>◎ '+T('Kỳ Môn V4.76 · Chủ–Khách theo nguồn','Qi Men V4.76 · Source-profiled Host–Guest Judgment')+'</b></summary><div class="kd476"><p><b>Status:</b> '+esc(d.status)+' · <b>Profile:</b> '+esc(profile.id||'SOURCE LOCK')+' · <b>'+T('Nguồn','Source')+':</b> '+esc(profile.source||'—')+'</p><p>'+esc(profile.rule||'')+'</p><p><b>'+T('Quan hệ Chủ↔Khách hiện tại','Current Host↔Guest relation')+':</b> '+esc(d.hostGuestRelation||'SOURCE LOCK')+' — '+esc(vi()?d.hostGuestMeaning.vi:d.hostGuestMeaning.en)+'</p><p><b>'+T('Phán theo profile','Profile judgment')+':</b> '+esc(direct)+'</p><div class="scroll"><table><thead><tr><th>'+T('Dụng thần','Use axis')+'</th><th>'+T('Cung','Palace')+'</th><th>'+T('Chủ ↔ Dụng','Host ↔ Use')+'</th><th>'+T('Khách ↔ Dụng','Guest ↔ Use')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+T('V4.76 sửa một điểm quan trọng: Chủ–Khách không có một công thức duy nhất cho mọi phép chiêm. Binh sự, công danh, tránh nạn và các phép khác giữ profile riêng. Quan hệ Nhật can/Thời can của V4.75 chỉ là bằng chứng typed, không tự động được gọi là quy tắc cổ pháp thắng/thua.','V4.76 corrects an important boundary: Host–Guest does not have one universal rule for every divination. Military, examination, avoidance and other methods retain separate profiles. V4.75 day/hour-stem relations remain typed evidence and are not automatically treated as a classical win/loss rule.')+'</p></div></details>';
+}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV476={version:V,status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{var d=apply(km);return h+panel(Object.assign({},km,{qimenV476:d}));}catch(e){return h;}};
+window.KD_QIMEN_V476={version:V,apply:apply,profiles:PROFILES,sourceProfiledHostGuest:true,noUniversalHostGuestVerdict:true,noPredictiveProbability:true};
+window.KD_RELEASE='4.76.0-qimen-source-profiled-host-guest-judgment';
+})();
+</script>
+<style id="kd-v476-qimen-style">.kd-km-v476 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd476{padding-top:10px;line-height:1.7}.kd476 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.kd476 table{width:100%;border-collapse:collapse;min-width:820px}.kd476 th,.kd476 td{padding:7px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd476 .dim{opacity:.76}</style>
+\n<!-- KD QIMEN V4.77: source-profiled seasonal strength -->
+<script id="kd-v477-qimen-seasonal-strength">
+(function(){'use strict';
+var V='4.77.0';
+var STAR_EL={'天蓬':'水','天芮':'土','天沖':'木','天冲':'木','天輔':'木','天辅':'木','天禽':'土','天心':'金','天柱':'金','天任':'土','天英':'火'};
+var BR_EL=['水','土','木','木','土','火','火','土','金','金','土','水'];
+var GEN={'木':'火','火':'土','土':'金','金':'水','水':'木'},CTL={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+var GATES=['休門','生門','傷門','杜門','景門','死門','驚門','開門'];
+var GATE_STATE=['旺','絕','胎','沐','死','囚','休','廢'];
+var NODE_GATES=[
+ {deg:270,term:'冬至',gate:'休門'},{deg:315,term:'立春',gate:'生門'},{deg:0,term:'春分',gate:'傷門'},{deg:45,term:'立夏',gate:'杜門'},
+ {deg:90,term:'夏至',gate:'景門'},{deg:135,term:'立秋',gate:'死門'},{deg:180,term:'秋分',gate:'驚門'},{deg:225,term:'立冬',gate:'開門'}];
+var PROFILES={
+ starBaojian:{id:'YU_DING_QIMEN_BAOJIAN_QIYING',source:'《御定奇門寶鑑》·釋氣應',rule:'我生之月旺、我同之月相、我克之月休、克我之月囚、生我之月廢'},
+ starYanyi:{id:'DUNJIA_YANYI_VOL3_TABLE',source:'《遁甲演義》卷三·九星旺相休囚表',rule:'同類月旺、我生月相、生我月廢、我克月休、克我月囚'},
+ gateTongzong:{id:'QIMEN_TONGZONG_EIGHT_NODES',source:'《奇門遁甲統宗》·八節應八門旺相',rule:'冬至休旺；立春生旺；春分傷旺；立夏杜旺；夏至景旺；立秋死旺；秋分驚旺；立冬開旺，依旺絕胎沐死囚休廢環列'}
+};
+function arr(x){return Array.isArray(x)?x:[];}function normGate(x){return String(x||'').replace(/休门/g,'休門').replace(/生门/g,'生門').replace(/伤门/g,'傷門').replace(/杜门/g,'杜門').replace(/景门/g,'景門').replace(/死门/g,'死門').replace(/惊门/g,'驚門').replace(/开门/g,'開門');}
+function starStateBaojian(el,mel){if(!el||!mel)return null;if(GEN[el]===mel)return '旺';if(el===mel)return '相';if(CTL[el]===mel)return '休';if(CTL[mel]===el)return '囚';if(GEN[mel]===el)return '廢';return null;}
+function starStateYanyi(el,mel){if(!el||!mel)return null;if(el===mel)return '旺';if(GEN[el]===mel)return '相';if(GEN[mel]===el)return '廢';if(CTL[el]===mel)return '休';if(CTL[mel]===el)return '囚';return null;}
+function longitude(km){try{if(typeof window.kdSolarLongitude==='function'&&Number.isFinite(km.dd)&&Number.isFinite(km.mm)&&Number.isFinite(km.yy))return ((window.kdSolarLongitude(km.dd,km.mm,km.yy,Number(km.hh)||0)%360)+360)%360;}catch(e){}return null;}
+function nodeFor(lon){if(!Number.isFinite(lon))return null;var x=(lon-270+360)%360,idx=Math.floor(x/45)%8;return NODE_GATES[idx];}
+function gateStates(node){if(!node)return null;var start=GATES.indexOf(node.gate),o={};for(var i=0;i<8;i++)o[GATES[(start+i)%8]]=GATE_STATE[i];return o;}
+function contract(km){return km&&km.qimenTyped||window.__KD_QIMEN_LAST_TYPED||null;}
+function apply(km){var c=contract(km);var out={version:V,status:'SOURCE LOCK',profiles:PROFILES,solarLongitude:null,eightNode:null,monthBranchIndex:null,monthElement:null,palaces:[],conflictNote:'Nine-star seasonal strength is profile-sensitive: 《御定奇門寶鑑》氣應 and the explicit 《遁甲演義》卷三 table reverse 旺/相 for same-vs-generated month. Both are retained; no silent merge.'};if(!c||!arr(c.palaces).length)return out;
+ var mi=Number(km&&km.mChi);if(Number.isInteger(mi)){mi=((mi%12)+12)%12;out.monthBranchIndex=mi;out.monthElement=BR_EL[mi];}
+ var lon=longitude(km||{}),node=nodeFor(lon),gs=gateStates(node);out.solarLongitude=lon;out.eightNode=node;
+ out.palaces=arr(c.palaces).map(function(p){var star=String(p.star||''),gate=normGate(p.gate),el=STAR_EL[star]||null;return {palace:p.palace,star:star||null,starElement:el,starStrength:{baojian:starStateBaojian(el,out.monthElement),yanyi:starStateYanyi(el,out.monthElement)},gate:gate||null,gateStrength:gs&&gate?gs[gate]||null:null};});
+ var haveStar=out.palaces.some(function(p){return p.starStrength.baojian||p.starStrength.yanyi}),haveGate=out.palaces.some(function(p){return p.gateStrength});out.status=haveStar&&haveGate?'PASS':(haveStar||haveGate?'PARTIAL':'SOURCE LOCK');
+ c.diagnostics=c.diagnostics||{};c.diagnostics.seasonalStrength={version:V,status:out.status,profiled:true,monthElement:out.monthElement,solarLongitude:lon,eightNode:node,palaces:out.palaces,profiles:PROFILES};window.__KD_QIMEN_LAST_TYPED=c;if(km)km.qimenV477=out;return out;}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV477={version:V,status:'REVIEW',reason:String(e)}}return r;};
+function vi(){return window.S_ICHING_LANGUAGE!=='en';}function T(a,b){return vi()?a:b;}function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function panel(km){var d=km&&km.qimenV477||apply(km||{}),rows=arr(d.palaces).filter(function(x){return x.palace!==5}).map(function(x){return '<tr><td>'+E(x.palace)+'</td><td>'+E(x.gate||'—')+'</td><td>'+E(x.gateStrength||'SOURCE LOCK')+'</td><td>'+E(x.star||'—')+'</td><td>'+E(x.starStrength.baojian||'SOURCE LOCK')+'</td><td>'+E(x.starStrength.yanyi||'SOURCE LOCK')+'</td></tr>';}).join('');return '<details class="card kd-km-v477"><summary><b>◎ '+T('Kỳ Môn V4.77 · Vượng suy theo thời khí','Qi Men V4.77 · Seasonal Strength')+'</b></summary><div class="kd477"><p><b>Status:</b> '+E(d.status)+' · <b>'+T('Tháng hành','Month phase')+':</b> '+E(d.monthElement||'SOURCE LOCK')+' · <b>'+T('Bát tiết','Eight-node')+':</b> '+E(d.eightNode?d.eightNode.term+' → '+d.eightNode.gate+' 旺':'SOURCE LOCK')+'</p><div class="tableWrap"><table><thead><tr><th>'+T('Cung','Palace')+'</th><th>'+T('Môn','Gate')+'</th><th>'+T('Khí Môn','Gate qi')+'</th><th>'+T('Tinh','Star')+'</th><th>《御定奇門寶鑑》</th><th>《遁甲演義》</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+T('Cửu Tinh giữ hai profile riêng vì hai nguồn cho thứ tự 旺/相 khác nhau. Bát Môn dùng chu kỳ Bát tiết của 《奇門遁甲統宗》. Không quy đổi vượng suy thành phần trăm dự đoán.','Nine Stars retain two separate profiles because the sources differ on 旺/相 ordering. Eight Gates use the eight-node cycle in Qimen Tongzong. Strength is not converted into predictive percentages.')+'</p></div></details>';}
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V477={version:V,apply:apply,profiles:PROFILES,starProfileConflictPreserved:true,eightGateSolarNodeStrength:true,noPredictiveProbability:true};window.KD_RELEASE='4.77.0-qimen-seasonal-strength-typed-engine';
+})();
+</script>
+<style id="kd-v477-qimen-style">.kd477 .tableWrap{overflow:auto}.kd477 table{width:100%;border-collapse:collapse}.kd477 th,.kd477 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.25);text-align:left}.kd477 .dim{opacity:.75}</style>
+
+<!-- KD QIMEN V4.78: Final Topic Synthesis -->
+<script id="kd-v478-qimen-final-topic-synthesis">
+(function(){'use strict';
+if(window.KD_QIMEN_V478)return;
+var V='4.78.0';
+function A(x){return Array.isArray(x)?x:[];}
+function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function T(a,b){return vi()?a:b;}
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function normGate(x){return String(x||'').replace(/门/g,'門');}
+function normStar(x){return String(x||'').replace('天冲','天沖').replace('天辅','天輔');}
+function palaceMap(km){var m={};A(km&&km.qimenTyped&&km.qimenTyped.palaces).forEach(function(p){m[Number(p.palace)]=p;});return m;}
+function seasonalMap(km){var m={};A(km&&km.qimenV477&&km.qimenV477.palaces).forEach(function(p){m[Number(p.palace)]=p;});return m;}
+function relationText(r){var M={SAME:['đồng hành','same element'],A_GENERATES_B:['Chủ sinh Dụng: chủ thể phải xuất lực cho sự việc','Host generates Use: the host expends toward the matter'],B_GENERATES_A:['Dụng sinh Chủ: sự việc có chiều nâng đỡ chủ thể','Use generates Host: the matter supports the host'],A_CONTROLS_B:['Chủ khắc Dụng: chủ thể có khả năng chế ước/điều khiển sự việc','Host controls Use: the host can constrain/control the matter'],B_CONTROLS_A:['Dụng khắc Chủ: sự việc tạo áp lực lên chủ thể','Use controls Host: the matter pressures the host']};var z=M[r];return z?(vi()?z[0]:z[1]):null;}
+function special(p){var d=p&&p.diagnosticSynthesis||{},ev=A(d.evidence);return ev.map(function(x){return {code:x.code||'',label:x.label||x.code||'',source:x.source||''};});}
+function classifyAxis(axis,p,sea,rel){var pos=[],cau=[];if(!p)return {state:'INSUFFICIENT',positive:pos,caution:cau};
+ var gate=normGate(p.gate),star=normStar(p.star),sp=String(p.spirit||'');
+ if(gate==='生門'||gate==='開門'||gate==='休門')pos.push(T('Cát môn '+gate+' hiện diện tại cung Dụng Thần.','Auspicious gate '+gate+' is present at the Use-Spirit palace.'));
+ if(gate==='死門'||gate==='驚門'||gate==='傷門')cau.push(T('Môn '+gate+' cần thận trọng theo đúng phép đang xét; không tự suy thành kết quả chắc chắn.','Gate '+gate+' calls for caution in the applicable method; it is not an automatic outcome.'));
+ if(sp==='六合')pos.push(T('六合 hiện diện: chỉ dùng như bằng chứng hòa hợp/môi giới khi profile chủ đề cho phép.','六合 is present: used as harmony/mediation evidence only where the topic profile supports it.'));
+ A(special(p)).forEach(function(e){var c=e.code||'';if(/VOID|TOMB|PUNISH|PRESSURE|FU_YIN|FAN_YIN/.test(c))cau.push((e.label||c));});
+ if(sea){if(sea.gateStrength==='旺'||sea.gateStrength==='相')pos.push(T('Bát Môn đang '+sea.gateStrength+' theo profile Bát tiết.','Gate is '+sea.gateStrength+' under the eight-node profile.'));if(sea.gateStrength==='死'||sea.gateStrength==='囚'||sea.gateStrength==='廢')cau.push(T('Bát Môn đang '+sea.gateStrength+' theo profile Bát tiết.','Gate is '+sea.gateStrength+' under the eight-node profile.'));}
+ var rt=relationText(rel);if(rt){if(rel==='B_GENERATES_A'||rel==='A_CONTROLS_B'||rel==='SAME')pos.push(rt);else cau.push(rt);}
+ var state=pos.length&&cau.length?'MIXED':(pos.length?'SUPPORTIVE':(cau.length?'CAUTION':'OBSERVED'));
+ return {state:state,positive:pos,caution:cau,gate:gate||null,star:star||null,spirit:sp||null};}
+var TOPIC_RULES={
+ finance:{source:'《奇門遁甲元靈經》卷十六·占求財',noteVI:'以生門為體，兼察上下盤格局、旺衰、時干與甲子戊；伏吟反吟、空亡等不可略。',noteEN:'Uses 生門 as the central axis, then examines upper/lower-plate configuration, strength, hour stem and 甲子戊; Fu/Fan Yin and void conditions are not ignored.'},
+ love:{source:'《奇門遁甲元靈經》卷十·占婚姻',noteVI:'乙為女、庚為夫，六合為媒；重點在兩宮生合或刑克，並察門迫、擊刑與旺衰。',noteEN:'乙 represents the woman, 庚 the man, 六合 the mediator; judge palace generation/harmony versus punishment/control, with gate pressure and strength.'},
+ health:{source:'《奇門遁甲元靈經》卷十二·占疾病',noteVI:'天芮為病神，並察生門、死門及病者年干宮；旺衰與凶格需合看。',noteEN:'天芮 is the illness indicator, considered with 生門, 死門 and the patient year-stem palace; strength and adverse configurations are read together.'},
+ career:{source:'《奇門遁甲元靈經》卷九',noteVI:'官職類需按具體子法分辨；本版只綜合已鎖定的開門/主客/宮位證據。',noteEN:'Official-career questions vary by sub-method; this version synthesizes only already sourced Open-Gate/host-guest/palace evidence.'},
+ exam:{source:'《奇門遁甲元靈經》卷八',noteVI:'科名須合看天輔、日干、丁奇及吉門，不以單一指標斷成敗。',noteEN:'Examination methods combine 天輔, day stem, 丁 and favorable gates; no single indicator determines success.'},
+ lost:{source:'《奇門遁甲元靈經》卷十八',noteVI:'走失、失物各有子法；只合成 V4.73 已鎖定的時干、六合、甲子戊、玄武等證據。',noteEN:'Missing-person and lost-item methods have distinct subrules; only V4.73 sourced axes are synthesized.'}
+};
+function apply(km){
+ var u=km&&km.qimenV473;if(!u&&window.KD_QIMEN_V473&&window.KD_QIMEN_V473.apply)try{u=window.KD_QIMEN_V473.apply(km);}catch(e){}
+ var r=km&&km.qimenV475;if(!r&&window.KD_QIMEN_V475&&window.KD_QIMEN_V475.apply)try{r=window.KD_QIMEN_V475.apply(km);}catch(e){}
+ var ss=km&&km.qimenV477;if(!ss&&window.KD_QIMEN_V477&&window.KD_QIMEN_V477.apply)try{ss=window.KD_QIMEN_V477.apply(km);}catch(e){}
+ if(!u)return {version:V,status:'SOURCE LOCK',reason:'V4.73 sourced Use-Spirit matrix unavailable'};
+ var pm=palaceMap(km),sm=seasonalMap(km),relBy={};A(r&&r.axes).forEach(function(x){relBy[String(x.value)+'@'+String(x.palace)]=x;});
+ var axes=[];A(u.roles).forEach(function(role){A(role.palaces).forEach(function(no){var rr=relBy[String(role.value)+'@'+String(no)]||{};axes.push({value:role.value,role:role.role,palace:Number(no),judgment:classifyAxis(role,pm[Number(no)],sm[Number(no)],rr.hostRelation),hostRelation:rr.hostRelation||null,guestRelation:rr.guestRelation||null});});});
+ var states=axes.map(function(x){return x.judgment.state;}),status=!axes.length?'SOURCE LOCK':(states.indexOf('MIXED')>=0?'MIXED':(states.indexOf('CAUTION')>=0&&states.indexOf('SUPPORTIVE')>=0?'MIXED':(states.indexOf('CAUTION')>=0?'CAUTION':(states.indexOf('SUPPORTIVE')>=0?'SUPPORTIVE':'OBSERVED'))));
+ var rule=TOPIC_RULES[u.topic]||{source:u.source||'SOURCE LOCK',noteVI:'Chủ đề này chưa có quy tắc tổng hợp cuối được khóa nguồn; chỉ hiển thị bằng chứng đã quan sát.',noteEN:'No source-locked final synthesis rule exists for this topic; observed evidence only.'};
+ var out={version:V,topic:u.topic,label:u.label,status:status,profileSource:rule.source,profileNote:vi()?rule.noteVI:rule.noteEN,axes:axes,policy:'Traditional evidence synthesis, not a scientific prediction or probability. Conflicting evidence is preserved; SOURCE LOCK is retained where rules are not independently sourced.'};
+ if(km)km.qimenV478=out;return out;
+}
+function panel(km){var d=km&&km.qimenV478||apply(km||{});var rows=A(d.axes).map(function(a){var j=a.judgment;return '<tr><td>'+E(a.value)+'</td><td>'+E(a.palace)+'</td><td><b>'+E(j.state)+'</b></td><td>'+E(j.positive.join(' · ')||'—')+'</td><td>'+E(j.caution.join(' · ')||'—')+'</td></tr>';}).join('')||'<tr><td colspan="5">SOURCE LOCK</td></tr>';
+ return '<details class="card kd-km-v478"><summary><b>◎ '+T('Kỳ Môn V4.78 · Tổng hợp luận việc theo chủ đề','Qi Men V4.78 · Final Topic Synthesis')+'</b></summary><div class="kd478"><p><b>'+T('Chủ đề','Topic')+':</b> '+E(d.label||d.topic||'—')+' · <b>Status:</b> '+E(d.status)+'</p><p>'+E(d.profileNote||'')+'</p><div class="scroll"><table><thead><tr><th>'+T('Dụng thần','Use axis')+'</th><th>'+T('Cung','Palace')+'</th><th>'+T('Kết cấu','Structure')+'</th><th>'+T('Bằng chứng thuận','Supportive evidence')+'</th><th>'+T('Điểm cần thận trọng','Caution evidence')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p><b>'+T('Nguồn profile','Profile source')+':</b> '+E(d.profileSource||'SOURCE LOCK')+'</p><p class="dim">'+T('Đây là tổng hợp bằng chứng cổ pháp có truy nguyên, không phải xác suất khoa học. Bằng chứng xung đột được giữ nguyên; chủ đề chưa khóa đủ quy tắc sẽ không bị ép thành phán quyết thành/bại.','This is traceable traditional evidence synthesis, not a scientific probability. Conflicting evidence is preserved; incompletely sourced topics are not forced into success/failure verdicts.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV478={version:V,status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V478={version:V,apply:apply,topicRules:TOPIC_RULES,traceableEvidence:true,preservesConflicts:true,noPredictiveProbability:true};window.KD_RELEASE='4.78.0-qimen-final-topic-synthesis';
+})();
+</script>
+<style id="kd-v478-qimen-style">.kd478{padding-top:10px;line-height:1.65}.kd478 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd478 table{width:100%;border-collapse:collapse;min-width:760px}.kd478 th,.kd478 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.25);vertical-align:top;text-align:left}.kd478 .dim{opacity:.76}</style>
+
+
+<!-- KD QIMEN V4.79: sourced legal / travel / lost-person / lost-item methods -->
+<script id="kd-v479-qimen-legal-travel-lost-sourced-methods">
+(function(){'use strict';
+if(window.KD_QIMEN_V479)return;
+var V='4.79.0';
+function A(x){return Array.isArray(x)?x:[];} function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function T(a,b){return vi()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function question(){var e=document.getElementById('q');return e?String(e.value||''):'';}
+function classify(q){q=String(q==null?question():q);var a=[
+ {id:'legal',re:/kiện|tranh chấp|tòa|pháp lý|legal|court|lawsuit|dispute/i},
+ {id:'travel',re:/xuất hành|đi xa|chuyến đi|du lịch|travel|trip|journey/i},
+ {id:'lost',re:/thất lạc|mất đồ|mất vật|tìm người|tìm vật|lost|missing|find/i}
+ ];for(var i=0;i<a.length;i++)if(a[i].re.test(q))return a[i].id;
+ try{var old=window.KD_QIMEN_V472&&window.KD_QIMEN_V472.classify;if(typeof old==='function'){var z=old(q);if(z&&z.id)return z.id;}}catch(e){}
+ return null;}
+function palaces(km){return A(km&&km.qimenTyped&&km.qimenTyped.palaces);}
+function norm(x){return String(x||'').replace(/门/g,'門').replace('腾蛇','騰蛇').replace('太阴','太陰').replace('勾陈','勾陳');}
+function by(km,key,val){return palaces(km).filter(function(p){return norm(p&&p[key])===norm(val);});}
+function stem(v){var m=String(v||'').match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+function first(o,n){for(var i=0;i<n.length;i++){var v=o&&o[n[i]];if(v!=null&&v!=='')return v;}return null;}
+function dayHour(km){return {day:stem(first(km,['dayGan','dayStem','ngayCan','canNgay','dayPillar','ngay'])),hour:stem(first(km,['hourGan','hourStem','gioCan','canGio','hourPillar','gio']))};}
+function byStem(km,st){if(!st)return [];return palaces(km).filter(function(p){return p.heavenStem===st||p.earthStem===st;});}
+function item(kind,label,ps,status,note){return {kind:kind,label:label,palaces:A(ps).map(function(p){return Number(p.palace);}).filter(Boolean),status:status||((ps&&ps.length)?'OBSERVED':'SOURCE LOCK'),note:note||''};}
+function legal(km){
+ var open=by(km,'gate','開門'), alarm=by(km,'gate','驚門'), chief=by(km,'spirit','值符');
+ return {id:'legal',label:T('Kiện tụng / tranh chấp','Litigation / dispute'),source:'《奇門遁甲元靈經》卷十三·占詞訟',status:(open.length&&alarm.length&&chief.length)?'PARTIAL':'SOURCE LOCK',axes:[
+  item('gate','開門 · quan/official',open),item('spirit','值符 · nguyên cáo/plaintiff',chief),item('gate','驚門 · tụng thần/litigation indicator',alarm),
+  item('role','天乙 · bị cáo/defendant',[],'SOURCE LOCK',T('Không suy 天乙 từ tên khác nếu runtime chưa xuất typed role này.','天乙 is not inferred from another label unless runtime exports this typed role.'))
+ ],rule:T('Cổ pháp xét 開門 là quan, 值符 là nguyên cáo, 天乙 là bị cáo, 驚門 là tụng thần; thắng-bại còn phải xét sinh/khắc và vượng/suy của các cung. Bản này không phán thắng-thua khi 天乙 chưa có typed data.','The sourced method uses 開門 as official, 值符 as plaintiff, 天乙 as defendant and 驚門 as litigation indicator; generation/control and strength must also be judged. No win/loss verdict is produced while 天乙 lacks typed data.')};
+}
+function travel(km){var dh=dayHour(km),hp=byStem(km,dh.hour),dp=byStem(km,dh.day),open=by(km,'gate','開門');return {id:'travel',label:T('Xuất hành / di chuyển','Travel / movement'),source:'《奇門遁甲元靈經》卷十四·占出行期/占道途吉凶',status:(dh.hour&&dh.day&&open.length)?'PASS':'PARTIAL',axes:[item('stem','時干 · người khởi hành/traveler',hp,dh.hour?'OBSERVED':'SOURCE LOCK'),item('stem','日干 · sự ràng buộc/constraint',dp,dh.day?'OBSERVED':'SOURCE LOCK'),item('gate','開門 · kỳ khởi hành/departure timing',open)],rule:T('Phép nguồn dùng 時干 làm người khởi hành, 日干 làm sự ràng buộc và 開門 để xét kỳ đi. Nhật can khắc Thời can thì khó đi; Thời can khắc Nhật can thì có thể đi. Đường đi còn có phép riêng xét cung trước cung Thời can và Thiên Bồng, nên không gộp thành một điểm cát/hung.','The sourced method uses the Hour Stem for the traveler, Day Stem for constraint and 開門 for departure timing. Day controlling Hour obstructs departure; Hour controlling Day favors departure. Route safety is a separate sub-method involving the palace ahead and 天蓬, so it is not collapsed into one score.')};}
+function lost(km){var dh=dayHour(km),owner=byStem(km,dh.hour),union=by(km,'spirit','六合'),wu=byStem(km,'戊'),black=by(km,'spirit','玄武');return {id:'lost',label:T('Tìm người / vật thất lạc','Missing person / lost item'),source:'《奇門遁甲元靈經》卷十八·占走失/占失物',status:(dh.hour&&(union.length||wu.length))?'PASS':'PARTIAL',axes:[item('stem','時干 · thất chủ/owner-searcher',owner,dh.hour?'OBSERVED':'SOURCE LOCK'),item('spirit','六合 · người/vật chạy mất (走失)',union),item('stem','甲子戊 · tài vật (失物)',wu),item('spirit','玄武 · dấu trộm/theft indicator',black)],rule:T('走失 và 失物 là hai phép khác nhau: 走失 dùng 時干 + 六合 để xét xa/gần và phương; 失物 dùng 甲子戊 làm tài vật, xét 玄武 và 空亡. Không đồng nhất “không thấy Huyền Vũ” với chắc chắn không bị trộm ngoài phạm vi phép cổ.','Missing-person and lost-item methods are distinct: 走失 uses Hour Stem + 六合 for distance/direction; 失物 uses 甲子戊 for the object with 玄武 and Void. Absence of 玄武 is not generalized beyond the sourced traditional rule.')};}
+function apply(km,q){var id=classify(q);if(!id)return null;var d=id==='legal'?legal(km):id==='travel'?travel(km):lost(km);if(km)km.qimenV479=d;return d;}
+function panel(km){var d=apply(km);if(!d)return '';var rows=A(d.axes).map(function(x){return '<tr><td>'+E(x.label)+'</td><td>'+E(x.palaces.length?x.palaces.join(', '):'—')+'</td><td>'+E(x.status)+'</td><td>'+E(x.note||'')+'</td></tr>';}).join('');return '<details class="card kd-km-v479" open><summary><b>◎ '+T('Kỳ Môn V4.79 · Phép chuyên đề có nguồn','Qi Men V4.79 · Sourced Topic Method')+'</b></summary><div class="kd479"><p><b>'+E(d.label)+'</b> · <b>Status:</b> '+E(d.status)+'</p><p>'+E(d.rule)+'</p><div class="scroll"><table><thead><tr><th>'+T('Trục cổ pháp','Classical axis')+'</th><th>'+T('Cung typed','Typed palace')+'</th><th>Status</th><th>'+T('Ghi chú','Note')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p><b>'+T('Nguồn','Source')+':</b> '+E(d.source)+'</p><p class="dim">'+T('Không dùng xác suất dự báo; trường thiếu typed data giữ SOURCE LOCK.','No predictive probability; missing typed fields remain SOURCE LOCK.')+'</p></div></details>';}
+// Repair V4.72 classifier contract used by V4.73: older V4.72 exposed no classify() and attached no qimenV472 object.
+if(window.KD_QIMEN_V472&&!window.KD_QIMEN_V472.classify){window.KD_QIMEN_V472.classify=function(q){var id=classify(q)||'general';var names={legal:['Kiện tụng / tranh chấp','Legal / dispute'],travel:['Đi lại / xuất hành','Travel / movement'],lost:['Tìm người / vật thất lạc','Missing person / lost item'],general:['Tổng quát','General']};return {id:id,vi:(names[id]||names.general)[0],en:(names[id]||names.general)[1]};};}
+// Unlock only the V4.73 profiles now independently sourced.
+try{var M=window.KD_QIMEN_V473&&window.KD_QIMEN_V473.matrix;if(M){M.legal={labelVI:'Kiện tụng / tranh chấp',labelEN:'Legal / dispute',primary:[{kind:'gate',value:'開門',role:'quan'},{kind:'spirit',value:'值符',role:'nguyên cáo'},{kind:'gate',value:'驚門',role:'tụng thần'}],secondary:[{kind:'relation',value:'天乙',role:'bị cáo — SOURCE LOCK nếu runtime chưa xuất'}],source:'奇門遁甲元靈經·卷十三·占詞訟',status:'SOURCED'};M.travel={labelVI:'Đi lại / xuất hành',labelEN:'Travel / movement',primary:[{kind:'stem',value:'時干',role:'người khởi hành'},{kind:'stem',value:'日干',role:'ràng buộc'},{kind:'gate',value:'開門',role:'kỳ khởi hành'}],secondary:[],source:'奇門遁甲元靈經·卷十四·占出行期',status:'SOURCED'};}}
+catch(e){}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{var c=window.KD_QIMEN_V472&&window.KD_QIMEN_V472.classify?window.KD_QIMEN_V472.classify(question()):null;if(r&&c)r.qimenV472={topic:c.id,label:vi()?c.vi:c.en};if(window.KD_QIMEN_V473&&window.KD_QIMEN_V473.apply)window.KD_QIMEN_V473.apply(r);apply(r);}catch(e){}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){try{var c=window.KD_QIMEN_V472&&window.KD_QIMEN_V472.classify?window.KD_QIMEN_V472.classify(question()):null;if(km&&c)km.qimenV472={topic:c.id,label:vi()?c.vi:c.en};if(km&&window.KD_QIMEN_V473&&window.KD_QIMEN_V473.apply)window.KD_QIMEN_V473.apply(km);}catch(e){}var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V479={version:V,classify:classify,apply:apply,profiles:{legal:'元靈經卷十三',travel:'元靈經卷十四',lost:'元靈經卷十八'},repairsV472ClassifierContract:true,separatesLostPersonAndLostItem:true,noPredictiveProbability:true};
+window.KD_RELEASE='4.79.0-qimen-legal-travel-lost-sourced-methods';
+})();
+</script>
+<style id="kd-v479-qimen-style">.kd479{padding-top:10px;line-height:1.68}.kd479 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd479 table{width:100%;border-collapse:collapse;min-width:720px}.kd479 th,.kd479 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.25);vertical-align:top;text-align:left}.kd479 .dim{opacity:.76}</style>
+<!-- KD QIMEN V4.80: sourced traditional timing-window engine -->
+<script id="kd-v480-qimen-yingqi-timing-engine">
+(function(){'use strict';
+if(window.KD_QIMEN_V480)return;
+var V='4.80.0';
+function A(x){return Array.isArray(x)?x:[];} function vi(){return window.S_ICHING_LANGUAGE!=='en';}
+function T(a,b){return vi()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function q(){var e=document.getElementById('q');return e?String(e.value||''):'';}
+function stem(v){var m=String(v||'').match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+function first(o,n){for(var i=0;i<n.length;i++){var v=o&&o[n[i]];if(v!=null&&v!=='')return v;}return null;}
+function pals(km){return A(km&&km.qimenTyped&&km.qimenTyped.palaces);}
+function norm(x){return String(x||'').replace(/门/g,'門').replace('腾蛇','騰蛇').replace('太阴','太陰').replace('勾陈','勾陳');}
+function by(km,key,val){return pals(km).filter(function(p){return norm(p&&p[key])===norm(val);});}
+function byStem(km,s){if(!s)return [];return pals(km).filter(function(p){return p&&((p.heavenStem===s)||(p.earthStem===s));});}
+function topic(){try{var z=window.KD_QIMEN_V479&&window.KD_QIMEN_V479.classify&&window.KD_QIMEN_V479.classify(q());if(z)return z;}catch(e){} try{var c=window.KD_QIMEN_V472&&window.KD_QIMEN_V472.classify&&window.KD_QIMEN_V472.classify(q());if(c&&c.id)return c.id;}catch(e){} return null;}
+var PAL_BRANCH={1:['子'],2:['未','申'],3:['卯'],4:['辰','巳'],5:[],6:['戌','亥'],7:['酉'],8:['丑','寅'],9:['午']};
+function palaceWindow(p){var n=Number(p&&p.palace);return {palace:n||null,branches:PAL_BRANCH[n]||[],earthStem:p&&p.earthStem||null};}
+function globalState(km){var g=km&&km.qimenV470;return g&&g.global||g&&g.summary||null;}
+function hasState(km,re){var txt=JSON.stringify(globalState(km)||{})+' '+JSON.stringify(A(km&&km.qimenTyped&&km.qimenTyped.palaces).map(function(p){return p&&p.diagnosticSynthesis;}));return re.test(txt);}
+function finance(km){var dh={hour:stem(first(km,['hourGan','hourStem','gioCan','canGio','hourPillar','gio']))};var hp=byStem(km,dh.hour),wu=byStem(km,'戊'),sheng=by(km,'gate','生門');var bothIn=(hp.length&&wu.length)?'OBSERVED':'SOURCE LOCK';var fuyin=hasState(km,/FU_YIN|伏吟/i),fanyin=hasState(km,/FAN_YIN|反吟/i);var win=wu[0]?palaceWindow(wu[0]):null;return {id:'finance',label:T('Ứng kỳ cầu tài','Finance timing'),source:'《奇門遁甲元靈經》卷十六·占求財',status:(dh.hour&&wu.length)?'PARTIAL':'SOURCE LOCK',basis:[T('Thời can và 甲子戊 cùng ở nội địa: nguồn nói kỳ tài đến nhanh; cùng ở ngoại địa: nguồn ghi nửa năm.','Hour Stem and 甲子戊 both in inner palaces: the source describes faster receipt; both outer: it records half a year.'),T('甲子戊 + Thời can cùng hợp cát môn: kỳ đến nhanh. Phục/Phản Ngâm: nguồn cảnh báo phản phục, không lấy làm ngày chắc chắn.','甲子戊 + Hour Stem with favorable gates: faster timing. Fu/Fan Yin indicates repetition/reversal rather than a guaranteed date.')],candidate:win,flags:{hourStem:dh.hour||null,hourPalaces:hp.map(function(p){return p.palace;}),wuPalaces:wu.map(function(p){return p.palace;}),shengPalaces:sheng.map(function(p){return p.palace;}),pairAvailability:bothIn,fuYin:fuyin,fanYin:fanyin}};}
+function lost(km){var wu=byStem(km,'戊'),black=by(km,'spirit','玄武');var p=wu[0]||null;var voided=!!(p&&(p.void===true||(p.diagnostics&&p.diagnostics.void===true)));return {id:'lost',label:T('Ứng kỳ thất vật','Lost-item timing'),source:'《奇門遁甲元靈經》卷十八·占失物',status:p?'PASS':'SOURCE LOCK',basis:[T('Nguồn nói kỳ tìm lại lấy cung Địa bàn và can-chi của cung để quyết; ví dụ 甲子戊 ở Chấn 3 thì ứng ngày Mão.','The source says recovery timing is determined from the Earth-plate palace and its stem/branch; its example places 甲子戊 in Zhen 3 and gives a Mao-day response.'),T('Nếu 甲子戊 lạc Không Vong, nguồn nói khó/không phục đắc; engine giữ đây là điều kiện truyền thống, không phải bảo đảm thực tế.','If 甲子戊 falls into Void, the source treats recovery as unavailable; this remains a traditional condition, not a real-world guarantee.')],candidate:p?palaceWindow(p):null,flags:{wuPalaces:wu.map(function(x){return x.palace;}),xuanwuPalaces:black.map(function(x){return x.palace;}),void:voided}};}
+function traveler(km){var hs=stem(first(km,['hourGan','hourStem','gioCan','canGio','hourPillar','gio'])),hp=byStem(km,hs),fuyin=hasState(km,/FU_YIN|伏吟/i),fanyin=hasState(km,/FAN_YIN|反吟/i);return {id:'traveler',label:T('Ứng kỳ hành nhân','Traveler/return timing'),source:'《奇門遁甲元靈經》卷十五·占行人',status:hs?'PARTIAL':'SOURCE LOCK',basis:[T('Nguồn lấy Thời can làm một trục định kỳ: Phục Ngâm chủ chưa đến/chưa động, Phản Ngâm chủ đến nhanh; đồng thời còn xét xa-gần và vượng-tướng.','The source uses the Hour Stem as one timing axis: Fu Yin indicates not yet arriving/moving, Fan Yin a faster return, while distance and seasonal strength remain relevant.'),T('Nguồn còn nêu năm cách/năm đến, tháng cách/tháng đến, ngày cách/ngày đến, giờ cách/giờ đến. V4.80 chỉ báo khi typed data đủ, không tự dựng ngày lịch.','The source also states year/month/day/hour 格 correspond to those timing scales. V4.80 reports only what typed data supports and does not fabricate calendar dates.')],candidate:hp[0]?palaceWindow(hp[0]):null,flags:{hourStem:hs||null,hourPalaces:hp.map(function(p){return p.palace;}),fuYin:fuyin,fanYin:fanyin}};}
+function apply(km){var id=topic(),d=null;if(id==='finance')d=finance(km);else if(id==='lost')d=lost(km);else if(id==='travel')d=traveler(km);else return null;if(km)km.qimenV480=d;return d;}
+function panel(km){var d=apply(km);if(!d)return '';var c=d.candidate||{},br=A(c.branches);var flags=Object.keys(d.flags||{}).map(function(k){var v=d.flags[k];return '<tr><td>'+E(k)+'</td><td>'+E(Array.isArray(v)?v.join(', '):String(v==null?'—':v))+'</td></tr>';}).join('');return '<details class="card kd-km-v480" open><summary><b>◎ '+T('Kỳ Môn V4.80 · Ứng Kỳ có nguồn','Qi Men V4.80 · Sourced Timing Window')+'</b></summary><div class="kd480"><p><b>'+E(d.label)+'</b> · <b>Status:</b> '+E(d.status)+'</p><p><b>'+T('Ứng kỳ truyền thống','Traditional timing signature')+':</b> '+(c.palace?T('Cung ','Palace ')+E(c.palace)+' · '+T('Chi ứng viên ','Candidate branch ')+E(br.length?br.join('/'):'—')+' · '+T('Địa bàn Can ','Earth stem ')+E(c.earthStem||'—'):T('SOURCE LOCK — chưa đủ typed data để dựng cửa sổ thời gian.','SOURCE LOCK — insufficient typed data for a timing window.'))+'</p><ul>'+A(d.basis).map(function(x){return '<li>'+E(x)+'</li>';}).join('')+'</ul><div class="scroll"><table><tbody>'+flags+'</tbody></table></div><p><b>'+T('Nguồn','Source')+':</b> '+E(d.source)+'</p><p class="dim">'+T('Ứng Kỳ ở đây là cửa sổ/đầu mối thời gian của phép cổ, không phải lời bảo đảm sự kiện sẽ xảy ra. Không tự đổi chi ứng viên thành ngày dương lịch khi thiếu lịch pháp typed đã kiểm chứng.','Timing here is a traditional window/signature, not a guarantee that an event will occur. Candidate branches are not converted into Gregorian dates without validated typed calendrical data.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V480={version:V,apply:apply,profiles:{finance:'元靈經卷十六·占求財',traveler:'元靈經卷十五·占行人',lost:'元靈經卷十八·占失物'},candidateBranchesByPalace:PAL_BRANCH,noGuaranteedEvent:true,noSyntheticGregorianDate:true};
+window.KD_RELEASE='4.80.0-qimen-sourced-yingqi-timing-engine';
+})();
+</script>
+<style id="kd-v480-qimen-style">.kd480{padding-top:10px;line-height:1.68}.kd480 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd480 table{width:100%;border-collapse:collapse}.kd480 td{padding:6px;border-bottom:1px solid rgba(128,128,128,.22);vertical-align:top}.kd480 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.82: sourced Nine Escapes + San Qi De Shi + Wu Bu Yu Shi -->
+<script id="kd-v482-qimen-nine-escapes-sanqi-wubuyu">
+(function(){'use strict';
+if(window.KD_QIMEN_V482)return;
+var V='4.82.0';
+function A(x){return Array.isArray(x)?x:[];} function vi(){return window.S_ICHING_LANGUAGE!=='en';} function T(a,b){return vi()?a:b;}
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function N(x){return String(x||'').replace(/门/g,'門').replace('太阴','太陰').replace('九天','九天').replace('九地','九地').trim();}
+function ps(km){return A(km&&km.qimenTyped&&km.qimenTyped.palaces);} function is(p,k,v){return N(p&&p[k])===N(v);} function good(p){return ['開門','休門','生門'].indexOf(N(p&&p.gate))>=0;}
+function first(km,keys){for(var i=0;i<keys.length;i++){var v=km&&km[keys[i]];if(v!=null&&v!=='')return v;}return null;}
+function stem(x){var m=String(x||'').match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+var DE_SHI={乙:['己','辛'],丙:['戊','庚'],丁:['壬','癸']};
+var WUBUYU={甲:'庚',乙:'辛',丙:'壬',丁:'癸',戊:'甲',己:'乙',庚:'丙',辛:'丁',壬:'戊',癸:'己'};
+function sanQi(km){var rows=[];ps(km).forEach(function(p){var h=N(p.heavenStem),e=N(p.earthStem);if(DE_SHI[h]&&DE_SHI[h].indexOf(e)>=0)rows.push({palace:Number(p.palace),qi:h,earth:e,status:'MATCH'});});return {status:rows.length?'MATCH':(ps(km).length?'NO MATCH':'SOURCE LOCK'),matches:rows,source:'遁甲演義·三奇得使',rule:'乙加甲戌/甲午（己/辛）；丙加甲子/甲申（戊/庚）；丁加甲辰/甲寅（壬/癸）',caution:'Source also warns that some De-Shi combinations can carry conflicting bad patterns; De-Shi is not treated as an unconditional final verdict.'};}
+function wuBuYu(km){var d=stem(first(km,['dayGan','dayStem','ngayCan','canNgay','dayPillar','ngay'])),h=stem(first(km,['hourGan','hourStem','gioCan','canGio','hourPillar','gio']));if(!d||!h)return {status:'SOURCE LOCK',dayStem:d,hourStem:h,source:'遁甲演義·五不遇'};return {status:WUBUYU[d]===h?'MATCH':'NO MATCH',dayStem:d,hourStem:h,expectedHourStem:WUBUYU[d],source:'遁甲演義·五不遇',rule:'時干克日干，陽克陽、陰克陰；以十組日干/時干表核驗'};}
+function nine(km){var hits=[];ps(km).forEach(function(p){var H=N(p.heavenStem),D=N(p.earthStem),G=N(p.gate),S=N(p.spirit),P=Number(p.palace);function add(id,label,profile,note){hits.push({id:id,label:label,palace:P,profile:profile,note:note||''});}
+ if(H==='丙'&&G==='生門'&&D==='丁')add('TIAN_DUN',T('天遁','Heaven Escape'),'遁甲演義','天上六丙 + 生門 + 地盤六丁');
+ if(H==='乙'&&G==='開門'&&D==='己')add('DI_DUN',T('地遁','Earth Escape'),'遁甲演義','天上六乙 + 開門 + 地盤六己');
+ if(H==='丁'&&G==='休門'&&S==='太陰')add('REN_DUN',T('人遁','Human Escape'),'遁甲演義','天上六丁 + 休門 + 太陰');
+ if(H==='丙'&&G==='生門'&&S==='九天')add('SHEN_DUN',T('神遁','Spirit Escape'),'遁甲演義','六丙 + 生門 + 九天');
+ if((H==='乙'&&G==='杜門'&&S==='九地')||(H==='丁'&&G==='休門'&&S==='九地')||(H==='乙'&&G==='開門'&&S==='九地'))add('GUI_DUN',T('鬼遁','Ghost Escape'),'遁甲演義·異文並列','乙杜九地 / 丁休九地 / 乙開九地；保留異文，不合併成唯一式');
+ if(H==='乙'&&good(p)&&P===4)add('FENG_DUN',T('風遁','Wind Escape'),'遁甲演義·主式','天上六乙 + 三吉門 + 巽四宮；其他異式未作同義替換');
+ if(H==='乙'&&D==='辛'&&good(p))add('YUN_DUN',T('雲遁','Cloud Escape'),'遁甲演義','天上六乙 + 地盤六辛 + 三吉門');
+ if(H==='乙'&&G==='休門'&&(D==='癸'||P===1))add('LONG_DUN',T('龍遁','Dragon Escape'),'遁甲演義·並列條件','乙奇 + 休門 + 六癸，或臨坎宮');
+ if(H==='乙'&&D==='辛'&&G==='生門')add('HU_DUN',T('虎遁','Tiger Escape'),'遁甲演義','乙奇 + 生門 + 六辛；艮宮說作異文提示');
+ });
+ var ids={};hits.forEach(function(x){ids[x.id]=true;});return {status:ps(km).length?'PASS':'SOURCE LOCK',matches:hits,coverage:{formsLocked:9,formsMatched:Object.keys(ids).length},completeNineFormCatalog:true,variantAware:true,source:'遁甲演義卷二·奇門吉格',policy:'Nine named forms are catalogued; variant clauses remain explicit. A MATCH is a structural match, not a guarantee of outcome.'};}
+function apply(km){var d={schema:'KD.QIMEN.PATTERN.v2',version:V,sanQiDeShi:sanQi(km),wuBuYuShi:wuBuYu(km),nineEscapes:nine(km),noProbability:true,noUnconditionalVerdict:true};if(km)km.qimenV482=d;return d;}
+function panel(km){var d=apply(km||{}),r=A(d.nineEscapes.matches).map(function(x){return '<tr><td>'+E(x.label)+'</td><td>'+E(x.palace)+'</td><td>'+E(x.profile)+'</td><td>'+E(x.note)+'</td></tr>';}).join('')||'<tr><td colspan="4">'+T('Không có Cửu Độn nào khớp typed data hiện tại.','No Nine-Escape form matches the current typed data.')+'</td></tr>';var sq=A(d.sanQiDeShi.matches).map(function(x){return x.qi+'→'+x.earth+' @'+x.palace;}).join(' · ')||d.sanQiDeShi.status;return '<details class="card kd-km-v482" open><summary><b>◎ '+T('Kỳ Môn V4.82 · Cửu Độn · Tam Kỳ Đắc Sứ · Ngũ Bất Ngộ','Qi Men V4.82 · Nine Escapes · San Qi De Shi · Wu Bu Yu Shi')+'</b></summary><div class="kd482"><p><b>三奇得使:</b> '+E(sq)+'</p><p><b>五不遇時:</b> '+E(d.wuBuYuShi.status)+(d.wuBuYuShi.dayStem?' · '+E(d.wuBuYuShi.dayStem)+'日 / '+E(d.wuBuYuShi.hourStem||'—')+'時':'')+'</p><div class="scroll"><table><thead><tr><th>'+T('Độn','Escape')+'</th><th>'+T('Cung','Palace')+'</th><th>Profile</th><th>'+T('Điều kiện','Condition')+'</th></tr></thead><tbody>'+r+'</tbody></table></div><p class="dim">'+T('V4.82 khóa đủ 9 tên Độn theo 《遁甲演義》 nhưng giữ nguyên các dị văn ở 鬼遁/風遁/龍遁/虎遁. MATCH chỉ có nghĩa cấu trúc typed khớp công thức nguồn; không phải xác suất hay bảo đảm cát hung.','V4.82 locks all nine named Escapes to the Dun Jia Yan Yi profile while retaining textual variants. MATCH means only that typed structure matches the sourced formula; it is not a probability or guaranteed outcome.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V482={version:V,apply:apply,schema:'KD.QIMEN.PATTERN.v2',profiles:{nineEscapes:'遁甲演義卷二',sanQiDeShi:'遁甲演義·三奇得使',wuBuYuShi:'遁甲演義·五不遇'},completeNineEscapes:true,variantAware:true,noPredictiveProbability:true};
+window.KD_RELEASE='4.82.0-qimen-nine-escapes-sanqi-wubuyu';
+})();
+</script>
+<style id="kd-v482-qimen-style">.kd482{padding-top:10px;line-height:1.68}.kd482 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd482 table{width:100%;border-collapse:collapse;min-width:760px}.kd482 th,.kd482 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.24);vertical-align:top;text-align:left}.kd482 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.84: final topic judgment resolver -->
+<script id="kd-v484-qimen-final-judgment-resolver">
+(function(){'use strict';
+if(window.KD_QIMEN_V484)return;
+var V='4.84.0';
+function A(x){return Array.isArray(x)?x:[];} function vi(){return window.S_ICHING_LANGUAGE!=='en';} function T(a,b){return vi()?a:b;}
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function uniq(a){var o={};return A(a).filter(function(x){var k=JSON.stringify(x);if(o[k])return false;o[k]=1;return true;});}
+function ensure(km,key,api){try{if(km&&km[key])return km[key];if(api&&typeof api.apply==='function')return api.apply(km)||null;}catch(e){}return null;}
+function relevantPalaces(topic,detail){var a=[];A(topic&&topic.axes).forEach(function(x){if(x&&x.palace)a.push(Number(x.palace));});A(detail&&detail.axes).forEach(function(x){A(x&&x.palaces).forEach(function(p){a.push(Number(p));});});return uniq(a.filter(Boolean));}
+function scopedConflict(km,pals){var raw=ensure(km,'qimenV483',window.KD_QIMEN_V483)||{},support=[],caution=[],context=[];function take(x){return x&&(!x.palace||!pals.length||pals.indexOf(Number(x.palace))>=0);}A(raw.support).forEach(function(x){if(take(x))support.push(x);});A(raw.caution).forEach(function(x){if(take(x)||/WU_BU_YU_SHI/.test(String(x.code||'')))caution.push(x);});A(raw.context).forEach(function(x){if(take(x))context.push(x);});return {support:support,caution:caution,context:context,raw:raw};}
+function apply(km){if(!km)return {version:V,status:'SOURCE LOCK',reason:'chart unavailable'};var topic=ensure(km,'qimenV478',window.KD_QIMEN_V478),detail=ensure(km,'qimenV479',window.KD_QIMEN_V479),timing=ensure(km,'qimenV480',window.KD_QIMEN_V480),pals=relevantPalaces(topic,detail),conf=scopedConflict(km,pals);
+ var tstat=topic&&topic.status||'SOURCE LOCK', support=A(conf.support), caution=A(conf.caution), severe=caution.filter(function(x){return /WU_BU_YU_SHI|TOMB|PUNISH|GATE_CONTROLS|FU_YIN|FAN_YIN/i.test(String(x.code||''));});
+ var verdict='OBSERVED';if(!topic&&!detail)verdict='SOURCE LOCK';else if(tstat==='SOURCE LOCK'&&!(detail&&detail.status&&detail.status!=='SOURCE LOCK'))verdict='SOURCE LOCK';else if(severe.length&&support.length)verdict='MIXED_CONFLICT';else if(severe.length)verdict='CAUTION';else if(tstat==='CAUTION')verdict='CAUTION';else if(tstat==='MIXED'||(support.length&&caution.length))verdict='MIXED';else if(tstat==='SUPPORTIVE'||support.length)verdict='SUPPORTIVE_WITH_CONDITIONS';
+ var headline={SUPPORTIVE_WITH_CONDITIONS:T('Có trợ lực, nhưng phải giữ điều kiện của phép đang xét.','Support is present, subject to the conditions of the applicable method.'),MIXED_CONFLICT:T('Cát và trở lực cùng hiện; không được lấy một cách tốt để xóa các điều kiện xấu.','Support and obstruction coexist; an auspicious pattern does not erase adverse conditions.'),MIXED:T('Bằng chứng hỗn hợp; cần đọc theo đúng Dụng Thần và cung liên quan.','Evidence is mixed; read it through the relevant Use-Spirit and palaces.'),CAUTION:T('Trở lực nổi bật trong các cung liên quan; chưa đủ cơ sở để kết luận thuận lợi.','Obstruction is prominent in relevant palaces; there is insufficient basis for a favorable conclusion.'),OBSERVED:T('Đã có dữ liệu quan sát nhưng chưa đủ quy tắc có nguồn để phán thành/bại.','Observed data exists, but sourced rules are insufficient for a success/failure verdict.'),'SOURCE LOCK':T('Chưa đủ dữ liệu typed hoặc quy tắc nguồn để kết luận.','Insufficient typed data or sourced rules for a conclusion.')}[verdict]||verdict;
+ var out={schema:'KD.QIMEN.FINAL.v1',version:V,status:'PASS',verdict:verdict,headline:headline,topic:topic||null,sourcedMethod:detail||null,timing:timing||null,relevantPalaces:pals,support:support,caution:caution,context:A(conf.context),policy:{noProbability:true,noAutomaticSuccessFailure:true,scope:'Only topic/use-spirit palaces plus chart-wide 五不遇時 are allowed to affect this resolver.',conflictRule:'Adverse evidence is preserved; favorable patterns do not cancel it.'}};km.qimenV484=out;return out;}
+function evRows(a){return A(a).map(function(x){return '<tr><td>'+E(x.label||x.code||'—')+'</td><td>'+E(x.palace||'—')+'</td><td>'+E(x.source||'—')+'</td></tr>';}).join('')||'<tr><td colspan="3">—</td></tr>';}
+function panel(km){var d=apply(km||{}),tp=d.topic||{},sm=d.sourcedMethod||{},tm=d.timing||{};return '<details class="card kd-km-v484" open><summary><b>⚖ '+T('Kỳ Môn V4.84 · Kết luận cuối theo chủ đề','Qi Men V4.84 · Final Topic Judgment')+'</b></summary><div class="kd484"><p><b>'+T('Kết luận','Verdict')+':</b> '+E(d.verdict)+'</p><p class="headline">'+E(d.headline)+'</p><p><b>'+T('Chủ đề','Topic')+':</b> '+E(tp.label||tp.topic||sm.label||'—')+' · <b>'+T('Cung liên quan','Relevant palaces')+':</b> '+E(d.relevantPalaces.join(', ')||'—')+'</p><div class="grid"><div><h4>'+T('Bằng chứng thuận','Support')+'</h4><div class="scroll"><table><tbody>'+evRows(d.support)+'</tbody></table></div></div><div><h4>'+T('Trở lực/xung đột','Caution / conflict')+'</h4><div class="scroll"><table><tbody>'+evRows(d.caution)+'</tbody></table></div></div></div>'+(sm&&sm.source?'<p><b>'+T('Phép chuyên đề','Sourced topic method')+':</b> '+E(sm.source)+' · '+E(sm.status||'')+'</p>':'')+(tm&&tm.source?'<p><b>'+T('Ứng kỳ','Timing')+':</b> '+E(tm.source)+' · '+E(tm.status||'')+'</p>':'')+'<p class="dim">'+T('Resolver chỉ cho phép bằng chứng ở cung Dụng Thần/chủ đề liên quan tham gia kết luận, ngoại trừ Ngũ Bất Ngộ Thời là điều kiện toàn bàn. Không dùng phần trăm dự đoán và không tự tuyên bố chắc chắn thành/bại.','The resolver admits evidence only from topic/Use-Spirit palaces, except chart-wide Five Unmet Hours. It uses no predictive percentage and does not claim guaranteed success/failure.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V484={version:V,apply:apply,schema:'KD.QIMEN.FINAL.v1',topicScopedEvidence:true,preservesAdverseEvidence:true,noPredictiveProbability:true,noGuaranteedOutcome:true};window.KD_RELEASE='4.84.0-qimen-final-judgment-resolver';
+})();
+</script>
+<style id="kd-v484-qimen-style">.kd484{padding-top:10px;line-height:1.68}.kd484 .headline{font-weight:700}.kd484 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.kd484 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd484 table{width:100%;border-collapse:collapse;min-width:420px}.kd484 td{padding:7px;border-bottom:1px solid rgba(128,128,128,.24);vertical-align:top}.kd484 .dim{opacity:.76}@media(max-width:720px){.kd484 .grid{grid-template-columns:1fr}}</style>
+<!-- KD QIMEN V4.85: sourced Heaven/Earth Stem Response Matrix -->
+<script id="kd-v485-qimen-ten-stem-sourced-matrix">
+(function(){'use strict';
+if(window.KD_QIMEN_V485)return;
+var ACTUAL=['乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var ALL=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var EL={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+var GEN={'木':'火','火':'土','土':'金','金':'水','水':'木'},CTL={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+function vi(){return (window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return vi()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function N(x){var m=String(x==null?'':x).match(/[甲乙丙丁戊己庚辛壬癸]/);return m?m[0]:null;}
+function rel(a,b){var x=EL[a],y=EL[b];if(!x||!y)return 'UNKNOWN';if(x===y)return 'SAME';if(GEN[x]===y)return 'HEAVEN_GENERATES_EARTH';if(GEN[y]===x)return 'EARTH_GENERATES_HEAVEN';if(CTL[x]===y)return 'HEAVEN_CONTROLS_EARTH';if(CTL[y]===x)return 'EARTH_CONTROLS_HEAVEN';return 'UNKNOWN';}
+var RELVI={SAME:'Đồng hành',HEAVEN_GENERATES_EARTH:'Thiên bàn sinh Địa bàn',EARTH_GENERATES_HEAVEN:'Địa bàn sinh Thiên bàn',HEAVEN_CONTROLS_EARTH:'Thiên bàn khắc Địa bàn',EARTH_CONTROLS_HEAVEN:'Địa bàn khắc Thiên bàn',UNKNOWN:'Chưa xác định'};
+var RELEN={SAME:'Same element',HEAVEN_GENERATES_EARTH:'Heaven stem generates Earth stem',EARTH_GENERATES_HEAVEN:'Earth stem generates Heaven stem',HEAVEN_CONTROLS_EARTH:'Heaven stem controls Earth stem',EARTH_CONTROLS_HEAVEN:'Earth stem controls Heaven stem',UNKNOWN:'Unknown'};
+var SRC='《奇門遁甲元靈經》卷二 · 天盤加地盤吉凶';
+var C={}; function add(a,b,name,viText,enText){C[a+b]={heaven:a,earth:b,name:name||'',vi:viText,en:enText||viText,source:SRC,status:'SOURCE VERIFIED'};}
+add('甲','甲','青龍出土','Phục Ngâm; cát hung còn tùy Môn, đại thể không lợi cầu tài.','Fu-Yin; outcome remains conditional on the Gate, generally unfavorable for seeking wealth.');
+add('甲','乙','青龍入雲','Có Tam Kỳ/Cát Môn thì tăng trợ lực; phải xét thêm Tinh và Môn.','With Three Wonders/favorable Gate it gains support; Star and Gate still condition the reading.');
+add('甲','丙','青龍返首','Động tác có lợi khi Môn/Nghi phối hợp; không coi là cát vô điều kiện.','Action is favored when Gate/instruments agree; not unconditional fortune.');
+add('甲','丁','青龍耀明','Có Cát Môn thì lợi yết quý/cầu quan; Phù/Sứ xấu có thể dẫn tranh tụng.','With a favorable Gate it supports audience/career matters; adverse Chief/Envoy can bring dispute.');
+add('甲','己','青龍合靈','Tinh tốt thì có tài và việc dễ thành; Tinh/Môn không hợp thì hao hư.','With favorable Star there may be gain and completion; mismatched Star/Gate indicates waste.');
+add('甲','庚','', 'Có biến cố bất ngờ; dù Tinh tốt vẫn thiên về thủ chờ.','Unexpected trouble; even with a favorable Star the text leans toward waiting/defense.');
+add('甲','辛','青龍失驚','Môn/Tinh tốt thì làm việc thuận; xấu thì chủ thất tài.','Favorable Gate/Star supports action; adverse configuration points to loss.');
+add('甲','壬','青龍入網','Nguồn phân biệt âm/nam nữ theo văn cổ; app chỉ giữ cảnh báo bất hòa/tai ách ở mức văn bản lịch sử.','The source uses gendered historical wording; the app retains only a contextual caution about discord/adversity.');
+add('甲','癸','青龍華蓋','Môn hợp, Tinh tốt thì thuận; gặp Thương/Tử Môn thì không đẹp.','Favorable Gate/Star helps; Injury/Death Gate weakens the configuration.');
+add('乙','甲','陰中反陽','Gặp hung tinh có thể chủ tổn tài/tổn người; cần xét toàn cung.','With an adverse Star the source warns of loss/harm; whole-palace context remains necessary.');
+add('乙','乙','日奇伏刑','Không lợi cầu danh; Môn hợp có thể giảm, Môn nghịch tăng bất lợi.','Unfavorable for seeking reputation; a compatible Gate may mitigate, an adverse Gate worsens it.');
+add('乙','丙','奇儀得順','Gặp Cát Tinh có dấu hiệu thăng chuyển; việc hôn nhân có lời cảnh báo riêng trong nguồn.','With a favorable Star it can indicate advancement; the source adds a marriage-specific caution.');
+add('乙','丁','朱雀入江','Văn thư dễ chậm; Cát Tinh có thể giải giảm.','Documents may be delayed; a favorable Star can mitigate.');
+add('乙','己','日奇入霧','Thổ Mộc tương khắc, cầu việc bất lợi; Môn hung càng nặng.','Earth/Wood conflict; unfavorable for seeking affairs, worse with an adverse Gate.');
+add('乙','庚','日奇受刑','Nguồn chủ tranh tài thành tụng; cần phối hợp chủ đề và cung.','The source associates it with disputes over resources/litigation; topic and palace context are required.');
+add('乙','辛','青龍逃走','Nguồn cảnh báo thất tài/đào thoát; không dùng như xác suất.','The source warns of loss/escape; not treated as a probability.');
+add('乙','壬','', 'Nguồn ghi vạn sự trì trệ và tổn hao/bệnh tượng; chỉ dùng như bằng chứng phụ.','The source records obstruction and loss/illness symbolism; used only as supporting evidence.');
+add('乙','癸','日入天網','Nguồn cảnh báo quan sự, phá tài, tổn thương.','The source warns of legal entanglement, financial loss and damage.');
+add('丙','甲','飛鳥跌穴','Nguồn xem là cách thuận mạnh; vẫn phải kiểm Môn/Tinh và xung đột cách cục.','The source treats it as strongly favorable; Gate/Star and conflicting patterns still must be checked.');
+add('丙','乙','人遁','Nguồn liên hệ thăng quan/thụ lộc.','The source associates it with advancement and emolument.');
+add('丙','丙','奇中有奇','Nguồn ghi quý nhân có quan lộc, thường nhân có việc khác thường; không phổ quát hóa.','The source distinguishes status/context; the app does not universalize it.');
+add('丙','丁','奇日太陰','Nguồn thuận cho văn thư và sở vọng.','The source favors documents and fulfillment of aims.');
+add('丙','己','火入勾陳','Nguồn bất lợi cho hình danh/pháp lý.','The source is unfavorable for penal/legal matters.');
+add('丙','庚','', 'Nguồn gắn với tư tình/oan tụng; giữ như cảnh báo theo văn bản cổ.','The source links it with private entanglement/dispute; retained as a historical-text caution.');
+add('丙','辛','朱雀入獄','Nguồn cảnh báo mất vị hoặc chịu hình; cần xét chủ đề trước khi dùng.','The source warns of loss of position/punishment; topic context is required.');
+add('丙','壬','', 'Nguồn ghi tiến lộc và hòa mỹ.','The source records advancement/gain and harmony.');
+add('丙','癸','朱雀沉吟','Nguồn ghi công tư bất hợp, hai việc đều tổn.','The source records public/private discord and mutual impairment.');
+function apply(km){var c=km&&km.qimenTyped;if(!c||!Array.isArray(c.palaces))return {status:'SOURCE LOCK',reason:'qimenTyped unavailable',rows:[]};var rows=[],verified=0,structural=0;
+ c.palaces.forEach(function(p){var h=N(p.heavenStem),e=N(p.earthStem);if(!h||!e)return;var key=h+e,cl=C[key]||null,r=rel(h,e);var x={palace:Number(p.palace),heavenStem:h,earthStem:e,key:key,relation:r,relationLabel:vi()?RELVI[r]:RELEN[r],classical:cl,status:cl?'SOURCE VERIFIED':'STRUCTURAL ONLY'};p.stemResponse=x;rows.push(x);if(cl)verified++;else structural++;});
+ var out={schema:'KD.QIMEN.STEM_RESPONSE.v1',version:'4.85.0',status:rows.length?(verified?'PARTIAL':'STRUCTURAL ONLY'):'SOURCE LOCK',rows:rows,sourceVerified:verified,structuralOnly:structural,runtimeDomain:'Nine visible Qi-Men stems (乙丙丁戊己庚辛壬癸); 甲 is hidden under 六儀 and is not fabricated as a visible palace stem.',catalog:{classicalTenStemPairs:Object.keys(C).length,source:SRC,coverage:'partial-source-catalog'},guards:{noHtmlInference:true,noInventedPairText:true,noProbability:true,hiddenJiaNotFabricated:true}};
+ c.diagnostics=c.diagnostics||{};c.diagnostics.stemResponse=out;km.qimenV485=out;return out;}
+function badge(x){return '<span class="tag">'+E(x)+'</span>';}
+function panel(km){var d=km&&km.qimenV485||apply(km||{}),rows=(d.rows||[]).map(function(x){var cl=x.classical;return '<tr><td>'+x.palace+'</td><td><b>'+E(x.heavenStem)+' / '+E(x.earthStem)+'</b></td><td>'+E(x.relationLabel)+'</td><td>'+(cl?('<b>'+E(cl.name||T('Có mục nguồn','Sourced entry'))+'</b><br>'+E(vi()?cl.vi:cl.en)):T('Chỉ có quan hệ cấu trúc; chưa gán lời đoán cổ.','Structural relation only; no classical pair wording assigned.'))+'</td><td>'+badge(x.status)+'</td></tr>';}).join('');if(!rows)rows='<tr><td colspan="5">'+T('Thiên/Địa bàn Can typed chưa đủ để chạy ma trận.','Typed Heaven/Earth stems are not yet sufficient to run the matrix.')+'</td></tr>';
+ return '<details class="card kd-km-v485"><summary><b>十干克應 · '+T('V4.85 Ma trận có nguồn','V4.85 Sourced Stem-Response Matrix')+'</b></summary><div class="kd485"><p>'+T('Sửa kiến trúc: bàn Kỳ Môn runtime chỉ có chín can hiển lộ 乙丙丁戊己庚辛壬癸; 甲 ẩn dưới Lục Nghi. Vì vậy app không còn ép “10×10” thành 100 cặp runtime giả. Danh mục văn bản vẫn có thể lưu các mục 甲 theo cổ thư, nhưng chỉ cặp Thiên/Địa bàn thực sự xuất hiện mới được áp vào cung.','Architecture correction: a runtime Qi-Men chart exposes nine stems 乙丙丁戊己庚辛壬癸; 甲 is hidden under the Six Instruments. The app therefore no longer forces a fake 100-pair runtime matrix. Textual 甲 entries may remain in the source catalog, but only actually typed Heaven/Earth pairs are applied to palaces.')+'</p><p><b>'+T('Độ phủ nguồn hiện khóa','Currently locked source coverage')+':</b> '+E(d.sourceVerified)+' '+T('cặp đang xuất hiện có văn nghĩa nguồn; ','live pairs have sourced wording; ')+E(d.structuralOnly)+' '+T('cặp chỉ giữ quan hệ ngũ hành.','live pairs retain structural Five-Phase relation only.')+'</p><div style="overflow-x:auto"><table><thead><tr><th>'+T('Cung','Palace')+'</th><th>'+T('Thiên / Địa Can','Heaven / Earth stem')+'</th><th>'+T('Sinh khắc','Five-Phase relation')+'</th><th>'+T('Khắc ứng có nguồn','Sourced response')+'</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+T('Nguồn khóa: 《奇門遁甲元靈經》卷二, mục「天盤加地盤吉凶」. V4.85 chỉ mã hóa những mục đã đối chiếu được; cặp chưa có văn bản khóa nguồn không được tự viết lời đoán.','Locked source: Qi Men Dun Jia Yuan Ling Jing, vol. 2, “Heaven Plate added to Earth Plate: auspicious/inauspicious”. V4.85 encodes only entries actually verified; unsourced pairs receive no invented prognostication.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV485={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km,lv){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V485={version:'4.85.0',schema:'KD.QIMEN.STEM_RESPONSE.v1',runtimeStemDomain:ACTUAL.slice(),classicalStemDomain:ALL.slice(),sourceCatalog:C,apply:apply,guards:{noInventedPairText:true,hiddenJiaNotFabricated:true,noPredictiveProbability:true}};
+window.KD_RELEASE='4.85.0-qimen-sourced-stem-response';
+})();
+</script>
+<style id="kd-v485-qimen-style">.kd-km-v485 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd485{padding-top:10px;line-height:1.7}.kd485 table{width:100%;border-collapse:collapse}.kd485 th,.kd485 td{padding:8px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd485 .dim{opacity:.76}</style>
+
+<script id="kd-v488-qimen-source-aware-final">
+(function(){
+function T(vi,en){try{return window.KD_LANG==='en'?en:vi}catch(e){return vi}}
+function uniq(a){return Array.from(new Set((a||[]).filter(Boolean)))}
+function apply(km){
+ if(!km||typeof km!=='object')return null;
+ var v487=km.qimenV487||null, v484=km.qimenV484||null;
+ var live=(v487&&v487.live)||[];
+ var counts={AGREEMENT:0,SOURCE_VARIANT:0,YUANLING_ONLY:0,FAQIAO_ONLY:0,UNSOURCED:0};
+ live.forEach(function(x){var s=x&&x.status||'UNSOURCED';counts[s]=(counts[s]||0)+1});
+ var level='NO_LIVE_STEM_EVIDENCE';
+ if(live.length){
+   if(counts.SOURCE_VARIANT>0) level='SOURCE_VARIANT_PRESENT';
+   else if(counts.AGREEMENT>0 && counts.YUANLING_ONLY===0 && counts.FAQIAO_ONLY===0) level='MULTI_SOURCE_AGREEMENT';
+   else if(counts.AGREEMENT>0) level='AGREEMENT_WITH_SINGLE_SOURCE_ITEMS';
+   else level='SINGLE_SOURCE_ONLY';
+ }
+ var notes=[];
+ if(counts.SOURCE_VARIANT)notes.push(T('Có dị bản giữa các profile cổ thư; giữ song song, không tự hòa giải.','Classical source variants are present; profiles remain parallel and are not forcibly reconciled.'));
+ if(counts.AGREEMENT)notes.push(T('Có cặp Can được nhiều profile đã mã hóa cùng xác nhận ở cấp cấu trúc.','Some stem pairs are structurally supported by multiple encoded profiles.'));
+ if(counts.YUANLING_ONLY||counts.FAQIAO_ONLY)notes.push(T('Một phần bằng chứng hiện chỉ được khóa từ một nguồn; mức chắc chắn nguồn thấp hơn đồng thuận đa nguồn.','Some evidence is currently locked to a single source and therefore has lower source confidence than multi-source agreement.'));
+ var r={schema:'KD.QIMEN.FINAL.SOURCE_AWARE.v1',status:'PASS',sourceConfidence:level,counts:counts,liveEvidence:live,baseFinal:v484||null,notes:uniq(notes),guards:{doesNotChangeVerdictFromSourceCount:true,noForcedReconciliation:true,noPredictiveProbability:true}};
+ km.qimenV488=r;return r;
+}
+function panel(km){var r=km&&km.qimenV488||apply(km);if(!r)return '';var rows=(r.liveEvidence||[]).map(function(x){return '<tr><td>'+(x.palace||'—')+'</td><td>'+(x.pair||'—')+'</td><td>'+(x.status||'—')+'</td></tr>'}).join('')||'<tr><td colspan="3">—</td></tr>';return '<details class="card kd-km-v488"><summary><b>'+T('Kỳ Môn V4.88 · Source-aware Final Judgment','Qi Men V4.88 · Source-aware Final Judgment')+'</b></summary><div class="kd488"><p><b>'+T('Độ tin cậy nguồn','Source confidence')+':</b> '+r.sourceConfidence+'</p><p>'+T('Lớp này không đổi verdict chỉ vì số nguồn nhiều hay ít. Nó chỉ gắn mức provenance vào bằng chứng Thập Can Khắc Ứng để phân biệt đồng thuận, dị bản và bằng chứng đơn nguồn.','This layer does not change a verdict merely because more or fewer sources exist. It attaches provenance confidence to Ten-Stem evidence, distinguishing agreement, variants, and single-source evidence.')+'</p><div class="scroll"><table><thead><tr><th>'+T('Cung','Palace')+'</th><th>'+T('Cặp Can','Stem pair')+'</th><th>'+T('Trạng thái nguồn','Source status')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div><p class="dim">'+(r.notes||[]).join(' ')+'</p></div></details>'}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r)}catch(e){r.qimenV488={status:'REVIEW',reason:String(e)}}return r};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km)}catch(e){return h}};
+window.KD_QIMEN_V488={version:'4.88.0',schema:'KD.QIMEN.FINAL.SOURCE_AWARE.v1',apply:apply,guards:{doesNotChangeVerdictFromSourceCount:true,noForcedReconciliation:true,noPredictiveProbability:true}};window.KD_RELEASE='4.88.0-qimen-source-aware-final-judgment';
+})();
+</script>
+<style id="kd-v488-qimen-style">.kd-km-v488 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd488{padding-top:10px;line-height:1.7}.kd488 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd488 table{width:100%;border-collapse:collapse;min-width:520px}.kd488 th,.kd488 td{padding:8px;border-bottom:1px solid var(--line,#55482a);text-align:left}.kd488 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.92: sourced combination interpretation library -->
+<script id="kd-v492-qimen-combination-interpretation-library">
+(function(){'use strict';
+if(window.KD_QIMEN_V492)return;
+var V='4.92.0';
+function VI(){return (window.S_ICHING_LANGUAGE||window.KD_LANG||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return VI()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});} function A(x){return Array.isArray(x)?x:[];}
+var G={
+ '休門':{el:'水',base:['nghỉ, điều hòa, dưỡng sức; cần xét cung và vượng suy trước khi luận việc','rest, regulation and recovery; palace and seasonal state must be checked before judgment']},
+ '生門':{el:'土',base:['sinh trưởng, sinh kế và cầu tài trong các phép chuyên đề đã khóa nguồn','growth, livelihood and wealth-seeking in sourced topic methods']},
+ '傷門':{el:'木',base:['tổn thương, va chạm hoặc hành động mạnh; không tự đồng nhất với kết quả hung','injury, friction or forceful action; not automatically an adverse outcome']},
+ '杜門':{el:'木',base:['đóng, ẩn, ngăn cách hoặc bảo mật','closure, concealment, obstruction or secrecy']},
+ '景門':{el:'火',base:['hiển lộ, văn thư, hình ảnh và biểu hiện ra ngoài','visibility, documents, imagery and outward presentation']},
+ '死門':{el:'土',base:['đình trệ, kết thúc hoặc trạng thái ít sinh khí; phải phối hợp Dụng Thần','stagnation, ending or low vitality; must be read with the Use-Spirit']},
+ '驚門':{el:'金',base:['kinh động, khẩu thiệt, tin tức bất ngờ hoặc áp lực','alarm, verbal dispute, unexpected news or pressure']},
+ '開門':{el:'金',base:['mở, thông, công danh/công vụ và cơ hội tiếp cận trong các phép đã khóa nguồn','opening, access, office/career and opportunity in sourced methods']}
+};
+var S={
+ '天蓬':{el:'水',rank:'大凶',base:['tính thủy, biến động và rủi ro; mức nặng nhẹ còn tùy vượng suy','water quality, volatility and risk; severity still depends on seasonal strength']},
+ '天芮':{el:'土',rank:'大凶',base:['bệnh/phế và vấn đề cần xử lý; trong phép bệnh là một trục chuyên biệt','illness/defect and matters needing remedy; a dedicated axis in health methods']},
+ '天沖':{el:'木',rank:'次吉',base:['xung động, tiến nhanh, chủ động','impulse, rapid advance and initiative']},
+ '天輔':{el:'木',rank:'上吉',base:['phụ trợ, học tập, văn giáo; trong thi cử là trục đã khóa nguồn','support, learning and scholarship; a sourced axis for examinations']},
+ '天禽':{el:'土',rank:'上吉',base:['trung tâm, điều phối; phép ký cung phải theo source profile','central coordination; lodging rule must follow the active source profile']},
+ '天心':{el:'金',rank:'上吉',base:['tâm trí, quyết đoán, quản trị và chữa trị trong truyền thống','judgment, decision, administration and healing in the tradition']},
+ '天柱':{el:'金',rank:'小凶',base:['cản trở, tranh biện hoặc áp lực cấu trúc','obstruction, argument or structural pressure']},
+ '天任':{el:'土',rank:'次吉',base:['gánh vác, ổn định, đảm nhiệm','responsibility, stability and carrying a task']},
+ '天英':{el:'火',rank:'小凶',base:['sáng rõ, danh tiếng, nóng/vội hoặc phô lộ','brightness, reputation, heat/haste or exposure']}
+};
+function rel(a,b){var sh={'木':'火','火':'土','土':'金','金':'水','水':'木'},ke={'木':'土','土':'水','水':'火','火':'金','金':'木'};if(!a||!b)return 'UNKNOWN';if(a===b)return 'SAME';if(sh[a]===b)return 'GATE_GENERATES_STAR';if(sh[b]===a)return 'STAR_GENERATES_GATE';if(ke[a]===b)return 'GATE_CONTROLS_STAR';if(ke[b]===a)return 'STAR_CONTROLS_GATE';return 'UNKNOWN';}
+function explain(c){var g=G[c.gate]||null,s=S[c.star]||null,r=g&&s?rel(g.el,s.el):'SOURCE LOCK';var lines=[];if(g)lines.push(T('Môn: ','Gate: ')+c.gate+' · '+g.el+' — '+T(g.base[0],g.base[1]));if(s)lines.push(T('Tinh: ','Star: ')+c.star+' · '+s.el+' · '+s.rank+' — '+T(s.base[0],s.base[1]));if(g&&s)lines.push(T('Quan hệ ngũ hành Môn↔Tinh: ','Gate↔Star five-phase relation: ')+r);if(c.spirit)lines.push(T('Bát Thần hiện hành: ','Active Spirit: ')+c.spirit+T(' — giữ như lớp điều kiện riêng, chưa gán một câu cổ pháp cố định cho bộ ba nếu chưa có nguồn trực tiếp.',' — retained as a separate condition; no fixed classical triple meaning is assigned without direct sourcing.'));return {palace:c.palace,gate:c.gate||null,star:c.star||null,spirit:c.spirit||null,gateProfile:g,starProfile:s,relation:r,lines:lines,sourceState:(g||s)?'SOURCED_COMPONENTS':'SOURCE LOCK'};}
+function apply(km){if(!km)return {status:'SOURCE LOCK'};var base=km.qimenV491||(window.KD_QIMEN_V491&&window.KD_QIMEN_V491.apply?window.KD_QIMEN_V491.apply(km):null);var rows=A(base&&base.focus).map(explain);var out={schema:'KD.QIMEN.COMBINATION.INTERPRETATION.v1',version:V,status:rows.length?'PASS':'SOURCE LOCK',rows:rows,sources:[{id:'DUNJIA_YANYI',title:'遁甲演義',scope:'九星吉凶與旺相；八門九星布局'},{id:'QIMEN_TONGZONG',title:'奇門遁甲統宗',scope:'八門、九星、迫、旺相與八神 profile'}],policy:{componentMeaningsSourced:true,compositionIsAnalyticalNotQuotedClassicalFormula:true,noInventedTripleFormula:true,noProbability:true,noGuaranteedOutcome:true}};km.qimenV492=out;return out;}
+function panel(km){var d=km.qimenV492||apply(km);var rows=A(d.rows).map(function(x){return '<section><h4>'+E(T('Cung ','Palace ')+x.palace)+' · '+E((x.gate||'—')+' × '+(x.star||'—')+(x.spirit?' × '+x.spirit:''))+'</h4><ul>'+A(x.lines).map(function(z){return '<li>'+E(z)+'</li>';}).join('')+'</ul><p class="tag">'+E(x.sourceState)+'</p></section>';}).join('')||'<p>—</p>';return '<details class="card kd-km-v492" open><summary><b>☯ '+E(T('Kỳ Môn V4.92 · Thư viện nghĩa tổ hợp có nguồn','Qi Men V4.92 · Sourced Combination Interpretation Library'))+'</b></summary><div class="kd492">'+rows+'<p class="dim">'+E(T('V4.92 khóa nghĩa nền của Môn và Tinh theo nguồn, rồi mô tả quan hệ ngũ hành của tổ hợp đang xuất hiện. Phần ghép Môn×Tinh×Thần là phân tích của engine, không được trình bày như một câu cổ thư nếu nguồn không ghi trực tiếp.','V4.92 locks sourced base meanings for Gates and Stars, then describes the five-phase relation of the live combination. Gate×Star×Spirit composition is engine analysis and is not presented as a classical quotation unless directly sourced.'))+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){if(r)r.qimenV492={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V492={version:V,schema:'KD.QIMEN.COMBINATION.INTERPRETATION.v1',apply:apply,sources:['遁甲演義','奇門遁甲統宗'],policy:{componentMeaningsSourced:true,noInventedTripleFormula:true,noProbability:true,noGuaranteedOutcome:true}};window.KD_RELEASE='4.92.0-qimen-combination-interpretation-library';
+})();
+</script>
+<style id="kd-v492-qimen-style">.kd-km-v492 summary{cursor:pointer;min-height:46px;display:flex;align-items:center}.kd492{padding-top:10px;line-height:1.72}.kd492 section{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px;margin:9px 0}.kd492 h4{margin:0 0 6px}.kd492 ul{margin:4px 0;padding-left:20px}.kd492 .tag{display:inline-block;font-size:.78em;opacity:.78;border:1px solid var(--line,#55482a);border-radius:999px;padding:2px 7px}.kd492 .dim{opacity:.74}</style>
+
+
+<!-- KD QIMEN V4.93: Eight-Spirit interpretation profiles -->
+<script id="kd-v493-qimen-eight-spirit-interpretation-profiles">
+(function(){'use strict';
+if(window.KD_QIMEN_V493)return;
+var V='4.93.0';
+function VI(){return (window.S_ICHING_LANGUAGE||window.KD_LANG||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return VI()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});} function A(x){return Array.isArray(x)?x:[];}
+var PROFILES={
+ TONGZONG_GOUZHU:{id:'TONGZONG_GOUZHU',title:'奇門遁甲統宗 · 勾陳/朱雀',sequence:['值符','騰蛇','太陰','六合','勾陳','朱雀','九地','九天'],source:'奇門遁甲統宗',semanticPolicy:'勾陳/朱雀 only structural unless a direct semantic passage is separately locked'},
+ YANYI_BAI_XUAN:{id:'YANYI_BAI_XUAN',title:'遁甲演義 · 白虎/玄武',sequence:['值符','騰蛇','太陰','六合','白虎','玄武','九地','九天'],source:'遁甲演義',semanticPolicy:'direct spirit descriptions available in 天乙直符吉凶神說'}
+};
+var SEM={
+ '值符':{vi:'Trực Phù/T天乙: lớp chỉ huy và phương ứng cấp; cổ văn dùng phương Trực Phù trong tình huống khẩn, nhưng không đồng nghĩa mọi việc đều cát.',en:'Chief/Tian Yi: command and urgent-direction layer; the source uses the Chief direction in urgent situations, but this does not make every matter favorable.',src:'遁甲演義'},
+ '騰蛇':{vi:'Đằng Xà: hư trá, tinh thần hoảng hốt, mộng mị; cổ văn đồng thời nói nếu được Kỳ–Môn hội hợp thì không nhất thiết phải kỵ.',en:'Soaring Snake: deception, mental confusion and dreamlike disturbance; the source also says it need not be feared when favorable Qi-Men conditions combine.',src:'遁甲演義'},
+ '太陰':{vi:'Thái Âm: âm trợ, ẩn phục, che giấu và tránh nạn; thích hợp đọc như lớp kín/ẩn chứ không tự động là kết quả tốt.',en:'Great Yin: hidden assistance, concealment and refuge; read as a covert/hidden layer rather than an automatic favorable outcome.',src:'遁甲演義'},
+ '六合':{vi:'Lục Hợp: hộ vệ, phối hợp, mai phục/phòng bị và tránh hại; trong các phép chuyên đề còn có thể là trục quan hệ.',en:'Six Harmony: protection, coordination, ambush/defense and avoidance of harm; in sourced topic methods it may also serve as a relationship axis.',src:'遁甲演義'},
+ '白虎':{vi:'Bạch Hổ: hung mãnh, cảnh giác xung đột hoặc tập kích; cổ văn nói gặp Kỳ–Môn hội hợp thì không nên máy móc coi là kỵ.',en:'White Tiger: fierceness and vigilance against conflict or attack; the source says favorable Qi-Men combinations can prevent a mechanical adverse reading.',src:'遁甲演義'},
+ '玄武':{vi:'Huyền Vũ: trộm cắp, gian tế, dò xét hoặc hành vi ẩn; gặp Kỳ–Môn hội hợp không được máy móc phán hung.',en:'Black Tortoise: theft, spies, covert observation or hidden conduct; favorable Qi-Men combinations prevent an automatic adverse judgment.',src:'遁甲演義'},
+ '九地':{vi:'Cửu Địa: kiên cố, ẩn tàng, đóng giữ và phòng thủ; thiên về tĩnh và giữ.',en:'Nine Earth: firmness, concealment, holding position and defense; oriented toward stillness and holding.',src:'遁甲演義'},
+ '九天':{vi:'Cửu Thiên: uy thế, phát động, triển khai và công kích; thiên về động và phát.',en:'Nine Heaven: force, mobilization, deployment and attack; oriented toward movement and projection.',src:'遁甲演義'},
+ '勾陳':{vi:'Profile 《統宗》 xác nhận vị trí 勾陳 trong chuỗi Bát Thần, nhưng V4.93 chưa khóa một đoạn nghĩa trực tiếp độc lập cho thần này.',en:'The Tong Zong profile confirms Gou Chen in the Eight-Spirit sequence, but V4.93 has not locked an independent direct semantic passage for it.',src:'奇門遁甲統宗',lock:true},
+ '朱雀':{vi:'Profile 《統宗》 xác nhận vị trí 朱雀 trong chuỗi Bát Thần, nhưng V4.93 chưa dùng một nghĩa suy diễn để thay thế văn nguồn trực tiếp.',en:'The Tong Zong profile confirms Vermilion Bird in the Eight-Spirit sequence, but V4.93 does not substitute an inferred meaning for a direct source passage.',src:'奇門遁甲統宗',lock:true}
+};
+function activeProfile(km){var q=km&&km.qimenTyped, meta=(q&&q.diagnostics&&q.diagnostics.eightSpirit)||km.qimenV466||{};var raw=JSON.stringify(meta||{});if(/白虎|玄武|YANYI|BAI_XUAN/.test(raw))return PROFILES.YANYI_BAI_XUAN;if(/勾陳|朱雀|TONGZONG|GOUZHU/.test(raw))return PROFILES.TONGZONG_GOUZHU;var ps=A(q&&q.palaces), names=ps.map(function(p){return p&&p.spirit}).filter(Boolean);if(names.indexOf('白虎')>=0||names.indexOf('玄武')>=0)return PROFILES.YANYI_BAI_XUAN;if(names.indexOf('勾陳')>=0||names.indexOf('朱雀')>=0)return PROFILES.TONGZONG_GOUZHU;return null;}
+function apply(km){if(!km)return {status:'SOURCE LOCK'};var q=km.qimenTyped||{}, ps=A(q.palaces), prof=activeProfile(km);var rows=[];ps.forEach(function(p){if(!p||!p.spirit)return;var m=SEM[p.spirit]||null;var row={palace:Number(p.palace),spirit:p.spirit,profile:prof?prof.id:null,meaning:m?(VI()?m.vi:m.en):null,source:m&&m.src||null,status:m?(m.lock?'SOURCE LOCK':'SOURCED'):'SOURCE LOCK'};p.spiritInterpretation=row;rows.push(row);});var out={schema:'KD.QIMEN.EIGHT_SPIRIT.INTERPRETATION.v1',version:V,status:rows.length?(prof?'PASS':'PARTIAL'):'SOURCE LOCK',activeProfile:prof,profiles:PROFILES,rows:rows,policy:{profilesSeparated:true,noSilentVariantMerge:true,directSemanticsOnly:true,noInventedMeaningForGouChenZhuQue:true,noProbability:true,noGuaranteedOutcome:true}};km.qimenV493=out;return out;}
+function panel(km){var d=km.qimenV493||apply(km);var rows=A(d.rows).map(function(x){return '<section><h4>'+E(T('Cung ','Palace ')+x.palace)+' · '+E(x.spirit)+'</h4><p>'+E(x.meaning||T('Chưa khóa nghĩa trực tiếp từ source profile.','Direct meaning not yet locked from the source profile.'))+'</p><p class="tag">'+E(x.status+(x.source?' · '+x.source:''))+'</p></section>';}).join('')||'<p>—</p>';var prof=d.activeProfile?d.activeProfile.title:T('Chưa xác định profile Bát Thần','Eight-Spirit profile unresolved');return '<details class="card kd-km-v493" open><summary><b>☯ '+E(T('Kỳ Môn V4.93 · Bát Thần theo dị bản nguồn','Qi Men V4.93 · Source-profiled Eight Spirits'))+'</b></summary><div class="kd493"><p><b>'+E(T('Profile đang dùng','Active profile'))+':</b> '+E(prof)+'</p>'+rows+'<p class="dim">'+E(T('V4.93 giữ riêng 勾陳/朱雀 của 《奇門遁甲統宗》 và 白虎/玄武 của 《遁甲演義》. Không tự đổi tên, không trộn hai chuỗi và không gán nghĩa suy diễn thành cổ văn.','V4.93 keeps the Gou Chen/Vermilion Bird sequence of Qi Men Dun Jia Tong Zong separate from the White Tiger/Black Tortoise sequence of Dun Jia Yan Yi. It does not silently rename, merge, or present inferred meanings as classical text.'))+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){if(r)r.qimenV493={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V493={version:V,schema:'KD.QIMEN.EIGHT_SPIRIT.INTERPRETATION.v1',apply:apply,profiles:PROFILES,sources:['奇門遁甲統宗','遁甲演義'],policy:{profilesSeparated:true,noSilentVariantMerge:true,directSemanticsOnly:true,noProbability:true,noGuaranteedOutcome:true}};
+window.KD_RELEASE='4.93.0-qimen-eight-spirit-interpretation-profiles';
+})();
+</script>
+<style id="kd-v493-qimen-style">.kd-km-v493 summary{cursor:pointer;min-height:46px;display:flex;align-items:center}.kd493{padding-top:10px;line-height:1.72}.kd493 section{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px;margin:9px 0}.kd493 h4{margin:0 0 6px}.kd493 .tag{display:inline-block;font-size:.78em;opacity:.78;border:1px solid var(--line,#55482a);border-radius:999px;padding:2px 7px}.kd493 .dim{opacity:.74}</style>
 </body></html>
 
 <script id="kd-classical-engine-5000">
@@ -10283,3 +11044,94 @@ window.KD_RELEASE='4.70.0-qimen-fuyin-fanyin-typed-engine';
 })();
 </script>
 <style id="kd-v470-qimen-style">.kd-km-v470 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd470{padding-top:10px;line-height:1.7}.kd470 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kd470 .grid>div{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px}.kd470 .dim{opacity:.76}@media(max-width:620px){.kd470 .grid{grid-template-columns:1fr}}</style>
+
+<!-- KD QIMEN V4.87: stem-response source conflict resolver -->
+<script id="kd-v487-qimen-stem-response-conflict">
+(function(){'use strict';
+if(window.KD_QIMEN_V487)return;
+function vi(){return (window.S_ICHING_LANGUAGE||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return vi()?a:b;} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function tone(x){return String(x&&x.tone||'').toUpperCase();}
+function family(t){if(/SUPPORT/.test(t))return 'SUPPORT';if(/CAUTION|ADVERSE/.test(t))return 'CAUTION';if(/MIXED|CONTEXT/.test(t))return 'CONTEXT';return 'UNCLASSIFIED';}
+function catalogs(){return {yuanling:(window.KD_QIMEN_V485&&window.KD_QIMEN_V485.sourceCatalog)||{},faqiao:(window.KD_QIMEN_V486&&window.KD_QIMEN_V486.catalog)||{}};}
+function compare(){var c=catalogs(),keys={},rows=[];Object.keys(c.yuanling).forEach(function(k){keys[k]=1});Object.keys(c.faqiao).forEach(function(k){keys[k]=1});Object.keys(keys).sort().forEach(function(k){var a=c.yuanling[k]||null,b=c.faqiao[k]||null,fa=family(tone(a)),fb=family(tone(b)),state=!a?'FAQIAO_ONLY':!b?'YUANLING_ONLY':fa===fb?'AGREEMENT':'SOURCE_VARIANT';rows.push({key:k,yuanling:a,faqiao:b,state:state,toneA:fa,toneB:fb});});return rows;}
+function apply(km){var rows=compare(),overlap=rows.filter(function(x){return x.yuanling&&x.faqiao}),variants=overlap.filter(function(x){return x.state==='SOURCE_VARIANT'}),agree=overlap.filter(function(x){return x.state==='AGREEMENT'});var live=[];var q=km&&km.qimenTyped;if(q&&Array.isArray(q.palaces)){q.palaces.forEach(function(p){var s=p.stemResponseExpanded||p.stemResponse;if(!s||!s.key)return;var r=rows.find(function(x){return x.key===s.key});if(r){p.stemResponseSourceConflict={key:r.key,state:r.state,profiles:{yuanling:r.yuanling||null,faqiao:r.faqiao||null}};live.push({palace:Number(p.palace),key:r.key,state:r.state});}});q.diagnostics=q.diagnostics||{};q.diagnostics.stemResponseSourceConflict={schema:'KD.QIMEN.STEM_RESPONSE.CONFLICT.v1',status:'PASS',live:live};}
+var out={schema:'KD.QIMEN.STEM_RESPONSE.CONFLICT.v1',version:'4.87.0',status:(Object.keys(catalogs().yuanling).length||Object.keys(catalogs().faqiao).length)?'PASS':'SOURCE LOCK',rows:rows,overlap:overlap.length,agreements:agree.length,variants:variants.length,live:live,policy:{profilesSeparated:true,noSilentOverride:true,noForcedReconciliation:true,noPredictiveProbability:true,preferredProfile:'NONE'}};if(km)km.qimenV487=out;return out;}
+function panel(km){var d=apply(km||{}),live=(d.live||[]).map(function(x){return '<tr><td>'+E(x.palace)+'</td><td><b>'+E(x.key)+'</b></td><td>'+E(x.state)+'</td></tr>';}).join('')||'<tr><td colspan="3">—</td></tr>';var vars=(d.rows||[]).filter(function(x){return x.state==='SOURCE_VARIANT'}).slice(0,20).map(function(x){return '<tr><td><b>'+E(x.key)+'</b></td><td>'+E(x.toneA)+'</td><td>'+E(x.toneB)+'</td><td>'+E(x.state)+'</td></tr>';}).join('')||'<tr><td colspan="4">—</td></tr>';return '<details class="card kd-km-v487"><summary><b>十干克應 · '+T('V4.87 Hòa giải dị bản nguồn','V4.87 Source Conflict Resolver')+'</b></summary><div class="kd487"><p><b>'+T('Nguyên tắc','Policy')+':</b> '+T('《元靈經》 và 《奇門法竅》 được giữ thành hai profile độc lập. Khi cùng một cặp có sắc thái khác nhau, app báo SOURCE_VARIANT; không âm thầm ghi đè và không ép hai bản thành một lời đoán.','Yuan Ling Jing and Qi Men Fa Qiao remain independent profiles. If the same pair differs in tone, the app reports SOURCE_VARIANT; neither source silently overwrites the other and no forced reconciliation is made.')+'</p><p><b>Overlap:</b> '+d.overlap+' · <b>'+T('Đồng thuận cấu trúc','Structural agreement')+':</b> '+d.agreements+' · <b>'+T('Dị bản','Variants')+':</b> '+d.variants+'</p><h4>'+T('Các cặp đang xuất hiện trên bàn','Live chart pairs')+'</h4><div class="scroll"><table><thead><tr><th>'+T('Cung','Palace')+'</th><th>'+T('Cặp Can','Stem pair')+'</th><th>Status</th></tr></thead><tbody>'+live+'</tbody></table></div><h4>'+T('Dị bản phát hiện trong catalog','Detected catalog variants')+'</h4><div class="scroll"><table><thead><tr><th>'+T('Cặp','Pair')+'</th><th>《元靈經》</th><th>《奇門法竅》</th><th>Status</th></tr></thead><tbody>'+vars+'</tbody></table></div><p class="dim">'+T('V4.87 chỉ phát hiện khác biệt giữa các profile đã mã hóa ở V4.85–V4.86. Nó không tuyên bố nguồn nào “đúng hơn” nếu chưa có tiêu chí văn bản học độc lập.','V4.87 only detects differences between source profiles encoded in V4.85–V4.86. It does not declare either source superior without an independent textual criterion.')+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV487={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V487={version:'4.87.0',schema:'KD.QIMEN.STEM_RESPONSE.CONFLICT.v1',apply:apply,compare:compare,sourceProfiles:['奇門遁甲元靈經','奇門法竅'],guards:{noSilentOverride:true,noForcedReconciliation:true,noPredictiveProbability:true}};window.KD_RELEASE='4.87.0-qimen-stem-response-source-conflict-resolver';
+})();
+
+</script>
+<style id="kd-v487-qimen-style">.kd-km-v487 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.kd487{padding-top:10px;line-height:1.7}.kd487 h4{margin:12px 0 5px}.kd487 .scroll{overflow:auto;-webkit-overflow-scrolling:touch}.kd487 table{width:100%;border-collapse:collapse;min-width:620px}.kd487 th,.kd487 td{padding:8px;border-bottom:1px solid var(--line,#55482a);text-align:left;vertical-align:top}.kd487 .dim{opacity:.76}</style>
+
+<!-- KD QIMEN V4.90: interpretation depth engine - runtime appended outside exportHTML -->
+<script id="kd-v490-qimen-interpretation-depth-engine">
+(function(){'use strict';
+if(window.KD_QIMEN_V490)return;
+var V='4.90.0';
+function VI(){return (window.S_ICHING_LANGUAGE||window.KD_LANG||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return VI()?a:b;} function A(x){return Array.isArray(x)?x:[];} function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function txt(x){if(x==null)return '';if(typeof x==='string')return x;return x.label||x.text||x.name||x.vi||x.en||x.reason||x.kind||x.type||x.status||'';}
+function uniq(a){var o={},r=[];A(a).forEach(function(x){x=txt(x);if(x&&!o[x]){o[x]=1;r.push(x)}});return r;}
+function topicKey(km,f){var q=((km&&km.qimenV479&&km.qimenV479.topic)||f.topic||{});var raw=(q.key||q.topic||q.id||q.label||'general').toString().toLowerCase();if(/財|tài|finance|business|wealth/.test(raw))return 'finance';if(/婚|tình|hôn|love|marriage/.test(raw))return 'marriage';if(/病|sức|health|medical/.test(raw))return 'health';if(/試|thi|exam|study/.test(raw))return 'exam';if(/官|職|công việc|career|promotion/.test(raw))return 'career';if(/訟|kiện|legal|litigation/.test(raw))return 'legal';if(/行|xuất hành|travel/.test(raw))return 'travel';if(/失|thất|lost/.test(raw))return 'lost';return 'general';}
+var COPY={
+ finance:{title:['Tài vận · Cầu tài','Finance · Wealth'],focus:['Trọng tâm là cung Dụng Thần tài lộc và khả năng vận hành của Sinh Môn; các trạng thái Không, Mộ, Hình, Môn–Cung và vượng suy được xem như điều kiện làm thuận hoặc làm nghẽn dòng tài.','Focus on the finance Use-Spirit palace and the operability of the Life Gate; Void, Tomb, Punishment, Gate–Palace relation and seasonal strength act as enabling or obstructing conditions.'],act:['Nếu bằng chứng hỗn hợp, ưu tiên giao dịch có thể kiểm chứng, chia nhỏ cam kết và tránh coi một cách cát đơn lẻ là bảo đảm lợi nhuận.','When evidence is mixed, prefer verifiable transactions, stage commitments, and never treat one favorable pattern as a guarantee of profit.']},
+ career:{title:['Công việc · Công danh','Career · Promotion'],focus:['Đọc Khai Môn/cung công danh cùng Chủ–Khách và vượng suy; dấu hiệu thuận chỉ có giá trị khi cung liên quan không đồng thời chịu các trở lực mạnh.','Read the Open Gate/career palace together with Host–Guest and seasonal strength; supportive signs matter only when the relevant palace is not simultaneously burdened by major obstacles.'],act:['Ưu tiên thời điểm và vị trí có bằng chứng thuận nhất; nếu gặp xung đột lớn, nên củng cố hồ sơ, quan hệ và điều kiện thực tế trước khi tiến.','Prefer timing and positioning with the strongest support; under major conflict, strengthen credentials, relationships and real-world conditions before advancing.']},
+ marriage:{title:['Tình duyên · Hôn nhân','Love · Marriage'],focus:['Trục 乙–庚–六合 được đọc cùng quan hệ sinh khắc và trạng thái cung; không dùng một dấu hiệu đơn lẻ để kết luận hợp hay tan.','The Yi–Geng–Six Harmony axis is read with generating/controlling relations and palace states; no single sign decides union or separation.'],act:['Dùng kết quả để nhận diện điểm thuận/nghẽn trong tương tác; quyết định quan hệ vẫn cần dựa trên giao tiếp, hành vi và hoàn cảnh thực tế.','Use the result to identify supportive or blocked interaction; relationship decisions should still rest on communication, behavior and real circumstances.']},
+ health:{title:['Sức khỏe','Health'],focus:['Thiên Nhuế và các Môn liên quan chỉ được dùng như biểu tượng trong hệ Kỳ Môn; Không/Mộ/Hình và vượng suy giúp mô tả cấu trúc bàn chứ không phải chẩn đoán y khoa.','Tian Rui and related Gates are symbolic within Qi Men; Void, Tomb, Punishment and strength describe chart structure, not medical diagnosis.'],act:['Không dùng Kỳ Môn để trì hoãn khám hoặc điều trị. Với triệu chứng thực tế, ưu tiên đánh giá y khoa phù hợp.','Do not use Qi Men to delay medical assessment or treatment. For real symptoms, prioritize appropriate medical care.']},
+ exam:{title:['Thi cử · Học tập','Exams · Study'],focus:['Thiên Phụ, Nhật can và 丁 được đọc cùng cung Dụng Thần, vượng suy và các trở lực; mục tiêu là nhận diện điều kiện thuận cho chuẩn bị và thể hiện.','Tian Fu, Day Stem and Ding are read with the Use-Spirit palace, strength and obstacles to identify conditions favorable for preparation and performance.'],act:['Nếu bàn có trở lực, chuyển thành hành động cụ thể: tăng ôn tập, kiểm tra giấy tờ/lịch thi và giảm yếu tố gây phân tâm.','When obstacles appear, convert them into concrete actions: increase preparation, verify exam logistics and reduce distractions.']},
+ legal:{title:['Kiện tụng · Tranh chấp','Legal · Dispute'],focus:['Đọc riêng Khai Môn, Trực Phù, Thiên Ất và Kinh Môn theo profile kiện tụng; không suy từ profile quân sự hoặc Chủ–Khách tổng quát.','Read Open Gate, Chief, Tian Yi and Fear Gate under the legal profile; do not import military or generic Host–Guest rules.'],act:['Kết quả chỉ là khung cổ pháp, không thay thế tư vấn pháp lý. Với tranh chấp thật, ưu tiên chứng cứ, thời hạn và luật sư phù hợp.','This is a classical framework, not legal advice. For real disputes, prioritize evidence, deadlines and qualified counsel.']},
+ travel:{title:['Xuất hành · Di chuyển','Travel · Movement'],focus:['Thời can, Nhật can, Khai Môn, Dịch Mã và Phục/Phản Ngâm được đọc cùng nhau để mô tả động–tĩnh và điều kiện hành trình.','Hour Stem, Day Stem, Open Gate, Horse and Fu/Fan Yin are read together to describe movement, stasis and travel conditions.'],act:['Nếu xuất hiện cảnh báo, kiểm tra lại lịch trình, phương tiện, thời tiết và phương án dự phòng thay vì dựa vào dự báo huyền học.','When cautions appear, re-check itinerary, transport, weather and contingencies rather than relying on divinatory prediction.']},
+ lost:{title:['Thất vật · Tìm người/vật','Lost item/person'],focus:['走失 và 失物 được giữ là hai phép khác nhau; Thời can/六合 và 甲子戊/玄武/空亡 không bị trộn thành một công thức chung.','Missing-person and lost-object methods remain separate; Hour Stem/Six Harmony and Jia-Zi-Wu/Black Tortoise/Void are not merged into one rule.'],act:['Dùng phương hướng/thời điểm cổ pháp như gợi ý thứ cấp; ưu tiên truy vết thực tế, liên hệ nơi liên quan và biện pháp an toàn.','Treat classical direction/timing as secondary hints; prioritize practical tracing, relevant contacts and safety measures.']},
+ general:{title:['Luận việc tổng hợp','General interpretation'],focus:['Chưa có profile chuyên đề đủ chắc; chỉ tổng hợp các evidence typed đang thực sự có trên bàn.','No sufficiently grounded topic profile is active; only typed evidence actually present in the chart is summarized.'],act:['Không nên đưa ra quyết định mạnh khi Dụng Thần hoặc profile câu hỏi còn SOURCE LOCK.','Avoid strong decisions while the Use-Spirit or question profile remains SOURCE LOCK.']}
+};
+function apply(km){if(!km)return {status:'SOURCE LOCK'};var f=km.qimenV484||(window.KD_QIMEN_V484&&window.KD_QIMEN_V484.apply?window.KD_QIMEN_V484.apply(km):{})||{};var key=topicKey(km,f),c=COPY[key]||COPY.general;var sup=uniq(f.support).slice(0,6),cau=uniq(f.caution).slice(0,6);var out={schema:'KD.QIMEN.INTERPRETATION.DEPTH.v1',version:V,status:f.status||'PASS',topic:key,title:c.title[VI()?0:1],verdict:f.verdict||'SOURCE LOCK',focus:c.focus[VI()?0:1],support:sup,caution:cau,action:c.act[VI()?0:1],timing:km.qimenV480||null,sourceAware:km.qimenV488||null,guards:{topicSpecific:true,evidenceOnly:true,noInventedClassicalRule:true,noProbability:true,noGuaranteedOutcome:true,healthNotMedicalDiagnosis:true,legalNotLegalAdvice:true}};km.qimenV490=out;return out;}
+function list(a){return A(a).map(function(x){return '<li>'+E(x)+'</li>';}).join('')||'<li>—</li>';}
+function panel(km){var d=km.qimenV490||apply(km);return '<details class="card kd-km-v490" open><summary><b>☯ '+E(T('Kỳ Môn V4.90 · Luận sâu theo chủ đề','Qi Men V4.90 · Topic-specific interpretation'))+'</b></summary><div class="kd490"><h3>'+E(d.title)+'</h3><p class="focus">'+E(d.focus)+'</p><div class="grid"><section><h4>'+E(T('Bằng chứng hỗ trợ','Supporting evidence'))+'</h4><ul>'+list(d.support)+'</ul></section><section><h4>'+E(T('Trở lực / điều kiện','Obstacles / conditions'))+'</h4><ul>'+list(d.caution)+'</ul></section></div><h4>'+E(T('Hướng xử lý','Practical direction'))+'</h4><p>'+E(d.action)+'</p><p class="dim">'+E(T('Luận văn V4.90 chỉ diễn giải evidence đã được engine trước tạo ra; không thêm quy tắc cổ pháp mới và không tạo xác suất dự đoán.','V4.90 only interprets evidence produced by prior engines; it adds no new classical rules or predictive probabilities.'))+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){r.qimenV490={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V490={version:V,schema:'KD.QIMEN.INTERPRETATION.DEPTH.v1',apply:apply,guards:{topicSpecific:true,evidenceOnly:true,noInventedClassicalRule:true,noProbability:true,noGuaranteedOutcome:true}};window.KD_RELEASE='4.90.0-qimen-interpretation-depth-engine';
+})();
+</script>
+<style id="kd-v490-qimen-style">.kd-km-v490 summary{cursor:pointer;min-height:46px;display:flex;align-items:center}.kd490{padding-top:10px;line-height:1.72}.kd490 h3{margin:4px 0 8px}.kd490 .focus{font-weight:600}.kd490 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.kd490 section{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px}.kd490 h4{margin:10px 0 5px}.kd490 ul{margin:4px 0;padding-left:20px}.kd490 .dim{opacity:.74}@media(max-width:680px){.kd490 .grid{grid-template-columns:1fr}}</style>
+
+
+<!-- KD QIMEN V4.91: live palace combination interpretation, evidence-only -->
+<script id="kd-v491-qimen-live-palace-combination-engine">
+(function(){'use strict';
+if(window.KD_QIMEN_V491)return;
+var V='4.91.0';
+function VI(){return (window.S_ICHING_LANGUAGE||window.KD_LANG||document.documentElement.lang||'vi').toLowerCase().indexOf('en')!==0;}
+function T(a,b){return VI()?a:b;}
+function E(x){return String(x==null?'':x).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c;});}
+function A(x){return Array.isArray(x)?x:[];}
+function palaces(km){var q=km&&km.qimenTyped;return q&&Array.isArray(q.palaces)?q.palaces:[];}
+function pnum(x){return Number(x&&x.palace||x&&x.id||0)||0;}
+function first(x,keys){for(var i=0;i<keys.length;i++){if(x&&x[keys[i]]!=null&&x[keys[i]]!=='')return x[keys[i]];}return null;}
+function usePalaceNumbers(km){var set={};
+ function walk(x,depth){if(depth>5||x==null)return;if(Array.isArray(x)){x.forEach(function(v){walk(v,depth+1)});return;}if(typeof x!=='object')return;Object.keys(x).forEach(function(k){var v=x[k];if(/palace|cung/i.test(k)){var n=Number(v&&typeof v==='object'?(v.palace||v.id):v);if(n>=1&&n<=9)set[n]=1;}if(typeof v==='object')walk(v,depth+1);});}
+ walk(km&&km.qimenV473,0);walk(km&&km.qimenV474,0);walk(km&&km.qimenV484,0);return Object.keys(set).map(Number);
+}
+function flags(p){var r=[];if(p.void===true)r.push(T('Tuần Không','Void'));if(p.horse===true)r.push(T('Dịch Mã','Horse'));if(p.tomb===true||p.tomb&&p.tomb.active)r.push(T('Nhập Mộ','Tomb'));if(p.punishment===true||p.punishment&&p.punishment.active)r.push(T('Kích Hình','Punishment'));if(p.gatePressure===true)r.push(T('Môn khắc Cung','Gate controls Palace'));
+ var d=p.diagnosticSynthesis||p.diagnostics||{};var s=JSON.stringify(d);if(/STAR_FU_YIN|星伏吟/.test(s))r.push(T('Tinh Phục Ngâm','Star Fu Yin'));if(/STAR_FAN_YIN|星反吟/.test(s))r.push(T('Tinh Phản Ngâm','Star Fan Yin'));if(/GATE_FU_YIN|門伏吟/.test(s))r.push(T('Môn Phục Ngâm','Gate Fu Yin'));if(/GATE_FAN_YIN|門反吟/.test(s))r.push(T('Môn Phản Ngâm','Gate Fan Yin'));return Array.from(new Set(r));}
+function seasonal(p){var s=p.seasonalStrength||(p.diagnostics&&p.diagnostics.seasonalStrength)||null;if(!s)return null;if(typeof s==='string')return s;return s.gateState||s.starState||s.status||s.label||null;}
+function relation(p){return p.gatePalaceRelation||p.gateRelation||(p.diagnostics&&p.diagnostics.gatePalaceRelation)||null;}
+function describe(p,isUse){var gate=first(p,['gate','door']),star=first(p,['star']),spirit=first(p,['spirit']),hs=first(p,['heavenStem']),es=first(p,['earthStem']),fl=flags(p),sea=seasonal(p),rel=relation(p);var parts=[];
+ parts.push(T('Cung ','Palace ')+pnum(p)+(isUse?T(' · cung Dụng Thần/liên quan',' · Use-Spirit/relevant palace'):''));
+ var core=[];if(gate)core.push(T('Môn ','Gate ')+gate);if(star)core.push(T('Tinh ','Star ')+star);if(spirit)core.push(T('Thần ','Spirit ')+spirit);if(hs||es)core.push(T('Can Thiên/Địa ','Heaven/Earth stems ')+(hs||'—')+'/'+(es||'—'));if(core.length)parts.push(core.join(' · '));
+ if(rel)parts.push(T('Quan hệ Môn–Cung: ','Gate–Palace relation: ')+(typeof rel==='string'?rel:(rel.relation||rel.label||rel.status||'OBSERVED')));
+ if(sea)parts.push(T('Vượng suy đang ghi nhận: ','Recorded seasonal state: ')+sea);
+ if(fl.length)parts.push(T('Điều kiện đồng thời: ','Concurrent conditions: ')+fl.join(', '));else parts.push(T('Không có cờ chẩn đoán đặc biệt đã typed tại cung này.','No special typed diagnostic flag is active in this palace.'));
+ return {palace:pnum(p),isUse:!!isUse,gate:gate,star:star,spirit:spirit,heavenStem:hs,earthStem:es,flags:fl,seasonal:sea,relation:rel,text:parts};
+}
+function apply(km){if(!km)return {status:'SOURCE LOCK',combinations:[]};var ps=palaces(km),uses=usePalaceNumbers(km),combos=ps.filter(function(p){return pnum(p)>=1&&pnum(p)<=9;}).map(function(p){return describe(p,uses.indexOf(pnum(p))>=0)});var focus=combos.filter(function(x){return x.isUse});if(!focus.length)focus=combos.filter(function(x){return x.gate||x.star||x.spirit}).slice(0,3);var out={schema:'KD.QIMEN.LIVE_COMBINATION.v1',version:V,status:combos.length?'PASS':'SOURCE LOCK',usePalaces:uses,focus:focus,combinations:combos,policy:{liveTypedDataOnly:true,noHtmlInference:true,noNewClassicalRule:true,noProbability:true,noGuaranteedOutcome:true}};km.qimenV491=out;return out;}
+function panel(km){var d=km.qimenV491||apply(km);var rows=A(d.focus).map(function(x){return '<section><h4>'+E(T('Cung ','Palace ')+x.palace+(x.isUse?T(' · trọng tâm',' · focus'):''))+'</h4><ul>'+x.text.map(function(z){return '<li>'+E(z)+'</li>';}).join('')+'</ul></section>';}).join('')||'<p>—</p>';return '<details class="card kd-km-v491" open><summary><b>☯ '+E(T('Kỳ Môn V4.91 · Tổ hợp thực tế tại cung Dụng Thần','Qi Men V4.91 · Live Use-Spirit Palace Combinations'))+'</b></summary><div class="kd491">'+rows+'<p class="dim">'+E(T('V4.91 chỉ phối hợp các trường typed đang thực sự có trên bàn. Nó không sáng tạo thêm ý nghĩa cổ pháp cho một tổ hợp Môn–Tinh–Thần–Can chưa được source profile khóa.','V4.91 combines only typed fields actually present in the chart. It does not invent classical meanings for Gate–Star–Spirit–Stem combinations that have not been locked by a source profile.'))+'</p></div></details>';}
+var oldLap=window.kmLap;if(typeof oldLap==='function')window.kmLap=function(){var r=oldLap.apply(this,arguments);try{apply(r);}catch(e){if(r)r.qimenV491={status:'REVIEW',reason:String(e)}}return r;};
+var oldRender=window.kmRender;if(typeof oldRender==='function')window.kmRender=function(km){var h=oldRender.apply(this,arguments);try{return h+panel(km);}catch(e){return h;}};
+window.KD_QIMEN_V491={version:V,schema:'KD.QIMEN.LIVE_COMBINATION.v1',apply:apply,policy:{liveTypedDataOnly:true,noHtmlInference:true,noNewClassicalRule:true,noProbability:true,noGuaranteedOutcome:true}};
+window.KD_RELEASE='4.91.0-qimen-live-palace-combination-engine';
+})();
+</script>
+<style id="kd-v491-qimen-style">.kd-km-v491 summary{cursor:pointer;min-height:46px;display:flex;align-items:center}.kd491{padding-top:10px;line-height:1.72}.kd491 section{border:1px solid var(--line,#55482a);border-radius:10px;padding:10px;margin:9px 0}.kd491 h4{margin:0 0 6px}.kd491 ul{margin:4px 0;padding-left:20px}.kd491 .dim{opacity:.74}</style>
