@@ -5239,7 +5239,50 @@ window.KD_LOCAL_RESOURCE413={version:'4.13.0',manifest:M,verify:verify,install:i
 })();
 </script>
 
-</body></html>
+<script id="kd-thaiat-empty-sections-repair-20261101">
+(function(){'use strict';
+var busy=false;
+function moveInto(target, node){
+  if(!target||!node||target.contains(node)) return false;
+  target.appendChild(node); return true;
+}
+function repair(){
+  if(busy) return; busy=true;
+  try{
+    var out=document.getElementById('kd403-output');
+    if(!out) return;
+    var dg=out.querySelector('[data-kd478-target="domains"]');
+    var cg=out.querySelector('[data-kd478-target="chart"]');
+    var dc=dg&&dg.querySelector(':scope > .kd478-content');
+    var cc=cg&&cg.querySelector(':scope > .kd478-content');
+    if(dc){
+      var domains=out.querySelector('[data-kd447-domains]');
+      if(domains&&!dc.contains(domains)) moveInto(dc,domains);
+      var life=out.querySelector('[data-kd541-report]');
+      if(life&&!dc.contains(life)) moveInto(dc,life);
+      if(dc.children.length) dg.open=true;
+    }
+    if(cc){
+      var board=out.querySelector('[data-kd535-board]');
+      if(board&&!cc.contains(board)) moveInto(cc,board);
+      var placement=out.querySelector('[data-kd445-placement],[data-kd403-board],[data-kd403-grid]');
+      if(placement&&!cc.contains(placement)&&!(board&&board.contains(placement))) moveInto(cc,placement);
+      if(cc.children.length) cg.open=true;
+    }
+    /* Correct old shortcut wording without changing the reading engine. */
+    out.querySelectorAll('[data-kd478-jump="chart"]').forEach(function(b){
+      if(window.S_ICHING_LANGUAGE==='vi' && b.textContent.trim()==='Bàn đồ') b.textContent='Bản đồ';
+    });
+  } finally {busy=false;}
+}
+function schedule(){requestAnimationFrame(function(){repair();setTimeout(repair,0);setTimeout(repair,120);});}
+document.addEventListener('kd:module-ready',function(e){if(!e.detail||e.detail.module==='thaiat')schedule();});
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-s="scr-thaiat"],#scr-thaiat button,#scr-thaiat summary'))schedule();},true);
+function init(){var root=document.getElementById('scr-thaiat');if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});schedule();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.KD_THAIAT_SECTION_REPAIR_20261101={repair:repair};
+})();
+</script></body></html>
 
 <script id="kd-classical-engine-5000">
 (function(){
