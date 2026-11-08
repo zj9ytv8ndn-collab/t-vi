@@ -1205,7 +1205,39 @@ window.kdDownload95=function(name,mime,text){if(window.webkit&&window.webkit.mes
 
 // Native export adapter keeps existing HTML/PNG buttons usable in WKWebView.
 if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.kdShare){
- var nativeHTML=exportHTML;exportHTML=function(title,body){kdDownload95('S_I_CHING_result.html','text/html','<!doctype html><html lang="'+(window.S_ICHING_LANGUAGE==='vi'?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'+E(title)+'</title><style>body{font:16px Georgia,serif;max-width:900px;margin:auto;padding:20px;line-height:1.6;color:#221d10;background:#fffdf5}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{padding:14px;border:1px solid #aaa;margin:10px 0}button{display:none}</style></head><body><h1>'+E(title)+'</h1>'+body+'\n</body></html>');};
+ var nativeHTML=exportHTML;exportHTML=function(title,body){kdDownload95('S_I_CHING_result.html','text/html','<!doctype html><html lang="'+(window.S_ICHING_LANGUAGE==='vi'?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'+E(title)+'</title><style>body{font:16px Georgia,serif;max-width:900px;margin:auto;padding:20px;line-height:1.6;color:#221d10;background:#fffdf5}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{padding:14px;border:1px solid #aaa;margin:10px 0}button{display:none}</style></head><body><h1>'+E(title)+'</h1>'+body+'\n<script id="taiyi-v14-regression">
+(function(){'use strict';
+if(window.TaiyiRegressionV14)return;
+const YEARS=[724,725,796,1900,1901,1945,1950,1960,1972,1984,1990,1999,2000,2001,2010,2016,2020,2024,2026,2030,2044];
+const positiveMod=(a,b)=>((a%b)+b)%b;
+function inspect(){
+ const rows=[],api=window.TaiyiPrimarySourceAuditV12;
+ function record(label,ok,detail){rows.push({label,status:ok?'PASS':'FAIL',detail:detail||''})}
+ record('V12 API',!!api&&typeof api.derive==='function','');
+ if(api&&typeof api.derive==='function'){
+  for(const y of YEARS){try{
+   const got=api.derive(y),n=1937281+y-724,r360=positiveMod(n,360),r72=positiveMod(r360,72),r24=positiveMod(r72,24);
+   const ok=got.year===y&&got.accumulated===n&&got.mod360===r360&&got.mod72===r72&&got.mod24===r24&&got.div3Quotient===Math.floor(r24/3)&&got.div3Remainder===r24%3;
+   record('Arithmetic '+y,ok,ok?'':JSON.stringify({expected:{n,r360,r72,r24},got}));
+  }catch(e){record('Arithmetic '+y,false,String(e))}}
+  for(const invalid of [0,-1,1.5,'2026',null,10000]){let rejected=false;try{api.derive(invalid)}catch(e){rejected=true}record('Reject invalid year '+String(invalid),rejected,'')}
+ }
+ const leaked=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
+ while((node=walker.nextNode())){const parent=node.parentElement;if(!parent||parent.closest('script,style,noscript,textarea'))continue;const t=node.nodeValue||'';
+ if(/(?:HTMLAnchorElement\.prototype\.click|kdDownload95\(|var blobs=new Map\(|\\n\s*\\n\s*$)/.test(t))leaked.push(t.slice(0,130));}
+ record('No known leaked JavaScript in visible DOM',leaked.length===0,leaked.slice(0,5).join(' | '));
+ const result={version:'14',kind:'REGRESSION_NOT_CLASSICAL_VERIFICATION',checkedAt:new Date().toISOString(),summary:{total:rows.length,passed:rows.filter(x=>x.status==='PASS').length,failed:rows.filter(x=>x.status==='FAIL').length},checks:rows};return result;
+}
+function download(){const blob=new Blob([JSON.stringify(inspect(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='taiyi-v14-regression.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function mount(){if(document.getElementById('taiyi-v14-regression-panel'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;
+ const box=document.createElement('details');box.id='taiyi-v14-regression-panel';box.style.cssText='margin:14px 0;padding:12px;border:1px solid #ad914e;border-radius:10px;max-width:100%;overflow-wrap:anywhere';
+ const title=document.createElement('summary');title.textContent='V14 · Kiểm thử hồi quy 21 năm và dữ liệu đầu vào';title.style.cssText='font-weight:bold;cursor:pointer';box.append(title);
+ const note=document.createElement('p');note.textContent='Đối chiếu số học độc lập với API V12; không xác nhận công thức lập cục hoặc cổ pháp.';box.append(note);
+ const out=document.createElement('pre');out.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;font-size:12px';
+ for(const [label,action] of [['Chạy kiểm thử',()=>{const r=inspect();out.textContent=JSON.stringify(r.summary,null,2)+'\n'+r.checks.filter(x=>x.status!=='PASS').map(x=>x.label+': '+x.detail).join('\n')}],['Xuất JSON',download]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px';b.addEventListener('click',action);box.append(b)}box.append(out);host.append(box)}
+window.TaiyiRegressionV14=Object.freeze({inspect,download});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();document.addEventListener('kd:module-ready',mount);
+})();
+</script></body></html>');};
  var blobs=new Map(),create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL);URL.createObjectURL=function(blob){var url=create(blob);blobs.set(url,blob);return url;};URL.revokeObjectURL=function(url){blobs.delete(url);return revoke(url);};
  function shareBlob(url,name){var blob=blobs.get(url);if(!blob)return false;var reader=new FileReader();reader.onload=function(){var value=String(reader.result||''),comma=value.indexOf(',');if(comma<0)return;window.webkit.messageHandlers.kdShare.postMessage({name:name||('S_I_CHING_export.'+(blob.type==='image/png'?'png':blob.type.includes('json')?'json':'html')),mime:blob.type,base64:value.slice(comma+1)});};reader.readAsDataURL(blob);return true;}
  var anchorClick=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(){if(shareBlob(this.href,this.download))return;return anchorClick.apply(this,arguments);};
@@ -1259,7 +1291,39 @@ document.addEventListener('click',function(e){var view=e.target.closest&&e.targe
 exportHTML=function(title,body){
  try{var vi=window.S_ICHING_LANGUAGE==='vi',holder=document.createElement('div');holder.innerHTML=String(body||'');holder.querySelectorAll('script,iframe,object,embed,base,meta,link').forEach(function(e){e.remove();});holder.querySelectorAll('*').forEach(function(e){Array.from(e.attributes).forEach(function(a){if(/^on/i.test(a.name)||(a.name==='href'||a.name==='src')&&/^javascript:/i.test(a.value.replace(/[\x00-\x20]/g,'')))e.removeAttribute(a.name);});});
  var css='body{font:16px Georgia,serif;max-width:900px;margin:24px auto;padding:0 18px;color:#221d10;background:#fffdf5;line-height:1.65}h1{font-size:24px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{border:1px solid #c9b98a;border-radius:10px;padding:12px;margin:10px 0}button,input,select,textarea{display:none}details{margin:10px 0}a{overflow-wrap:anywhere}@media print{body{margin:0;max-width:none}.card{break-inside:avoid}}';
- var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+(vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.')+'</p></body></html>';
+ var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+(vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.')+'</p><script id="taiyi-v14-regression">
+(function(){'use strict';
+if(window.TaiyiRegressionV14)return;
+const YEARS=[724,725,796,1900,1901,1945,1950,1960,1972,1984,1990,1999,2000,2001,2010,2016,2020,2024,2026,2030,2044];
+const positiveMod=(a,b)=>((a%b)+b)%b;
+function inspect(){
+ const rows=[],api=window.TaiyiPrimarySourceAuditV12;
+ function record(label,ok,detail){rows.push({label,status:ok?'PASS':'FAIL',detail:detail||''})}
+ record('V12 API',!!api&&typeof api.derive==='function','');
+ if(api&&typeof api.derive==='function'){
+  for(const y of YEARS){try{
+   const got=api.derive(y),n=1937281+y-724,r360=positiveMod(n,360),r72=positiveMod(r360,72),r24=positiveMod(r72,24);
+   const ok=got.year===y&&got.accumulated===n&&got.mod360===r360&&got.mod72===r72&&got.mod24===r24&&got.div3Quotient===Math.floor(r24/3)&&got.div3Remainder===r24%3;
+   record('Arithmetic '+y,ok,ok?'':JSON.stringify({expected:{n,r360,r72,r24},got}));
+  }catch(e){record('Arithmetic '+y,false,String(e))}}
+  for(const invalid of [0,-1,1.5,'2026',null,10000]){let rejected=false;try{api.derive(invalid)}catch(e){rejected=true}record('Reject invalid year '+String(invalid),rejected,'')}
+ }
+ const leaked=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
+ while((node=walker.nextNode())){const parent=node.parentElement;if(!parent||parent.closest('script,style,noscript,textarea'))continue;const t=node.nodeValue||'';
+ if(/(?:HTMLAnchorElement\.prototype\.click|kdDownload95\(|var blobs=new Map\(|\\n\s*\\n\s*$)/.test(t))leaked.push(t.slice(0,130));}
+ record('No known leaked JavaScript in visible DOM',leaked.length===0,leaked.slice(0,5).join(' | '));
+ const result={version:'14',kind:'REGRESSION_NOT_CLASSICAL_VERIFICATION',checkedAt:new Date().toISOString(),summary:{total:rows.length,passed:rows.filter(x=>x.status==='PASS').length,failed:rows.filter(x=>x.status==='FAIL').length},checks:rows};return result;
+}
+function download(){const blob=new Blob([JSON.stringify(inspect(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='taiyi-v14-regression.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function mount(){if(document.getElementById('taiyi-v14-regression-panel'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;
+ const box=document.createElement('details');box.id='taiyi-v14-regression-panel';box.style.cssText='margin:14px 0;padding:12px;border:1px solid #ad914e;border-radius:10px;max-width:100%;overflow-wrap:anywhere';
+ const title=document.createElement('summary');title.textContent='V14 · Kiểm thử hồi quy 21 năm và dữ liệu đầu vào';title.style.cssText='font-weight:bold;cursor:pointer';box.append(title);
+ const note=document.createElement('p');note.textContent='Đối chiếu số học độc lập với API V12; không xác nhận công thức lập cục hoặc cổ pháp.';box.append(note);
+ const out=document.createElement('pre');out.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;font-size:12px';
+ for(const [label,action] of [['Chạy kiểm thử',()=>{const r=inspect();out.textContent=JSON.stringify(r.summary,null,2)+'\n'+r.checks.filter(x=>x.status!=='PASS').map(x=>x.label+': '+x.detail).join('\n')}],['Xuất JSON',download]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px';b.addEventListener('click',action);box.append(b)}box.append(out);host.append(box)}
+window.TaiyiRegressionV14=Object.freeze({inspect,download});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();document.addEventListener('kd:module-ready',mount);
+})();
+</script></body></html>';
  kdDownload95('S_I_CHING_result.html','text/html;charset=utf-8',doc);
  }catch(e){alert(String(e.message||e));}
 };
@@ -11967,4 +12031,76 @@ function audit(){let failures=[];for(const row of YEARS){const calc=derive(row.y
 function download(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function mount(){if(document.getElementById('taiyi-v12-panel'))return;let root=document.querySelector('[id*="taiyi" i][class*="debug" i]')||document.querySelector('[id*="thaiat" i]')||document.body;const section=document.createElement('details');section.id='taiyi-v12-panel';section.style.cssText='margin:18px 0;padding:14px;border:1px solid #ae914d;border-radius:12px;background:rgba(160,135,70,.08);color:inherit';const summary=document.createElement('summary');summary.textContent='Thái Ất V12 · Kiểm chứng nguồn cổ và tích niên (20 mẫu, 3 phép tính tay)';summary.style.cssText='font-weight:700;cursor:pointer;font-size:16px';section.append(summary);const intro=document.createElement('p');intro.textContent='Nguồn quyển 1 ghi năm 724 có tích niên 1.937.281. V12 chỉ tái lập phép tính tích niên và các bước chia dư 360 → 72 → 24 → 3. Chưa chứng nhận an cung, âm dương độn hay 20 golden độc lập.';section.append(intro);const link=document.createElement('a');link.href=SOURCE;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Xem nguyên văn Thái Ất Kim Kính Thức Kinh, quyển 1';section.append(link);const input=document.createElement('input');input.type='number';input.value='2026';input.min='1';input.max='9999';input.style.cssText='display:block;margin:12px 0;padding:8px;max-width:180px';section.append(input);const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;overflow:auto;max-height:420px;font-size:12px';function button(label,fn){const b=document.createElement('button');b.textContent=label;b.type='button';b.style.cssText='margin:5px;padding:8px 12px;cursor:pointer';b.addEventListener('click',()=>{try{const result=fn();pre.textContent=JSON.stringify(result,null,2)}catch(e){pre.textContent='Lỗi: '+e.message}});section.append(b)}button('Tính năm',()=>derive(Number(input.value)));button('3 phép tính tay',()=>[1900,2000,2026].map(derive));button('Kiểm toán 20 năm',audit);button('Xuất 20 mẫu nghiên cứu JSON',()=>{download(YEARS,'taiyi-v12-derived-not-golden.json');return {exported:YEARS.length,status:'DERIVED_NOT_INDEPENDENT_GOLDEN'}});button('Xuất báo cáo V12',()=>{const r=audit();download(r,'taiyi-v12-primary-source-audit.json');return r});section.append(pre);root.append(section)}
 window.TaiyiPrimarySourceAuditV12=Object.freeze({anchor:ANCHOR,derive,audit,records:YEARS});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();document.addEventListener('kd:module-ready',mount);
-})();</script></body></html>
+})();</script><script id="taiyi-v13-stability-audit">
+(function(){'use strict';
+if(window.TaiyiStabilityAuditV13)return;
+const checks=[];
+function check(name,fn){try{const r=fn();return {name,status:r===true?'PASS':'FAIL',detail:r===true?'':String(r)}}catch(e){return {name,status:'ERROR',detail:String(e.message||e)}}}
+function run(){
+ const api=window.TaiyiPrimarySourceAuditV12;
+ const result=[
+ check('V12 primary source audit API present',()=>!!api&&typeof api.derive==='function'||'V12 API unavailable'),
+ check('1900 arithmetic',()=>{if(!api)return 'API unavailable';const r=api.derive(1900);return JSON.stringify(r).includes('1938457')||'Expected 1,938,457 not found'}),
+ check('2000 arithmetic',()=>{if(!api)return 'API unavailable';const r=api.derive(2000);return JSON.stringify(r).includes('1938557')||'Expected 1,938,557 not found'}),
+ check('2026 arithmetic',()=>{if(!api)return 'API unavailable';const r=api.derive(2026);return JSON.stringify(r).includes('1938583')||'Expected 1,938,583 not found'}),
+ check('No visible raw JavaScript fragments',()=>{const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node,n=0;while((node=walker.nextNode())){if(node.parentElement&&/^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA)$/i.test(node.parentElement.tagName))continue;const t=node.textContent||'';if(/kdDownload95\(|HTMLAnchorElement\.prototype\.click|var blobs=new Map\(/.test(t))n++}return n===0||n+' leaked text nodes'}),
+ check('No visible escaped newline artifacts',()=>{const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node,n=0;while((node=walker.nextNode())){if(node.parentElement&&/^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA)$/i.test(node.parentElement.tagName))continue;if(/^\s*(?:\\n\s*){2,}\s*$/.test(node.textContent||''))n++}return n===0||n+' escaped newline artifacts'}),
+ check('App navigation exists',()=>!!document.querySelector('nav, [role="navigation"], .bottom-nav, [class*="bottom-nav"], [class*="tabbar"]')||'Navigation selector not found (manual check needed)')
+ ];
+ const report={version:'13.0',generatedAt:new Date().toISOString(),kind:'STRUCTURAL_RUNTIME_CHECK_NOT_CLASSICAL_VERIFICATION',summary:{passed:result.filter(x=>x.status==='PASS').length,failed:result.filter(x=>x.status!=='PASS').length},checks:result};checks.splice(0,checks.length,...result);return report;
+}
+function exportReport(){const blob=new Blob([JSON.stringify(run(),null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='taiyi-v13-stability-audit.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+function mount(){if(document.getElementById('taiyi-v13-stability'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;const box=document.createElement('details');box.id='taiyi-v13-stability';box.style.cssText='margin-top:16px;padding:12px;border:1px solid #ad914e;border-radius:10px';const title=document.createElement('summary');title.textContent='V13 · Kiểm tra ổn định giao diện và phép tính';title.style.cssText='font-weight:700;cursor:pointer';box.append(title);const note=document.createElement('p');note.textContent='Kiểm tra runtime cục bộ, phát hiện mã nguồn rò ra giao diện và tính nhất quán của ba phép tính tích niên. Không phải chứng nhận cổ pháp hoặc kiểm thử Safari thực tế.';box.append(note);const output=document.createElement('pre');output.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto;font-size:12px';for(const [label,fn] of [['Chạy kiểm tra V13',()=>{output.textContent=JSON.stringify(run(),null,2)}],['Xuất JSON V13',exportReport]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px;cursor:pointer';b.addEventListener('click',fn);box.append(b)}box.append(output);host.append(box)}
+window.TaiyiStabilityAuditV13=Object.freeze({run,exportReport});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();
+</script><script id="taiyi-v14-regression">
+(function(){'use strict';
+if(window.TaiyiRegressionV14)return;
+const YEARS=[724,725,796,1900,1901,1945,1950,1960,1972,1984,1990,1999,2000,2001,2010,2016,2020,2024,2026,2030,2044];
+const positiveMod=(a,b)=>((a%b)+b)%b;
+function inspect(){
+ const rows=[],api=window.TaiyiPrimarySourceAuditV12;
+ function record(label,ok,detail){rows.push({label,status:ok?'PASS':'FAIL',detail:detail||''})}
+ record('V12 API',!!api&&typeof api.derive==='function','');
+ if(api&&typeof api.derive==='function'){
+  for(const y of YEARS){try{
+   const got=api.derive(y),n=1937281+y-724,r360=positiveMod(n,360),r72=positiveMod(r360,72),r24=positiveMod(r72,24);
+   const ok=got.year===y&&got.accumulated===n&&got.mod360===r360&&got.mod72===r72&&got.mod24===r24&&got.div3Quotient===Math.floor(r24/3)&&got.div3Remainder===r24%3;
+   record('Arithmetic '+y,ok,ok?'':JSON.stringify({expected:{n,r360,r72,r24},got}));
+  }catch(e){record('Arithmetic '+y,false,String(e))}}
+  for(const invalid of [0,-1,1.5,'2026',null,10000]){let rejected=false;try{api.derive(invalid)}catch(e){rejected=true}record('Reject invalid year '+String(invalid),rejected,'')}
+ }
+ const leaked=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
+ while((node=walker.nextNode())){const parent=node.parentElement;if(!parent||parent.closest('script,style,noscript,textarea'))continue;const t=node.nodeValue||'';
+ if(/(?:HTMLAnchorElement\.prototype\.click|kdDownload95\(|var blobs=new Map\(|\\n\s*\\n\s*$)/.test(t))leaked.push(t.slice(0,130));}
+ record('No known leaked JavaScript in visible DOM',leaked.length===0,leaked.slice(0,5).join(' | '));
+ const result={version:'14',kind:'REGRESSION_NOT_CLASSICAL_VERIFICATION',checkedAt:new Date().toISOString(),summary:{total:rows.length,passed:rows.filter(x=>x.status==='PASS').length,failed:rows.filter(x=>x.status==='FAIL').length},checks:rows};return result;
+}
+function download(){const blob=new Blob([JSON.stringify(inspect(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='taiyi-v14-regression.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function mount(){if(document.getElementById('taiyi-v14-regression-panel'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;
+ const box=document.createElement('details');box.id='taiyi-v14-regression-panel';box.style.cssText='margin:14px 0;padding:12px;border:1px solid #ad914e;border-radius:10px;max-width:100%;overflow-wrap:anywhere';
+ const title=document.createElement('summary');title.textContent='V14 · Kiểm thử hồi quy 21 năm và dữ liệu đầu vào';title.style.cssText='font-weight:bold;cursor:pointer';box.append(title);
+ const note=document.createElement('p');note.textContent='Đối chiếu số học độc lập với API V12; không xác nhận công thức lập cục hoặc cổ pháp.';box.append(note);
+ const out=document.createElement('pre');out.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;font-size:12px';
+ for(const [label,action] of [['Chạy kiểm thử',()=>{const r=inspect();out.textContent=JSON.stringify(r.summary,null,2)+'\n'+r.checks.filter(x=>x.status!=='PASS').map(x=>x.label+': '+x.detail).join('\n')}],['Xuất JSON',download]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px';b.addEventListener('click',action);box.append(b)}box.append(out);host.append(box)}
+window.TaiyiRegressionV14=Object.freeze({inspect,download});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();document.addEventListener('kd:module-ready',mount);
+})();
+</script>
+<script id="taiyi-v15-coverage-audit">
+(function(){'use strict';
+if(window.TaiyiCoverageAuditV15)return;
+const ANCHOR=1937281, EPOCH=724;
+const mod=(a,n)=>((a%n)+n)%n;
+const profiles=[{id:'jinjing_annual_candidate',label:'Niên · Kim Kính (chưa chứng nhận)',levels:['year']},{id:'monthly_unresolved',label:'Nguyệt · chưa xác lập quy tắc',levels:['month']},{id:'daily_unresolved',label:'Nhật · chưa xác lập quy tắc',levels:['day']},{id:'hourly_unresolved',label:'Thời · chưa xác lập quy tắc',levels:['hour']}];
+const generals=['Thái Ất','Văn Xương','Thủy Kích','Chủ Đại Tướng','Khách Đại Tướng'];
+function arithmetic(year){if(!Number.isInteger(year)||year<1||year>9999)throw Error('Năm phải là số nguyên từ 1 đến 9999');const accumulated=ANCHOR+year-EPOCH;return {year,accumulated,mod360:mod(accumulated,360),mod72:mod(accumulated,72),mod24:mod(accumulated,24),quotient3:Math.floor(mod(accumulated,24)/3),remainder3:mod(accumulated,24)%3};}
+function audit(){const engine=window.TaiyiEngine, rows=[], coverage=[];let computable=0,errors=0;
+for(let ju=1;ju<=72;ju++){const year=EPOCH+ju-1;const expected=arithmetic(year);let result=null,error=null;try{if(!engine||typeof engine.compute!=='function')throw Error('Canonical compute unavailable');result=engine.compute({year,calendar:'gregorian'});if(result&&typeof result.then==='function')throw Error('Async compute cannot be audited synchronously');computable++;}catch(e){error=String(e.message||e);errors++}const actual=result&&result.ju;rows.push({testYear:year,cycleIndex:ju,accumulated:expected.accumulated,mod72:expected.mod72,engineJu:Number.isInteger(actual)?actual:null,engineJuRangeValid:Number.isInteger(actual)&&actual>=1&&actual<=72,engineError:error,academicVerified:false});}
+for(const p of profiles){coverage.push({profile:p.id,label:p.label,formulaVerified:false,calendarVerified:false,independentFixtures:0,requiredFixtures:20,palaceRulesVerified:0,requiredPalaceRules:5,level:p.levels[0]});}
+return {version:'15',status:'RESEARCH_ONLY_NOT_CLASSICAL_CERTIFICATION',generatedAt:new Date().toISOString(),reference:{epochYear:EPOCH,epochAccumulated:ANCHOR,scope:'Arithmetic reference only; no proof of historical year boundary or 72-palace mapping'},summary:{cycleRows:rows.length,engineCallsSucceeded:computable,engineErrors:errors,academicallyVerifiedJu:0,academicallyVerifiedGenerals:0,academicallyVerifiedMonthlyDailyHourly:0},generals,profiles:coverage,cycleRows:rows};}
+function download(){const data=JSON.stringify(audit(),null,2),blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='taiyi-v15-coverage-audit.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+function mount(){if(document.getElementById('taiyi-v15-coverage'))return;const host=document.getElementById('taiyi-v12-panel')||document.getElementById('taiyi-canonical-debug');if(!host)return;const panel=document.createElement('details');panel.id='taiyi-v15-coverage';panel.style.cssText='margin:16px 0;padding:14px;border:1px solid #b89a54;border-radius:12px;max-width:100%;overflow-wrap:anywhere';const summary=document.createElement('summary');summary.textContent='V15 · Ma trận kiểm toán 72 cục và năm thần tướng';summary.style.cssText='font-weight:700;cursor:pointer;color:#e8c46b';panel.append(summary);const p=document.createElement('p');p.textContent='Kiểm tra 72 đầu vào và tính hợp lệ cấu trúc, KHÔNG xác nhận 72 cục đúng cổ pháp. Niên/Nguyệt/Nhật/Thời và năm thần tướng được theo dõi riêng; mục chưa có nguồn độc lập giữ trạng thái chưa xác minh.';panel.append(p);const run=document.createElement('button');run.type='button';run.textContent='Chạy ma trận V15';run.style.cssText='margin:6px;padding:10px';const exp=document.createElement('button');exp.type='button';exp.textContent='Xuất báo cáo JSON V15';exp.style.cssText='margin:6px;padding:10px';const pre=document.createElement('pre');pre.style.cssText='max-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px';run.addEventListener('click',()=>{const a=audit();pre.textContent=JSON.stringify({summary:a.summary,profiles:a.profiles,failedRows:a.cycleRows.filter(r=>!r.engineJuRangeValid).slice(0,20)},null,2)});exp.addEventListener('click',download);panel.append(run,exp,pre);host.append(panel);}
+window.TaiyiCoverageAuditV15=Object.freeze({arithmetic,audit,download});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();
+</script>
+</body></html>
