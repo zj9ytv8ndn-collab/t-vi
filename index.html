@@ -1205,39 +1205,7 @@ window.kdDownload95=function(name,mime,text){if(window.webkit&&window.webkit.mes
 
 // Native export adapter keeps existing HTML/PNG buttons usable in WKWebView.
 if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.kdShare){
- var nativeHTML=exportHTML;exportHTML=function(title,body){kdDownload95('S_I_CHING_result.html','text/html','<!doctype html><html lang="'+(window.S_ICHING_LANGUAGE==='vi'?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'+E(title)+'</title><style>body{font:16px Georgia,serif;max-width:900px;margin:auto;padding:20px;line-height:1.6;color:#221d10;background:#fffdf5}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{padding:14px;border:1px solid #aaa;margin:10px 0}button{display:none}</style></head><body><h1>'+E(title)+'</h1>'+body+'\n<script id="taiyi-v14-regression">
-(function(){'use strict';
-if(window.TaiyiRegressionV14)return;
-const YEARS=[724,725,796,1900,1901,1945,1950,1960,1972,1984,1990,1999,2000,2001,2010,2016,2020,2024,2026,2030,2044];
-const positiveMod=(a,b)=>((a%b)+b)%b;
-function inspect(){
- const rows=[],api=window.TaiyiPrimarySourceAuditV12;
- function record(label,ok,detail){rows.push({label,status:ok?'PASS':'FAIL',detail:detail||''})}
- record('V12 API',!!api&&typeof api.derive==='function','');
- if(api&&typeof api.derive==='function'){
-  for(const y of YEARS){try{
-   const got=api.derive(y),n=1937281+y-724,r360=positiveMod(n,360),r72=positiveMod(r360,72),r24=positiveMod(r72,24);
-   const ok=got.year===y&&got.accumulated===n&&got.mod360===r360&&got.mod72===r72&&got.mod24===r24&&got.div3Quotient===Math.floor(r24/3)&&got.div3Remainder===r24%3;
-   record('Arithmetic '+y,ok,ok?'':JSON.stringify({expected:{n,r360,r72,r24},got}));
-  }catch(e){record('Arithmetic '+y,false,String(e))}}
-  for(const invalid of [0,-1,1.5,'2026',null,10000]){let rejected=false;try{api.derive(invalid)}catch(e){rejected=true}record('Reject invalid year '+String(invalid),rejected,'')}
- }
- const leaked=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
- while((node=walker.nextNode())){const parent=node.parentElement;if(!parent||parent.closest('script,style,noscript,textarea'))continue;const t=node.nodeValue||'';
- if(/(?:HTMLAnchorElement\.prototype\.click|kdDownload95\(|var blobs=new Map\(|\\n\s*\\n\s*$)/.test(t))leaked.push(t.slice(0,130));}
- record('No known leaked JavaScript in visible DOM',leaked.length===0,leaked.slice(0,5).join(' | '));
- const result={version:'14',kind:'REGRESSION_NOT_CLASSICAL_VERIFICATION',checkedAt:new Date().toISOString(),summary:{total:rows.length,passed:rows.filter(x=>x.status==='PASS').length,failed:rows.filter(x=>x.status==='FAIL').length},checks:rows};return result;
-}
-function download(){const blob=new Blob([JSON.stringify(inspect(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='taiyi-v14-regression.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
-function mount(){if(document.getElementById('taiyi-v14-regression-panel'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;
- const box=document.createElement('details');box.id='taiyi-v14-regression-panel';box.style.cssText='margin:14px 0;padding:12px;border:1px solid #ad914e;border-radius:10px;max-width:100%;overflow-wrap:anywhere';
- const title=document.createElement('summary');title.textContent='V14 · Kiểm thử hồi quy 21 năm và dữ liệu đầu vào';title.style.cssText='font-weight:bold;cursor:pointer';box.append(title);
- const note=document.createElement('p');note.textContent='Đối chiếu số học độc lập với API V12; không xác nhận công thức lập cục hoặc cổ pháp.';box.append(note);
- const out=document.createElement('pre');out.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;font-size:12px';
- for(const [label,action] of [['Chạy kiểm thử',()=>{const r=inspect();out.textContent=JSON.stringify(r.summary,null,2)+'\n'+r.checks.filter(x=>x.status!=='PASS').map(x=>x.label+': '+x.detail).join('\n')}],['Xuất JSON',download]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px';b.addEventListener('click',action);box.append(b)}box.append(out);host.append(box)}
-window.TaiyiRegressionV14=Object.freeze({inspect,download});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();document.addEventListener('kd:module-ready',mount);
-})();
-</script></body></html>');};
+ var nativeHTML=exportHTML;exportHTML=function(title,body){kdDownload95('S_I_CHING_result.html','text/html','<!doctype html><html lang="'+(window.S_ICHING_LANGUAGE==='vi'?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'+E(title)+'</title><style>body{font:16px Georgia,serif;max-width:900px;margin:auto;padding:20px;line-height:1.6;color:#221d10;background:#fffdf5}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{padding:14px;border:1px solid #aaa;margin:10px 0}button{display:none}</style></head><body><h1>'+E(title)+'</h1>'+body+'\n</body></html>');};
  var blobs=new Map(),create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL);URL.createObjectURL=function(blob){var url=create(blob);blobs.set(url,blob);return url;};URL.revokeObjectURL=function(url){blobs.delete(url);return revoke(url);};
  function shareBlob(url,name){var blob=blobs.get(url);if(!blob)return false;var reader=new FileReader();reader.onload=function(){var value=String(reader.result||''),comma=value.indexOf(',');if(comma<0)return;window.webkit.messageHandlers.kdShare.postMessage({name:name||('S_I_CHING_export.'+(blob.type==='image/png'?'png':blob.type.includes('json')?'json':'html')),mime:blob.type,base64:value.slice(comma+1)});};reader.readAsDataURL(blob);return true;}
  var anchorClick=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(){if(shareBlob(this.href,this.download))return;return anchorClick.apply(this,arguments);};
@@ -1291,39 +1259,7 @@ document.addEventListener('click',function(e){var view=e.target.closest&&e.targe
 exportHTML=function(title,body){
  try{var vi=window.S_ICHING_LANGUAGE==='vi',holder=document.createElement('div');holder.innerHTML=String(body||'');holder.querySelectorAll('script,iframe,object,embed,base,meta,link').forEach(function(e){e.remove();});holder.querySelectorAll('*').forEach(function(e){Array.from(e.attributes).forEach(function(a){if(/^on/i.test(a.name)||(a.name==='href'||a.name==='src')&&/^javascript:/i.test(a.value.replace(/[\x00-\x20]/g,'')))e.removeAttribute(a.name);});});
  var css='body{font:16px Georgia,serif;max-width:900px;margin:24px auto;padding:0 18px;color:#221d10;background:#fffdf5;line-height:1.65}h1{font-size:24px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px}svg,img{max-width:100%}.card{border:1px solid #c9b98a;border-radius:10px;padding:12px;margin:10px 0}button,input,select,textarea{display:none}details{margin:10px 0}a{overflow-wrap:anywhere}@media print{body{margin:0;max-width:none}.card{break-inside:avoid}}';
- var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+(vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.')+'</p><script id="taiyi-v14-regression">
-(function(){'use strict';
-if(window.TaiyiRegressionV14)return;
-const YEARS=[724,725,796,1900,1901,1945,1950,1960,1972,1984,1990,1999,2000,2001,2010,2016,2020,2024,2026,2030,2044];
-const positiveMod=(a,b)=>((a%b)+b)%b;
-function inspect(){
- const rows=[],api=window.TaiyiPrimarySourceAuditV12;
- function record(label,ok,detail){rows.push({label,status:ok?'PASS':'FAIL',detail:detail||''})}
- record('V12 API',!!api&&typeof api.derive==='function','');
- if(api&&typeof api.derive==='function'){
-  for(const y of YEARS){try{
-   const got=api.derive(y),n=1937281+y-724,r360=positiveMod(n,360),r72=positiveMod(r360,72),r24=positiveMod(r72,24);
-   const ok=got.year===y&&got.accumulated===n&&got.mod360===r360&&got.mod72===r72&&got.mod24===r24&&got.div3Quotient===Math.floor(r24/3)&&got.div3Remainder===r24%3;
-   record('Arithmetic '+y,ok,ok?'':JSON.stringify({expected:{n,r360,r72,r24},got}));
-  }catch(e){record('Arithmetic '+y,false,String(e))}}
-  for(const invalid of [0,-1,1.5,'2026',null,10000]){let rejected=false;try{api.derive(invalid)}catch(e){rejected=true}record('Reject invalid year '+String(invalid),rejected,'')}
- }
- const leaked=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
- while((node=walker.nextNode())){const parent=node.parentElement;if(!parent||parent.closest('script,style,noscript,textarea'))continue;const t=node.nodeValue||'';
- if(/(?:HTMLAnchorElement\.prototype\.click|kdDownload95\(|var blobs=new Map\(|\\n\s*\\n\s*$)/.test(t))leaked.push(t.slice(0,130));}
- record('No known leaked JavaScript in visible DOM',leaked.length===0,leaked.slice(0,5).join(' | '));
- const result={version:'14',kind:'REGRESSION_NOT_CLASSICAL_VERIFICATION',checkedAt:new Date().toISOString(),summary:{total:rows.length,passed:rows.filter(x=>x.status==='PASS').length,failed:rows.filter(x=>x.status==='FAIL').length},checks:rows};return result;
-}
-function download(){const blob=new Blob([JSON.stringify(inspect(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='taiyi-v14-regression.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
-function mount(){if(document.getElementById('taiyi-v14-regression-panel'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;
- const box=document.createElement('details');box.id='taiyi-v14-regression-panel';box.style.cssText='margin:14px 0;padding:12px;border:1px solid #ad914e;border-radius:10px;max-width:100%;overflow-wrap:anywhere';
- const title=document.createElement('summary');title.textContent='V14 · Kiểm thử hồi quy 21 năm và dữ liệu đầu vào';title.style.cssText='font-weight:bold;cursor:pointer';box.append(title);
- const note=document.createElement('p');note.textContent='Đối chiếu số học độc lập với API V12; không xác nhận công thức lập cục hoặc cổ pháp.';box.append(note);
- const out=document.createElement('pre');out.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;font-size:12px';
- for(const [label,action] of [['Chạy kiểm thử',()=>{const r=inspect();out.textContent=JSON.stringify(r.summary,null,2)+'\n'+r.checks.filter(x=>x.status!=='PASS').map(x=>x.label+': '+x.detail).join('\n')}],['Xuất JSON',download]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px';b.addEventListener('click',action);box.append(b)}box.append(out);host.append(box)}
-window.TaiyiRegressionV14=Object.freeze({inspect,download});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();document.addEventListener('kd:module-ready',mount);
-})();
-</script></body></html>';
+ var doc='<!doctype html><html lang="'+(vi?'vi':'en')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(title)+'</title><style>'+css+'</style></head><body><h1>'+E(title)+'</h1>'+holder.innerHTML+'<hr><p>'+(vi?'Xuất từ S I CHING · Nội dung chiêm nghiệm tham khảo.':'Exported from S I CHING · Content for reflection and reference.')+'</p></body></html>';
  kdDownload95('S_I_CHING_result.html','text/html;charset=utf-8',doc);
  }catch(e){alert(String(e.message||e));}
 };
@@ -12053,7 +11989,8 @@ function exportReport(){const blob=new Blob([JSON.stringify(run(),null,2)],{type
 function mount(){if(document.getElementById('taiyi-v13-stability'))return;const host=document.getElementById('taiyi-v12-panel');if(!host)return;const box=document.createElement('details');box.id='taiyi-v13-stability';box.style.cssText='margin-top:16px;padding:12px;border:1px solid #ad914e;border-radius:10px';const title=document.createElement('summary');title.textContent='V13 · Kiểm tra ổn định giao diện và phép tính';title.style.cssText='font-weight:700;cursor:pointer';box.append(title);const note=document.createElement('p');note.textContent='Kiểm tra runtime cục bộ, phát hiện mã nguồn rò ra giao diện và tính nhất quán của ba phép tính tích niên. Không phải chứng nhận cổ pháp hoặc kiểm thử Safari thực tế.';box.append(note);const output=document.createElement('pre');output.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto;font-size:12px';for(const [label,fn] of [['Chạy kiểm tra V13',()=>{output.textContent=JSON.stringify(run(),null,2)}],['Xuất JSON V13',exportReport]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='padding:8px 12px;margin:6px;cursor:pointer';b.addEventListener('click',fn);box.append(b)}box.append(output);host.append(box)}
 window.TaiyiStabilityAuditV13=Object.freeze({run,exportReport});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 })();
-</script><script id="taiyi-v14-regression">
+</script>
+<script id="taiyi-v14-regression">
 (function(){'use strict';
 if(window.TaiyiRegressionV14)return;
 const YEARS=[724,725,796,1900,1901,1945,1950,1960,1972,1984,1990,1999,2000,2001,2010,2016,2020,2024,2026,2030,2044];
