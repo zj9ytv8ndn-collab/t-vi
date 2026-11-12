@@ -1204,7 +1204,62 @@ function shareBatTuPNG(tt,nc,name){
 function exportHTML(title,bodyHtml){
  try{
  var css='body{font-family:serif;max-width:760px;margin:24px auto;padding:0 16px;color:#1c1a12;background:#fdfaf2;line-height:1.65}h1{font-size:22px;border-bottom:2px solid #b8942a;padding-bottom:8px}h2,h3{color:#7a5c10}table{border-collapse:collapse;width:100%}td,th{border:1px solid #c9b98a;padding:5px 8px}img,svg{max-width:100%}.card{border:1px solid #d8c894;border-radius:10px;padding:10px 14px;margin:10px 0}@media print{body{margin:0;max-width:none;background:#fff}.card{break-inside:avoid}button{display:none}}';
- var doc='<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>'+title+'</title><style>'+css+'</style></head><body><h1>'+title+'</h1>'+bodyHtml+'<hr><p style="font-size:12px;color:#777">Xuất từ ứng dụng Kinh Dịch 64 Quẻ · '+new Date().toLocaleString('vi-VN')+' — nội dung mang tính chiêm nghiệm tham khảo.</p></body></html>';
+ var doc='<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>'+title+'</title><style>'+css+'</style></head><body><h1>'+title+'</h1>'+bodyHtml+'<hr><p style="font-size:12px;color:#777">Xuất từ ứng dụng Kinh Dịch 64 Quẻ · '+new Date().toLocaleString('vi-VN')+' — nội dung mang tính chiêm nghiệm tham khảo.</p><style id="si-section-scroll-v6">
+/* V6: independent vertical scrolling within expandable content sections */
+.si-scroll-section{min-width:0;max-width:100%;overflow:visible!important;}
+.si-scroll-section>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--gold2);font-weight:700;font-size:clamp(17px,4.5vw,22px);line-height:1.45;padding:3px 0 9px;overflow-wrap:anywhere;}
+.si-scroll-section>summary::-webkit-details-marker{display:none}
+.si-scroll-section>summary .si-section-title{min-width:0;flex:1}
+.si-scroll-section>summary .si-section-arrow{flex:none;font-size:19px;color:var(--gold);transition:transform .2s}
+.si-scroll-section[open]>summary .si-section-arrow{transform:rotate(180deg)}
+.si-scroll-section>.si-section-body{min-width:0;max-width:100%;max-height:min(62dvh,620px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:8px 4px 14px 1px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+.si-scroll-section>.si-section-body::-webkit-scrollbar{width:4px}.si-scroll-section>.si-section-body::-webkit-scrollbar-thumb{background:var(--gold);border-radius:9px}
+.si-scroll-section .mrow,.si-scroll-section .mrow>*{min-width:0;max-width:100%;overflow-wrap:break-word;word-break:normal;white-space:normal}
+.si-scroll-section .tblwrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.si-scroll-section .si-section-body> :last-child{margin-bottom:0}
+@media(max-width:480px){.si-scroll-section{padding:14px!important;margin-bottom:12px!important}.si-scroll-section>.si-section-body{max-height:55dvh}}
+@media(prefers-reduced-motion:reduce){.si-scroll-section>summary .si-section-arrow{transition:none}}
+</style>
+<script id="si-section-scroll-script-v6">
+(function(){
+ if(window.__SI_SCROLL_V6__)return;window.__SI_SCROLL_V6__=true;
+ var busy=false;
+ function upgrade(){
+  if(busy)return;busy=true;
+  try{
+   document.querySelectorAll('.screen .card').forEach(function(card){
+    if(card.dataset.siScrollDone)return;
+    card.dataset.siScrollDone='1';
+    if(card.closest('details')||card.matches('details')||card.querySelector(':scope > details')||card.id==='castCard')return;
+    var heading=card.querySelector(':scope > h2');
+    if(!heading||card.querySelector('textarea,input,select')||card.querySelector(':scope > .btn'))return;
+    if((card.textContent||'').trim().length<240)return;
+    var summary=document.createElement('summary');
+    var title=document.createElement('span');title.className='si-section-title';title.textContent=heading.textContent;
+    var arrow=document.createElement('span');arrow.className='si-section-arrow';arrow.textContent='⌄';arrow.setAttribute('aria-hidden','true');
+    summary.append(title,arrow);
+    var body=document.createElement('div');body.className='si-section-body';
+    while(card.firstChild)body.appendChild(card.firstChild);
+    card.append(summary,body);
+    // Details on the existing card preserve its identity and event handlers.
+    var wasVisible=!!card.offsetParent;
+    var replacement=document.createElement('details');
+    replacement.className=card.className+' si-scroll-section';
+    replacement.id=card.id;
+    replacement.dataset.siScrollDone='1';
+    if(wasVisible&&document.querySelectorAll('.si-scroll-section[open]').length<2)replacement.open=true;
+    while(card.firstChild)replacement.appendChild(card.firstChild);
+    for(var i=0;i<card.attributes.length;i++){var a=card.attributes[i];if(a.name!=='class'&&a.name!=='id'&&a.name!=='data-si-scroll-done')replacement.setAttribute(a.name,a.value)}
+    card.replaceWith(replacement);
+   });
+  }finally{busy=false}
+ }
+ var pending=false;
+ function schedule(){if(pending)return;pending=true;requestAnimationFrame(function(){pending=false;upgrade()})}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
+ new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+})();
+</script></body></html>';
  var blob=new Blob([doc],{type:'text/html;charset=utf-8'});
  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
  a.download=title.replace(/[^\w\u00C0-\u1EF9]+/g,'_').slice(0,60)+'.html';
@@ -8695,4 +8750,59 @@ function truRender(){
   if(_kc){var _m='[KIEMCHUNG] '+(_kc.pass||0)+' PASS / '+(_kc.fail||0)+' FAIL';
     if(_kc.fail>0)console.warn(_m,_kc.log||'');else console.log(_m+' — co phap chuan xac');}
 }catch(e){console.warn('[KIEMCHUNG] khong chay duoc:',e&&e.message);}})();
+</script><style id="si-section-scroll-v6">
+/* V6: independent vertical scrolling within expandable content sections */
+.si-scroll-section{min-width:0;max-width:100%;overflow:visible!important;}
+.si-scroll-section>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--gold2);font-weight:700;font-size:clamp(17px,4.5vw,22px);line-height:1.45;padding:3px 0 9px;overflow-wrap:anywhere;}
+.si-scroll-section>summary::-webkit-details-marker{display:none}
+.si-scroll-section>summary .si-section-title{min-width:0;flex:1}
+.si-scroll-section>summary .si-section-arrow{flex:none;font-size:19px;color:var(--gold);transition:transform .2s}
+.si-scroll-section[open]>summary .si-section-arrow{transform:rotate(180deg)}
+.si-scroll-section>.si-section-body{min-width:0;max-width:100%;max-height:min(62dvh,620px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:8px 4px 14px 1px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+.si-scroll-section>.si-section-body::-webkit-scrollbar{width:4px}.si-scroll-section>.si-section-body::-webkit-scrollbar-thumb{background:var(--gold);border-radius:9px}
+.si-scroll-section .mrow,.si-scroll-section .mrow>*{min-width:0;max-width:100%;overflow-wrap:break-word;word-break:normal;white-space:normal}
+.si-scroll-section .tblwrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.si-scroll-section .si-section-body> :last-child{margin-bottom:0}
+@media(max-width:480px){.si-scroll-section{padding:14px!important;margin-bottom:12px!important}.si-scroll-section>.si-section-body{max-height:55dvh}}
+@media(prefers-reduced-motion:reduce){.si-scroll-section>summary .si-section-arrow{transition:none}}
+</style>
+<script id="si-section-scroll-script-v6">
+(function(){
+ if(window.__SI_SCROLL_V6__)return;window.__SI_SCROLL_V6__=true;
+ var busy=false;
+ function upgrade(){
+  if(busy)return;busy=true;
+  try{
+   document.querySelectorAll('.screen .card').forEach(function(card){
+    if(card.dataset.siScrollDone)return;
+    card.dataset.siScrollDone='1';
+    if(card.closest('details')||card.matches('details')||card.querySelector(':scope > details')||card.id==='castCard')return;
+    var heading=card.querySelector(':scope > h2');
+    if(!heading||card.querySelector('textarea,input,select')||card.querySelector(':scope > .btn'))return;
+    if((card.textContent||'').trim().length<240)return;
+    var summary=document.createElement('summary');
+    var title=document.createElement('span');title.className='si-section-title';title.textContent=heading.textContent;
+    var arrow=document.createElement('span');arrow.className='si-section-arrow';arrow.textContent='⌄';arrow.setAttribute('aria-hidden','true');
+    summary.append(title,arrow);
+    var body=document.createElement('div');body.className='si-section-body';
+    while(card.firstChild)body.appendChild(card.firstChild);
+    card.append(summary,body);
+    // Details on the existing card preserve its identity and event handlers.
+    var wasVisible=!!card.offsetParent;
+    var replacement=document.createElement('details');
+    replacement.className=card.className+' si-scroll-section';
+    replacement.id=card.id;
+    replacement.dataset.siScrollDone='1';
+    if(wasVisible&&document.querySelectorAll('.si-scroll-section[open]').length<2)replacement.open=true;
+    while(card.firstChild)replacement.appendChild(card.firstChild);
+    for(var i=0;i<card.attributes.length;i++){var a=card.attributes[i];if(a.name!=='class'&&a.name!=='id'&&a.name!=='data-si-scroll-done')replacement.setAttribute(a.name,a.value)}
+    card.replaceWith(replacement);
+   });
+  }finally{busy=false}
+ }
+ var pending=false;
+ function schedule(){if(pending)return;pending=true;requestAnimationFrame(function(){pending=false;upgrade()})}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
+ new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+})();
 </script></body></html>
