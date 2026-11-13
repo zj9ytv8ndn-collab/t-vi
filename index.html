@@ -1059,6 +1059,7 @@ function lbl(x,y,t,anchor){
  var btns=document.querySelectorAll('#tabs .tab');
  btns.forEach(function(b){
  b.addEventListener('click',function(){
+ if(!b.dataset.s)return; // Settings is a menu action, not a screen tab.
  btns.forEach(function(x){x.classList.remove('on');});
  b.classList.add('on');
  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
@@ -1247,10 +1248,17 @@ function openModal(html){
   $('modal').querySelector('.sheet').scrollTop=0;$('mClose').focus();
 }
 function closeModal(){
+  var returnToCast=!!window.siSettingsModalOpen;
+  window.siSettingsModalOpen=false;
   var wasOpen=$('modal').classList.contains('open');
   $('modal').classList.remove('open');
   if(wasOpen&&siModalReturnFocus&&typeof siModalReturnFocus.focus==='function'&&siModalReturnFocus.isConnected)siModalReturnFocus.focus();
   siModalReturnFocus=null;
+  if(wasOpen&&returnToCast){
+    var castTab=document.querySelector('#tabs .tab[data-s="scr-cast"]');
+    if(castTab)castTab.click();
+    else {document.querySelectorAll('.screen').forEach(function(el){el.classList.toggle('active',el.id==='scr-cast');});}
+  }
 }
 document.addEventListener('keydown',function(ev){
   if(!$('modal').classList.contains('open'))return;
@@ -4202,6 +4210,7 @@ function applyUI(){
  r.setProperty('--fs',fs);
 }
 function openSettings(){
+ window.siSettingsModalOpen=true;
  var cur=read('uiTheme')||'black';
  var fs=Math.round((parseFloat(read('uiFS'))||1)*100);
  var h='<h2 style="text-align:center;margin-bottom:4px">⚙ Cài Đặt Giao Diện</h2>'
