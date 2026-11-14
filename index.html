@@ -4659,12 +4659,25 @@ var _detailHTML0=detailHTML;
 detailHTML=function(x){
  return _detailHTML0(x)+batCungBlock(yangFromTri(x.up,x.lo),x.n);
 };
+// V110: Bảo đảm khối luận giải không biến mất khi tiêu đề neo thay đổi.
+function siChingInsertResultBlock(html,block,tag){
+ if(!block)return html;
+ if(typeof html!=='string')throw new TypeError('resultHTML.html không phải chuỗi');
+ var marker='data-si-ching-result-block="'+tag+'"';
+ if(html.indexOf(marker)!==-1)return html;
+ var wrapped='<div '+marker+'>'+block+'</div>';
+ var anchor='<h3>Đại Tượng Truyện</h3>';
+ if(html.indexOf(anchor)!==-1)return html.replace(anchor,wrapped+anchor);
+ // Không thay thế bằng nội dung khác hoặc bỏ qua lỗi; vẫn giữ luận giải.
+ if(typeof console!=='undefined'&&console.warn)console.warn('[S I CHING V110] Thiếu neo Đại Tượng Truyện:',tag);
+ return html+wrapped;
+}
 var _resultHTML0=resultHTML;
 resultHTML=function(q,dom,cast,forModal){
  var res=_resultHTML0(q,dom,cast,forModal);
  var vals=cast.vals;var yang=vals.map(function(v){return v===7||v===9;});
  var block=batCungBlock(yang,res.num);
- res.html=res.html.replace('<h3>Đại Tượng Truyện</h3>',block+'<h3>Đại Tượng Truyện</h3>');
+ res.html=siChingInsertResultBlock(res.html,block,'bat-cung');
  return res;
 };
 var _hexHTML0=hexHTML;
@@ -5214,7 +5227,7 @@ function lnSheHai(cand,khoas,duongNhat,haTac,thien){
  }
  best=tops[0];
  }
- note=CHI[khoas[best].th]+' thiệp hại thâm nhất ('+note+')';
+ note=CHI[khoas[best].th]+(cand.filter(function(i){return harmOf(khoas[i].th)===bestH;}).length>1?' được chọn sau khi xét đồng điểm Thiệp Hại':' có mức Thiệp Hại cao nhất')+' ('+note+')';
  return{idx:best,note:note};
 }
 function lnLap(dd,mm,yy,hh){
@@ -5684,7 +5697,7 @@ resultHTML=function(q,dom,cast,forModal){
  var vals=cast.vals;var yang=vals.map(function(v){return v===7||v===9;});
  var mv=cast.moving||vals.map(function(v){return v===6||v===9;});
  var block=bocThanhBlock(res.num,yang,mv,dom);
- res.html=res.html.replace('<h3>Đại Tượng Truyện</h3>',block+'<h3>Đại Tượng Truyện</h3>');
+ res.html=siChingInsertResultBlock(res.html,block,'boc-thanh');
  }catch(e){}
  return res;
 };
@@ -6533,7 +6546,7 @@ function haoViCoSo(mv,yang){
 function luan64Block(num,dom,q,mv,yang){
  var L=LUAN64[num];if(!L)return'';
  var vd=LUAN_VERD[L.v];
- var domKey=LUAN_DOMKEY[dom]||'tq';
+ var domKey=Object.prototype.hasOwnProperty.call(LUAN_DOMKEY,dom)?LUAN_DOMKEY[dom]:null;
  var x=BYN[num];
  var h='';
  h+='<h3>Kết Luận Cổ Pháp Cho Câu Hỏi Của Bạn</h3>';
@@ -6541,24 +6554,14 @@ function luan64Block(num,dom,q,mv,yang){
  +'<div style="font-size:1.05em;color:'+vd.c+';font-weight:700;letter-spacing:1px">◈ '+vd.t+' ◈</div>'
  +'<p style="margin:6px 0 0">'+(q?('Câu hỏi: <i>“'+esc(String(q))+'”</i><br>'):'')
  +'<b>Trả lời thẳng:</b> '+L.kl+'</p>'
- +'<p style="margin:6px 0 0"><b>Đối với riêng '+LUAN_DOMNAME[domKey]+' bạn đang hỏi:</b> '+L[domKey]+'</p>';
+ +(domKey?('<p style="margin:6px 0 0"><b>Đối với riêng '+LUAN_DOMNAME[domKey]+' bạn đang hỏi:</b> '+(L[domKey]||'Chưa có luận giải riêng cho chủ đề này.')+'</p>'):'<p style="margin:6px 0 0"><b>Giới hạn:</b> Chưa có luận giải chuyên biệt được kiểm chứng cho chủ đề đã chọn; kết luận trên chỉ là tổng luận của quẻ, không phải câu trả lời riêng cho vấn đề này.</p>');
  var coSo=thoanCoSo(x.t).concat(haoViCoSo(mv,yang));
  if(coSo.length){
  h+='<div style="margin:8px 0 0;padding:8px 10px;border-top:1px dashed rgba(216,178,106,.35)"><b style="color:#d9b96a">Căn cứ cổ pháp chốt lời:</b><ul style="margin:6px 0 0;padding-left:18px;line-height:1.7">'
  +coSo.map(function(s2){return '<li>'+s2+'</li>';}).join('')+'</ul></div>';
  }
  h+='<p style="margin:8px 0 0"><b>Lời khuyên hành động:</b> '+L.hd+'</p></div>';
- h+='<h3>Luận Chuyên Sâu 10 Chủ Đề Còn Lại</h3>';
- var keys=['tq','vm','tb','td','gd','sk','xh','tc','kt','tv','dt'];
- var upTri=TRI[BYN[num].up];
- var ord=0;
- for(var i=0;i<keys.length;i++){var k=keys[i];
- if(k===domKey)continue;
- ord++;
- var txt=L[k]||'';
- if(k==='tv'&&txt&&upTri)txt+=' Theo pháp Mai Hoa, tìm về hướng <b>'+upTri.dir+'</b> (thượng quái '+upTri.name+' '+(upTri.nat||'')+').';
- h+='<div class="mrow" style="display:block"><span class="k" style="color:#d9b96a">'+ord+'. '+LUAN_DOMNAME[k]+'</span><span class="v" style="text-align:left">'+txt+'</span></div>';
- }
+ // V109: Không xuất các chủ đề không được hỏi; tránh gây nhầm là câu trả lời trực tiếp.
  if(mv&&mv.filter(function(x){return x}).length>1){
  h+='<p class="dim">Quẻ có '+mv.filter(function(x){return x}).length+' hào động — ván cục đang biến động mạnh, kết luận trên cần đối chiếu thêm biến quẻ và phần Ứng Kỳ bên dưới để chốt hạn ứng nghiệm.</p>';
  }
@@ -6571,7 +6574,7 @@ resultHTML=function(q,dom,cast,forModal){
  var vals=cast.vals;var yang=vals.map(function(v){return v===7||v===9;});
  var mv=cast.moving||vals.map(function(v){return v===6||v===9;});
  var lb=luan64Block(res.num,dom,q,mv,yang);
- if(lb)res.html=res.html.replace('<h3>Đại Tượng Truyện</h3>',lb+'<h3>Đại Tượng Truyện</h3>');
+ if(lb)res.html=siChingInsertResultBlock(res.html,lb,'luan-64');
  }catch(e){}
  return res;
 };
@@ -6671,7 +6674,7 @@ resultHTML=function(q,dom,cast,forModal){
  var res=_resultHTML_west(q,dom,cast,forModal);
  try{
  var wb=westCastBlock(res.num,q||'');
- if(wb)res.html=res.html.replace('<h3>Đại Tượng Truyện</h3>',wb+'<h3>Đại Tượng Truyện</h3>');
+ if(wb)res.html=siChingInsertResultBlock(res.html,wb,'west-cast');
  }catch(e){}
  return res;
 };
@@ -7218,7 +7221,7 @@ resultHTML=function(q,dom,cast,forModal){
  var blk='<div class="card" style="margin-top:10px"><h3>🕰️ Thời Điểm Động Tâm Gieo Quẻ</h3>'
  +'<p style="font-size:calc(14px * var(--fs,1));line-height:1.7">Giờ <b>'+ccTxt(tt.gio)+'</b> · Ngày <b>'+ccTxt(tt.ngay)+'</b> · Tháng <b>'+ccTxt(tt.thang)+'</b> · Năm <b>'+ccTxt(tt.nam)+'</b>'
  +'<br>Trực nhật: <b>'+tr.name+'</b> ('+tr.rate+') — '+tr.note+'</p></div>';
- res.html=res.html.replace('<h3>Đại Tượng Truyện</h3>',blk+'<h3>Đại Tượng Truyện</h3>');
+ res.html=siChingInsertResultBlock(res.html,blk,'extra-block');
  }
  }catch(e){}
  return res;
@@ -10017,7 +10020,7 @@ function truRender(){
  }
  function orderLine(num){
  var tt=VV2TT[num],dtt=65-tt,dvv=TT2VV[dtt],db=BYN[dvv];
- return '<details class="card si-order-fixed si-accordion" open><summary>Thứ tự quẻ · Tiên Thiên / Hậu Thiên <span class="si-chevron">⌄</span></summary><div class="si-accordion-body"'
+ return '<details class="card si-order-fixed si-accordion" open><summary>Thứ tự quẻ · Tiên Thiên / Hậu Thiên <span class="si-chevron">⌄</span></summary><div class="si-accordion-body">'
  +'<div class="mrow"><span class="k">Thứ tự Hậu Thiên (Văn Vương)</span><span class="v">Quẻ số '+num+' / 64</span></div>'
  +'<div class="mrow"><span class="k">Thứ tự Tiên Thiên (Phục Hy · Phương Viên Đồ)</span><span class="v">Quẻ số '+tt+' / 64</span></div>'
  +'<div class="mrow"><span class="k">Đối quẻ Tiên Thiên</span><span class="v">'+tt+' ⟷ '+dtt+' (tổng 65) — '+db.name+' ('+db.han+')</span></div>'
@@ -10028,7 +10031,12 @@ function truRender(){
  var _r0=resultHTML;
  resultHTML=function(q,dom,cast,forModal){
  var res=_r0(q,dom,cast,forModal);
- res.html=res.html.replace('<div class="hr"></div>',orderLine(res.num)+'<div class="hr"></div>');
+ var orderBlock=orderLine(res.num);
+ if(res.html.indexOf('class="card si-order-fixed si-accordion"')===-1){
+  var orderAnchor='<div class="hr"></div>';
+  if(res.html.indexOf(orderAnchor)!==-1)res.html=res.html.replace(orderAnchor,orderBlock+orderAnchor);
+  else {if(typeof console!=='undefined'&&console.warn)console.warn('[S I CHING V111] Thiếu neo phân cách thứ tự quẻ');res.html=orderBlock+res.html;}
+ }
  return res;
  };
  var _b0=batCungBlock;
