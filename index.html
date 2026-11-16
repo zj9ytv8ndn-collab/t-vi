@@ -8181,7 +8181,40 @@ function kmPhanQuyet(km,lv){
  // label is not a new observation or additional confirmation.
  var kmSharedInputs=[];
  if(quyTacDiem.some(function(q){return q.nhom==='dung-than' && /nguyệt kiến/.test(q.canCu);})){kmSharedInputs.push('Nguyệt kiến dùng chung địa chi tháng '+CHI[km.mChi]+' cho các chủ đề trên cùng bàn');}
- if(kmGateEvidence.length && kmGatePalaceEvidence.length){kmSharedInputs.push('Hai quy tắc Môn và Môn–Cung cùng dùng Bát Môn '+mn);}
+ // V22: Quantify the overlap using actual ledger contributions, not just labels.
+ // This is an exposure diagnostic; it does not imply either contribution is invalid.
+ if(kmGateEvidence.length && kmGatePalaceEvidence.length){
+  var kmGateSharedPoints=kmGateEvidence.reduce(function(n,q){return n+q.diem;},0);
+  var kmGatePalaceSharedPoints=kmGatePalaceEvidence.reduce(function(n,q){return n+q.diem;},0);
+  var kmGateSharedAbs=kmGateEvidence.concat(kmGatePalaceEvidence).reduce(function(n,q){return n+Math.abs(q.diem);},0);
+  // V23: Sensitivity analysis only: remove one correlated rule family at a time.
+  // Neither counterfactual is a classical score or a substitute verdict.
+  var kmWithoutGate=sc-kmGateSharedPoints;
+  var kmWithoutGatePalace=sc-kmGatePalaceSharedPoints;
+  if(!Number.isFinite(kmWithoutGate)||!Number.isFinite(kmWithoutGatePalace)||
+     kmWithoutGate+kmGateSharedPoints!==sc||
+     kmWithoutGatePalace+kmGatePalaceSharedPoints!==sc){
+   throw new Error('Đối chứng chồng lặp Bát Môn không nhất quán');
+  }
+  // V24: Test whether removing either correlated family changes the existing
+  // four-tier verdict. This diagnostic never changes the actual verdict.
+  function kmSensitivityTier(score){return score>=3?0:score>=1?1:score===0?2:3;}
+  var kmTierNow=kmSensitivityTier(sc);
+  var kmTierWithoutGate=kmSensitivityTier(kmWithoutGate);
+  var kmTierWithoutPalace=kmSensitivityTier(kmWithoutGatePalace);
+  var kmTierSensitivity='Độ nhạy phân hạng: '+
+   (kmTierWithoutGate!==kmTierNow?'bỏ điểm Môn làm đổi hạng; ':'bỏ điểm Môn không đổi hạng; ')+
+   (kmTierWithoutPalace!==kmTierNow?'bỏ điểm Môn–Cung làm đổi hạng.':'bỏ điểm Môn–Cung không đổi hạng.')+
+   ' Đây chỉ là phép đối chứng thang điểm nội bộ, không phải kiểm chứng cổ pháp.';
+  kmSharedInputs.push(kmTierSensitivity);
+  kmSharedInputs.push('Hai nhóm quy tắc Môn và Môn–Cung cùng dùng Bát Môn '+mn+
+   ' (điểm Môn '+(kmGateSharedPoints>0?'+':'')+kmGateSharedPoints+
+   ', điểm Môn–Cung '+(kmGatePalaceSharedPoints>0?'+':'')+kmGatePalaceSharedPoints+
+   ', tổng độ lớn '+kmGateSharedAbs+' điểm; không được coi là hai chứng cứ độc lập). '+
+   'Đối chứng độ nhạy từ tổng điểm hiện hành '+sc+': bỏ riêng điểm Môn còn '+kmWithoutGate+
+   '; bỏ riêng điểm Môn–Cung còn '+kmWithoutGatePalace+
+   ' (chỉ là phép so sánh số học, không phải điểm cổ pháp thay thế)');
+ }
  var kmInputProvenanceNote=kmSharedInputs.length
   ?' Nguồn dữ liệu dùng chung: '+kmSharedInputs.join('; ')+'. Việc xuất hiện ở nhiều quy tắc không tự tạo thành nhiều bằng chứng độc lập.'
   :'';
@@ -8327,7 +8360,7 @@ function kmPhanQuyet(km,lv){
  function kmLoaiCanCu(q){
   var t=q.canCu||'';
   if(/nguyệt kiến/.test(t))return 'Thời lệnh';
-  if(/môn phá|cung sinh môn|cát môn|hung môn/.test(t))return 'Môn–cung';
+  if(/(?:quan hệ Môn khắc Cung|quan hệ Cung sinh Môn|đồng cung (?:cát|hung) môn )/i.test(t))return 'Môn–cung';
   if(/được thần|gặp Bạch Hổ|gặp Huyền Vũ|gặp Đằng Xà|thần /.test(t))return 'Bát Thần';
   if(/gặp (?:Ất|Bính|Đinh|Canh|Nhâm|Quý)(?=\s|[.,;:()–—-]|$)|kỳ quý|Thái Bạch/.test(t))return 'Thiên Can';
   return 'Yếu tố khác';
