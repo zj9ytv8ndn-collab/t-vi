@@ -8101,7 +8101,7 @@ function kmPhanQuyet(km,lv){
   }
   kmSeenScoreKeys[kmScoreKey]=true;
   sc+=p;
-  quyTacDiem.push({diem:p,canCu:t,nhom:nhomDiem});
+  quyTacDiem.push({diem:p,canCu:t,nhom:nhomDiem}); if(window.__v33ledger)window.__v33ledger.push({diem:p,canCu:t,nhom:nhomDiem});
   if(p>0)diemThuan+=p;else diemNgai+=p;
   (p>0?pros:cons).push((p>0?'+':'')+p+' · '+t);
  }
@@ -8183,7 +8183,7 @@ function kmPhanQuyet(km,lv){
  if(quyTacDiem.some(function(q){return q.nhom==='dung-than' && /nguyệt kiến/.test(q.canCu);})){kmSharedInputs.push('Nguyệt kiến dùng chung địa chi tháng '+CHI[km.mChi]+' cho các chủ đề trên cùng bàn');}
  // V22: Quantify the overlap using actual ledger contributions, not just labels.
  // This is an exposure diagnostic; it does not imply either contribution is invalid.
- if(kmGateEvidence.length && kmGatePalaceEvidence.length){
+ if(kmGateEvidence.length || kmGatePalaceEvidence.length){
   var kmGateSharedPoints=kmGateEvidence.reduce(function(n,q){return n+q.diem;},0);
   var kmGatePalaceSharedPoints=kmGatePalaceEvidence.reduce(function(n,q){return n+q.diem;},0);
   var kmGateSharedAbs=kmGateEvidence.concat(kmGatePalaceEvidence).reduce(function(n,q){return n+Math.abs(q.diem);},0);
@@ -8203,14 +8203,16 @@ function kmPhanQuyet(km,lv){
   var kmTierWithoutGate=kmSensitivityTier(kmWithoutGate);
   var kmTierWithoutPalace=kmSensitivityTier(kmWithoutGatePalace);
   var kmTierSensitivity='Độ nhạy phân hạng: '+
-   (kmTierWithoutGate!==kmTierNow?'bỏ điểm Môn làm đổi hạng; ':'bỏ điểm Môn không đổi hạng; ')+
-   (kmTierWithoutPalace!==kmTierNow?'bỏ điểm Môn–Cung làm đổi hạng.':'bỏ điểm Môn–Cung không đổi hạng.')+
+   (kmGateEvidence.length?(kmTierWithoutGate!==kmTierNow?'bỏ điểm Môn làm đổi hạng; ':'bỏ điểm Môn không đổi hạng; '):'nhóm Môn không đóng góp điểm; ')+
+   (kmGatePalaceEvidence.length?(kmTierWithoutPalace!==kmTierNow?'bỏ điểm Môn–Cung làm đổi hạng.':'bỏ điểm Môn–Cung không đổi hạng.'):'nhóm Môn–Cung không đóng góp điểm.')+
    ' Đây chỉ là phép đối chứng thang điểm nội bộ, không phải kiểm chứng cổ pháp.';
   kmSharedInputs.push(kmTierSensitivity);
-  kmSharedInputs.push('Hai nhóm quy tắc Môn và Môn–Cung cùng dùng Bát Môn '+mn+
-   ' (điểm Môn '+(kmGateSharedPoints>0?'+':'')+kmGateSharedPoints+
+  kmSharedInputs.push((kmGateEvidence.length && kmGatePalaceEvidence.length
+   ?'Hai nhóm quy tắc Môn và Môn–Cung cùng dùng Bát Môn '+mn+'; không được coi là hai chứng cứ độc lập. '
+   :'Chỉ một trong hai nhóm Môn hoặc Môn–Cung tạo điểm tại cung đang xét. ')+
+   'Điểm Môn '+(kmGateSharedPoints>0?'+':'')+kmGateSharedPoints+
    ', điểm Môn–Cung '+(kmGatePalaceSharedPoints>0?'+':'')+kmGatePalaceSharedPoints+
-   ', tổng độ lớn '+kmGateSharedAbs+' điểm; không được coi là hai chứng cứ độc lập). '+
+   ', tổng độ lớn '+kmGateSharedAbs+' điểm. '+
    'Đối chứng độ nhạy từ tổng điểm hiện hành '+sc+': bỏ riêng điểm Môn còn '+kmWithoutGate+
    '; bỏ riêng điểm Môn–Cung còn '+kmWithoutGatePalace+
    ' (chỉ là phép so sánh số học, không phải điểm cổ pháp thay thế)');
