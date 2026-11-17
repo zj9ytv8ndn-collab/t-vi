@@ -8101,7 +8101,7 @@ function kmPhanQuyet(km,lv){
   }
   kmSeenScoreKeys[kmScoreKey]=true;
   sc+=p;
-  quyTacDiem.push({diem:p,canCu:t,nhom:nhomDiem}); if(window.__v33ledger)window.__v33ledger.push({diem:p,canCu:t,nhom:nhomDiem});
+  quyTacDiem.push({diem:p,canCu:t,nhom:nhomDiem});
   if(p>0)diemThuan+=p;else diemNgai+=p;
   (p>0?pros:cons).push((p>0?'+':'')+p+' · '+t);
  }
@@ -8342,7 +8342,7 @@ function kmPhanQuyet(km,lv){
   });
  }
  function kmTopSummary(arr,positive){
-  if(!arr.length)return positive?'không có điểm thuận':'không có điểm bất lợi';
+  if(!arr.length)return positive?'không phát sinh khoản cộng điểm theo quy tắc Dụng Thần đang chấm':'không phát sinh khoản trừ điểm theo quy tắc Dụng Thần đang chấm; vẫn cần xét các dấu hiệu cát–hung chưa được quy đổi thành điểm';
   var shown=arr.slice(0,3).map(function(q){return q.canCu+' ('+(q.diem>0?'+':'')+q.diem+')';}).join('; ');
   // V92: Report all families among equal-score leaders, including those
   // hidden by the three-item display cap. No family is privileged in scoring.
