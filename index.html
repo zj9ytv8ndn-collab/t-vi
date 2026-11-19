@@ -7709,8 +7709,7 @@ function kmBenhTat(km){
  out.push('• '+kmMonVuong('Thổ','Thiên Nhuế',km.mChi)+': tương quan ngũ hành với nguyệt kiến của thời điểm lập bàn; không dùng để chọn thuốc, điều trị hoặc dự báo hồi phục.');
  var ukB=kmUngKy(gB,'mốc tượng số',' Mốc tượng số này không dự báo diễn tiến bệnh hay thời điểm hồi phục.');
  if(ukB)out.push(ukB);
- var kmMixedHealth=(gB!==5 && M[gB]==='Tử Môn' && ['Ất','Bính','Đinh'].indexOf(T[gB])>=0)?' <b>Đối chiếu tổ hợp Tam Kỳ + Tử Môn:</b> Tử Môn được ghi nhận là dấu hiệu bất lợi, đồng thời '+T[gB]+' kỳ được ghi nhận là dấu hiệu giảm nhẹ theo bảng nhận diện nội bộ. Hai dấu hiệu cùng tồn tại; chưa có quy tắc cứu giải đã kiểm chứng để kết luận Tam Kỳ hóa giải Tử Môn. Phép đảo dấu điểm trong phán quyết Sức khỏe không làm thay đổi ý nghĩa tượng số của từng dấu hiệu. ':'';
- var kl='Các dấu hiệu Thiên Nhuế được ghi nhận: '+(nang.concat(nhe).join(', ')||'không có tổ hợp bổ trợ trong bảng quy tắc')+'. '+kmMixedHealth+giaiThuoc+relBN+' Đây chỉ là diễn giải tượng số, không xác định mức độ bệnh, khả năng khỏi hoặc phương pháp điều trị. Khi có triệu chứng, hãy dựa vào đánh giá của nhân viên y tế.';
+ var kl='Các dấu hiệu Thiên Nhuế được ghi nhận: '+(nang.concat(nhe).join(', ')||'không có tổ hợp bổ trợ trong bảng quy tắc')+'. '+giaiThuoc+relBN+' Đây chỉ là diễn giải tượng số, không xác định mức độ bệnh, khả năng khỏi hoặc phương pháp điều trị. Khi có triệu chứng, hãy dựa vào đánh giá của nhân viên y tế.';
  out.push(kl);
  if(gT)out.push('🏥 <b>Thiên Tâm theo tượng số:</b> '+KM_CUNG_NAME[gT]+(gY?'; Ất kỳ: '+KM_CUNG_NAME[gY]:'')+'. Không chọn cơ sở khám chữa bệnh dựa trên phương hướng tượng số.');
  return out;
@@ -8612,7 +8611,7 @@ function kmRender(km,linhVuc){
  var relTF='';
  if(elTF){var r0=kmRel(elTF,KM_CUNG_EL[km.target]);
  relTF=r0===0?'tỷ hòa với cung — vững thế':r0===1?'sinh xuất cho cung — hao khí':r0===2?'được cung sinh vào — quan hệ cung sinh sao, chưa đủ kết luận đại lợi':r0===3?'khắc cung — quan hệ sao khắc cung':'bị cung khắc — quan hệ cung khắc sao';}
- h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">⭐ <b>Trực Phù '+tinhTF+'</b> đáp '+KM_CUNG_NAME[km.target]+' ('+relTF+'): '+KM_TINH_JI[tinhTF]+'.</p>';
+ h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">⭐ <b>Trực Phù '+tinhTF+'</b> đáp '+KM_CUNG_NAME[km.target]+' ('+relTF+'): '+(km.trucPhuTinhGoc==='Thiên Cầm'&&tinhTF==='Thiên Nhuế'?'Tượng nghĩa của Thiên Nhuế tại cung ký: '+KM_TINH_JI[tinhTF]+'; đây không phải tượng nghĩa của Thiên Cầm gốc':KM_TINH_JI[tinhTF])+'.'+(km.trucPhuTinhGoc&&km.trucPhuTinhGoc!==tinhTF?' <span class="dim">(Ghi chú ký cung: Trực Phù gốc là <b>'+km.trucPhuTinhGoc+'</b> tại Trung Cung; <b>'+tinhTF+'</b> là sao dùng tại cung ký theo quy ước engine. Quan hệ ngũ hành và tượng nghĩa trong câu này đang tính theo sao tại cung ký, không phải kết luận về tượng nghĩa sao gốc.)</span>':'')+'</p>';
  var mc2=km.mc,monTS=km.nhanMon[mc2]||km.trucSuMon;
  var relM='';
  if(KM_MON_EL[monTS]){var r1=kmRel(KM_MON_EL[monTS],KM_CUNG_EL[mc2]);
