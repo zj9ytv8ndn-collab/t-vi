@@ -7690,13 +7690,15 @@ function kmBenhTat(km){
  else{giaiThuoc+=ten+' đồng hành với Thiên Nhuế; không dự báo tốc độ hồi phục. ';}
  }
  soSanh(gT,'Thiên Tâm (thầy giỏi)');soSanh(gY,'Ất kỳ (thuốc men)');
+ // V188: Metadata-only note; Earth-board center Yi is not substituted for Heaven-board Yi.
+ if(!gY && km.dia[5]==='Ất'){giaiThuoc+='Ất kỳ không xuất hiện trên Thiên Bàn tám cung; Địa Bàn ghi Ất tại Trung Cung. Chưa xác nhận quy tắc ký cung để suy ra vị trí Ất Thiên Bàn, nên không xét quan hệ thầy thuốc theo Ất kỳ trong bàn này. ';}
  var dC=CAN[km.day.can];
  if(km.day.can===0)dC=kmTuan(km.day.can,km.day.chi).ngi;
  var gN=0;
  for(var g3=1;g3<=9;g3++)if(T[g3]===dC)gN=g3;
  if(gN===5)gN=2;
  var relBN='';
- if(!gN){relBN='Không xác định được cung Nhật Can trên Thiên Bàn tám cung; bỏ qua so sánh với Thiên Nhuế, không tự động ký trung cung sang Khôn 2.';}
+ if(!gN){relBN='Không xác định được cung Nhật Can trên Thiên Bàn tám cung; '+(km.dia[5]===dC?'can đại diện Nhật Can ('+dC+') nằm tại Địa Bàn Trung Cung; ':'')+'bỏ qua so sánh với Thiên Nhuế, không tự động ký trung cung sang Khôn 2.';}
  if(gN){
  var eN=KM_CUNG_EL[gN];
  if(KHAC_TT[elB]===eN)relBN='Thiên Nhuế khắc cung Nhật Can của bàn ('+dC+') theo tượng số; không xác định mức độ bệnh.';
@@ -8020,7 +8022,7 @@ function kmLuanChuyen(km,lv){
  else if(KHAC_TT[KM_CUNG_EL[gN]]===KM_MON_EL[mn0])out.push('👍 Môn được cung sinh hợp — thân an cư lạc nghiệp, nên giữ thế hiện tại.');
  }
  if(gV0)out.push('❓ <b>Việc (thời can '+hC0+') tại '+KM_CUNG_NAME[gV0]+'</b>: '+kmRelTxt(KM_CUNG_EL[gN],KM_CUNG_EL[gV0],'Thân ('+dC+')','Việc ('+hC0+')')+'.');
- out.push('⭐ <b>Trụ cột toàn cục:</b> Trực Phù '+km.trucPhuTinh+' tại '+KM_CUNG_NAME[km.target]+' ('+KM_TINH_JI[km.trucPhuTinh]+'); Trực Sử '+km.trucSuMon+' tại '+KM_CUNG_NAME[km.mc]+' ('+KM_MON_JI[km.trucSuMon].split(' — ')[0]+'). Đây là hai dấu hiệu cần phối hợp với dụng thần, môn, sao và sinh khắc của câu hỏi; không đủ để tự kết luận cát–hung hoặc ấn định hướng hành động.');
+ out.push('⭐ <b>Trụ cột toàn cục:</b> Trực Phù '+km.trucPhuTinh+' tại '+KM_CUNG_NAME[km.target]+' ('+(km.trucPhuTinhGoc==='Thiên Cầm'&&km.trucPhuTinh==='Thiên Nhuế'?'tượng nghĩa Thiên Nhuế tại cung ký: '+KM_TINH_JI[km.trucPhuTinh]+'; không đồng nhất với Thiên Cầm gốc':KM_TINH_JI[km.trucPhuTinh])+'); Trực Sử '+km.trucSuMon+' tại '+KM_CUNG_NAME[km.mc]+' ('+KM_MON_JI[km.trucSuMon].split(' — ')[0]+'). Đây là hai dấu hiệu cần phối hợp với dụng thần, môn, sao và sinh khắc của câu hỏi; không đủ để tự kết luận cát–hung hoặc ấn định hướng hành động.');
  if(km.trucPhuTinhGoc&&km.trucPhuTinhKyCung&&km.trucPhuTinhGoc!==km.trucPhuTinhKyCung){
   out.push('📌 <b>Phân biệt sao gốc và sao ký cung:</b> Trực Phù gốc '+km.trucPhuTinhGoc+' (cung '+km.trucPhuGocCung+'), sao tại cung ký '+km.trucPhuTinhKyCung+' (cung '+km.trucPhuKyCung+'). Quy ước ký cung hiện tại chưa được đối chiếu độc lập theo truyền bản; không đồng nhất hai danh tính sao khi luận giải.');
  }
@@ -8714,7 +8716,7 @@ function kmCungDetail(g){
  }else{
  var mon=km.nhanMon[g]||'',tinh=km.thienTinh[g]||'',than=km.thanBan[g]||'',tc=km.thienCan[g]||'',dc=km.dia[g]||'';
  var marks=[];
- if(g===km.target)marks.push('⭐ <b>Trực Phù ('+km.trucPhuTinh+') đang đáp cung này</b> — trụ cột của cục');
+ if(g===km.target)marks.push('⭐ <b>Trực Phù ('+km.trucPhuTinh+') đang đáp cung này</b> — trụ cột của cục'+(km.trucPhuTinhGoc==='Thiên Cầm'&&km.trucPhuTinh==='Thiên Nhuế'?' <span class="dim">(Thiên Cầm là Trực Phù gốc ở Trung Cung; Thiên Nhuế là sao vận hành tại cung ký. Không đồng nhất tượng nghĩa hai sao.)</span>':''));
  if(g===km.mc)marks.push('🚪 <b>Trực Sử ('+km.trucSuMon+') đang đáp cung này</b> — nơi sự việc vận hành');
  var cV=0;for(var g10=1;g10<=9;g10++)if(km.thienCan[g10]===km.hCanEff)cV=g10;
  if(cV===5)cV=2;
