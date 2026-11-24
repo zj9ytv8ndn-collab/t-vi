@@ -1547,7 +1547,18 @@ function tongHopLienMon(){
  if(latest['kymon']){
  var k=latest['kymon'];
  try{
- var km=kmLap(k.d,k.m,k.y,k.h),best=-99;
+ var aggregateISO;
+ // Phase 42: do not silently use device timezone for corrupt timestamped journal records.
+ if(Object.prototype.hasOwnProperty.call(k,'whenMs')&&(!Number.isSafeInteger(k.whenMs)||!Number.isInteger(k.utcOffsetMinutes)||Math.abs(k.utcOffsetMinutes)>840))throw new Error('Bản ghi Kỳ Môn có mốc UTC hoặc múi giờ gốc không hợp lệ');
+ if(Number.isSafeInteger(k.whenMs)&&Number.isInteger(k.utcOffsetMinutes)&&Math.abs(k.utcOffsetMinutes)<=840){
+  var savedWall=new Date(k.whenMs-k.utcOffsetMinutes*60000);
+  if(savedWall.getUTCFullYear()===k.y&&savedWall.getUTCMonth()+1===k.m&&savedWall.getUTCDate()===k.d&&savedWall.getUTCHours()===k.h&&savedWall.getUTCMinutes()===(Number.isInteger(k.minute)?k.minute:0)){
+   var padAggregate=function(n){return String(n).padStart(2,'0');};
+   var off=-k.utcOffsetMinutes,sign=off>=0?'+':'-',abs=Math.abs(off);
+   aggregateISO=String(k.y).padStart(4,'0')+'-'+padAggregate(k.m)+'-'+padAggregate(k.d)+'T'+padAggregate(k.h)+':'+padAggregate(savedWall.getUTCMinutes())+':'+padAggregate(savedWall.getUTCSeconds())+sign+padAggregate(Math.floor(abs/60))+':'+padAggregate(abs%60);
+  }else throw new Error('Mốc thời gian Kỳ Môn không khớp dữ liệu đã lưu');
+ }
+ var km=kmLap(k.d,k.m,k.y,k.h,aggregateISO),best=-99;
  [4,9,2,3,5,7,8,1,6].forEach(function(g){var sc=hkKMScore(km,g).sc;if(sc>best)best=sc;});
  var s2=best>=3?1:(best<=0?-1:0);
  sig.push({mon:'🧭 Kỳ Môn Độn Giáp',s:s2,txt:'Cục lập cho '+k.h+'h ngày '+k.d+'/'+k.m+'/'+k.y+' ('+esc(k.lv||'Tổng quan')+') — thế cục '+(s2>0?'khai thông, có môn cát tinh tốt để thừa dùng':(s2<0?'bế tắc, các môn tinh ít chỗ nương, nên thủ':'bình hòa, được mất ngang nhau'))+'.'});
@@ -7328,7 +7339,7 @@ function kmCheckInstantCivil(dd,mm,yy,hh,iso){
  var m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|([+-])(\d{2}):(\d{2}))$/.exec(iso);
  if(!m)throw new RangeError('Thời điểm cần ISO 8601 có múi giờ');
  var y=+m[1],mo=+m[2],d=+m[3],h=+m[4],minute=+m[5],sec=+(m[6]||0),offsetHour=+(m[10]||0),offsetMin=+(m[11]||0);
- if(y!==yy||mo!==mm||d!==dd||h!==hh||minute>59||sec>59||h>23||offsetHour>23||offsetMin>59)throw new RangeError('Thời điểm không khớp ngày giờ lập bàn');
+ if(y!==yy||mo!==mm||d!==dd||h!==hh||minute>59||sec>59||h>23||offsetHour>14||offsetMin>59||(offsetHour===14&&offsetMin!==0))throw new RangeError('Thời điểm không khớp ngày giờ lập bàn');
  var dt=new Date(Date.UTC(y,mo-1,d));
  if(dt.getUTCFullYear()!==y||dt.getUTCMonth()!==mo-1||dt.getUTCDate()!==d)throw new RangeError('Ngày lập bàn không tồn tại');
  if(!Number.isFinite(Date.parse(iso)))throw new RangeError('Thời điểm ISO không hợp lệ');
@@ -7506,7 +7517,8 @@ function kmLap(dd,mm,yy,hh,isoWithOffset){
     (home===5&&KM_TINH[home]===KM_TINH[homeR])){
   throw new Error('Danh tính Trực Phù gốc/ký cung không nhất quán');
  }
- var mChi=(2+Math.floor(((sunLongDeg(jdFromDate(dd,mm,yy)+0.5)-315+360)%360)/30))%12;
+ var monthJd=isoWithOffset===undefined?jdFromDate(dd,mm,yy)+0.5:Date.parse(isoWithOffset)/86400000+2440587.5;
+ var mChi=(2+Math.floor(((sunLongDeg(monthJd)-315+360)%360)/30))%12;
  // Metadata only: retain original central-palace data without changing any chart layer.
  var trungCung={
   cung:5,diaCan:dia[5],diaTinh:KM_TINH[5],
@@ -7521,7 +7533,7 @@ function kmLap(dd,mm,yy,hh,isoWithOffset){
   trucPhuTinhKhacDoKyCung:home!==homeR,
   quyUoc:'metadata-only; cung 2 la quy uoc engine hien tai, chua xac minh co phap'
  };
- return{trungCung:trungCung,when:new Date(yy,mm-1,dd,hh,0,0,0).getTime(),civilTime:{day:dd,month:mm,year:yy,hour:hh},canChiCivilDate:canChiCivilDate,kc:kc,dia:dia,day:dc,hIdx:hIdx,hCan:hCanTxt,hCanEff:hCanEff,tuan:tu,ngi:ngi,mChi:mChi,
+ return{trungCung:trungCung,when:isoWithOffset===undefined?new Date(yy,mm-1,dd,hh,0,0,0).getTime():Date.parse(isoWithOffset),civilTime:{day:dd,month:mm,year:yy,hour:hh},canChiCivilDate:canChiCivilDate,kc:kc,dia:dia,day:dc,hIdx:hIdx,hCan:hCanTxt,hCanEff:hCanEff,tuan:tu,ngi:ngi,mChi:mChi,
  trucPhuTinh:KM_TINH[trucPhu],trucPhuTinhGoc:KM_TINH[home],trucPhuTinhKyCung:KM_TINH[homeR],trucPhuGocCung:home,trucPhuKyCung:homeR,trucSuMon:KM_MON_HOME[trucSu],target:target,
  thienTinh:thienTinh,thienCan:thienCan,nhanMon:nhanMon,thanBan:thanBan,mc:mc};
 }
@@ -7556,7 +7568,7 @@ function kmPhan(km,linhVuc){
  // The heaven layer intentionally contains only eight outer palaces; fall back to earth for both stems.
  if(!cViec)for(var g3=1;g3<=9;g3++)if(km.dia[g3]===hC)cViec=g3;
  if(!cNguoi||!cViec)throw new Error('Không xác định được cung Nhật Can hoặc Thời Can; dừng luận giải Kỳ Môn');
- if(cNguoi===5)cNguoi=2;if(cViec===5)cViec=2;
+
  var starOffset=kmTinhRotation(km);
  var phuNhamTinh=(starOffset===0);
  var phanNhamTinh=(starOffset===4);
@@ -7609,13 +7621,15 @@ function kmPhan(km,linhVuc){
   else if(linhVuc==='Xuất hành'){topicPalace=km.mc;topicLabel='Trực Sử '+km.trucSuMon;}
   else if(linhVuc==='Tổng quan'){topicPalace=km.target;topicLabel='Trực Phù';}
   if(topicLabel){
-   if(topicPalace===5)topicPalace=2;
+
    if(!topicPalace||!KM_CUNG_NAME[topicPalace])throw new Error('Không xác định được điểm xét chủ đề '+linhVuc);
-   dungTxt='<b>Điểm xét chủ đề '+linhVuc+' ('+topicLabel+'; quy ước của engine, chưa xác minh đủ cho mọi dạng câu hỏi)</b> lâm '+KM_CUNG_NAME[topicPalace]+'. Không suy cát–hung từ riêng vị trí này.';
+   dungTxt='<b>Điểm xét chủ đề '+linhVuc+' ('+topicLabel+'; quy ước của engine, chưa xác minh đủ cho mọi dạng câu hỏi)</b> lâm '+KM_CUNG_NAME[topicPalace]+(topicPalace===5?'. Chưa xác định vị trí Thiên Bàn; không suy hướng tìm hoặc cát–hung từ cung ký.':'. Không suy cát–hung từ riêng vị trí này.');
   }
  }
  var rel='';
- if(cNguoi&&cViec){
+ if(cNguoi===5||cViec===5){
+ rel='Nhật Can hoặc Thời Can tại Địa Bàn Trung Cung; chưa xác định vị trí Thiên Bàn tương ứng, không luận sinh–khắc Người–Việc theo cung ký.';
+ }else if(cNguoi&&cViec){
  var r=kmRel(KM_CUNG_EL[cNguoi],KM_CUNG_EL[cViec]);
  rel='<b>Người ('+dC+' tại '+KM_CUNG_NAME[cNguoi]+') — Việc ('+hC+' tại '+KM_CUNG_NAME[cViec]+'):</b> '+
  (r===0?'đồng hành ngũ hành; chưa đủ để kết luận khả năng tự chủ.':r===1?'ngũ hành của người sinh ngũ hành của việc; đây là quan hệ sinh xuất, chưa chứng minh hao tổn thực tế.':r===2?'ngũ hành của việc sinh ngũ hành của người; đây là quan hệ sinh nhập, không bảo đảm thành công.':r===3?'ngũ hành của người khắc ngũ hành của việc; chưa đủ để kết luận người kiểm soát được kết quả.':'ngũ hành của việc khắc ngũ hành của người; chưa đủ để kết luận chắc chắn gặp áp lực hay thất bại.');
@@ -7661,7 +7675,54 @@ function kmCatCach(km){
  return out;
 }
 var KM_BO_VI={1:'thận, bàng quang, tai, máu huyết, sinh dục',2:'bụng, lá lách, cơ quan tiêu hóa',3:'gan, chân, gân cốt, dây thần kinh',4:'gan, khí quản, cánh tay, đùi',5:'tỳ vị, trung tiêu',6:'đầu, phổi, xương cốt',7:'miệng, răng, phổi, họng',8:'dạ dày, tay, mũi, lưng',9:'tim, mắt, mạch máu, huyết áp'};
+// V202: shared structural validation for both health interpretation layers.
+// Checks data integrity only; does not assert classical correctness.
+function kmValidateHealthChart(km){
+ if(!km||!km.thienTinh||!km.thienCan||!km.nhanMon||!km.thanBan||!km.dia||!km.day||
+    !Number.isInteger(km.day.can)||km.day.can<0||km.day.can>9||
+    !Number.isInteger(km.day.chi)||km.day.chi<0||km.day.chi>11||
+    km.day.can%2!==km.day.chi%2||
+    !Number.isInteger(km.mChi)||km.mChi<0||km.mChi>11)
+  throw new Error('Thiếu hoặc sai dữ liệu bàn Kỳ Môn cho luận giải Sức khỏe');
+ var count=0,doorsSeen=Object.create(null);
+ var allowedStars=Object.values(KM_TINH),allowedDoors=Object.values(KM_MON_HOME);
+ for(var g=1;g<=9;g++){
+  if(km.thienTinh[g]==='Thiên Nhuế')count++;
+  if(g!==5){
+   if(allowedStars.indexOf(km.thienTinh[g])<0||
+      KM_QI6.indexOf(km.thienCan[g])<0||
+      allowedDoors.indexOf(km.nhanMon[g])<0||
+      KM_THAN.indexOf(km.thanBan[g])<0||
+      KM_QI6.indexOf(km.dia[g])<0)
+    throw new Error('Thiếu hoặc sai sao, môn, thần hoặc can tại cung '+g+' trong bàn Sức khỏe');
+   if(doorsSeen[km.nhanMon[g]])throw new Error('Bát Môn bị trùng trong bàn Sức khỏe');
+   doorsSeen[km.nhanMon[g]]=true;
+  }
+ }
+ // V203: enforce complete, unique moving layers and nine-palace earth stems.
+ var ring=KM_RING, layers=[
+  ['Thiên Tinh',km.thienTinh,KM_RING.map(function(p){return KM_TINH[p];})],
+  ['Thiên Can',km.thienCan,null],
+  ['Bát Môn',km.nhanMon,Object.values(KM_MON_HOME)],
+  ['Bát Thần',km.thanBan,KM_THAN]
+ ];
+ layers.forEach(function(entry){
+  var values=ring.map(function(p){return entry[1][p];});
+  if(new Set(values).size!==8)throw new Error('Trùng hoặc thiếu '+entry[0]+' trên tám cung Sức khỏe');
+  if(entry[2]&&(values.some(function(v){return entry[2].indexOf(v)<0;})||
+     entry[2].some(function(v){return values.indexOf(v)<0;})))
+   throw new Error('Sai thành phần '+entry[0]+' trên tám cung Sức khỏe');
+ });
+ var sky=ring.map(function(p){return km.thienCan[p];});
+ if(sky.some(function(v){return KM_QI6.indexOf(v)<0;}))throw new Error('Thiên Can ngoại cung không hợp lệ');
+ var earth=[];for(var p=1;p<=9;p++)earth.push(km.dia[p]);
+ if(new Set(earth).size!==9||earth.some(function(v){return KM_QI6.indexOf(v)<0;}))
+  throw new Error('Địa Bàn thiếu hoặc trùng Lục Nghi Tam Kỳ');
+ if(count!==1)throw new Error('Bàn Kỳ Môn phải có đúng một Thiên Nhuế');
+ return true;
+}
 function kmBenhTat(km){
+ kmValidateHealthChart(km);
  var T=km.thienCan,M=km.nhanMon,TH=km.thanBan,TT=km.thienTinh,out=[];
  var gB=0;for(var g=1;g<=9;g++)if(TT[g]==='Thiên Nhuế')gB=g;
  if(!gB)return out;
@@ -7729,9 +7790,9 @@ function kmHungCach(km){
  if(T[g]==='Canh'&&D[g]==='Kỷ')out.push('⚖️ <b>Hình Cách</b> (Canh gia Kỷ) tại '+KM_CUNG_NAME[g]+' — hung: hình phạt quan sự, miệng tiếng thị phi; kỵ tranh tụng, cầu danh.');
  if(T[g]==='Canh'&&D[g]==='Canh')out.push('🗡️ <b>Chiến Cách / Thái Bạch Đồng Cung</b> (Canh gia Canh) tại '+KM_CUNG_NAME[g]+' — hung: quan tai ách nạn, đối đầu kịch liệt; tránh xung đột trực tiếp.');
  }
- if(T[2]==='Ất')out.push('🪦 <b>Ất Kỳ Nhập Mộ</b> tại Khôn (Mùi là mộ của Mộc): tài nghệ bị chôn, mưu sự ách tắc, nữ mệnh bất lợi.');
- if(T[6]==='Bính')out.push('🪦 <b>Bính Kỳ Nhập Mộ</b> tại Càn (Tuất là mộ của Hỏa): quyền lực suy, việc quan lộc trì trệ.');
- if(T[8]==='Đinh')out.push('🪦 <b>Đinh Kỳ Nhập Mộ</b> tại Cấn (cổ pháp: Đinh kỳ nhập mộ tại Cấn thổ — hỏa quang bị mai phục): tin vui tắt, văn thư không thành.');
+ if(T[2]==='Ất')out.push('🪦 <b>Ất Kỳ Nhập Mộ</b> tại Khôn 2: theo quy ước nhận diện hiện hành, tượng sự việc bị hạn chế hoặc khó triển khai; không đủ căn cứ kết luận bất lợi theo giới tính.');
+ if(T[6]==='Bính')out.push('🪦 <b>Bính Kỳ Nhập Mộ</b> tại Càn 6: theo quy ước nhận diện hiện hành, tượng khó phát huy hoặc chậm triển khai; không mặc định suy giảm quyền lực.');
+ if(T[8]==='Đinh')out.push('🪦 <b>Đinh Kỳ Nhập Mộ</b> tại Cấn 8: theo quy ước nhận diện hiện hành, tượng thông tin hoặc văn thư khó phát huy; không đủ căn cứ kết luận hồ sơ thất bại.');
  return out;
 }
 // V35: Direction labels are presentation data, never assume a particular palace-name format.
@@ -7967,11 +8028,11 @@ function kmLuanChuyen(km,lv){
  var NOI_GIAU={'Kim':'chỗ có kim loại: tủ khóa, hộp sắt, ngăn kéo, gầm xe, cạnh máy móc','Mộc':'chỗ gỗ: giá sách, tủ gỗ, đống quần áo, cạnh cây cối, hành lang dài','Thủy':'chỗ ẩm ướt: nhà vệ sinh, khu bếp nước, gần cống rãnh, bình chai, góc mát','Hỏa':'chỗ nóng sáng: gần bếp lửa, thiết bị điện, nơi nhiều giấy tờ sách vở, bàn làm việc','Thổ':'góc thấp khuất: dưới đống đồ, trong bao bì hộp cũ, sát đất, chỗ ít ai động'};
  var VAT_THAN={'Cửu Địa':'tượng vị trí thấp hoặc khuất; có thể kiểm tra các chỗ này nhưng chưa xác định vật còn nguyên vẹn','Trực Phù':'tượng nơi trang trọng hoặc cao ráo; không đủ căn cứ khẳng định có người giữ hộ','Thái Âm':'tượng nơi kín hoặc ít ánh sáng; không suy đoán người nữ trong nhà biết vị trí','Cửu Thiên':'tượng vị trí cao; có thể rà soát trên kệ hoặc gác như một gợi ý tìm kiếm','Bạch Hổ':'tượng biến động; không suy ra vật đã hư hỏng hoặc bị tác động','Đằng Xà':'tượng vướng mắc; có thể rà soát chỗ đồ đạc chồng lấn, không khẳng định vị trí','Lục Hợp':'tượng kết hợp; có thể kiểm tra vật dụng để chung, không suy đoán ai đã cầm nhầm','Huyền Vũ':'tượng ẩn giấu hoặc thiếu thông tin; không đủ căn cứ kết luận có người lấy vật'};
  var VAT_MON={'Tử Môn':'tượng bế tắc; chưa xác định được vật đã hỏng hoặc mất vĩnh viễn','Sinh Môn':'tượng sinh khí; không chứng minh tình trạng hay khả năng tìm lại vật','Đỗ Môn':'tượng che khuất; nên kiểm tra lại thao tác cuối cùng, không quy trách nhiệm cho người nhà','Khai Môn':'tượng nơi mở hoặc dễ quan sát; không bảo đảm sẽ tìm thấy','Thương Môn':'tượng biến động; không xác nhận vật đã hỏng hoặc mất giá trị','Kinh Môn':'tượng tranh luận; không suy đoán có người biết mà che giấu'};
- var gHV=kmCungThan(km,'Huyền Vũ'),hC=km.hCanEff,gV=kmCungOf(km,hC);if(gV===5)gV=2;
+ var gHV=kmCungThan(km,'Huyền Vũ'),hC=km.hCanEff,gV=kmCungOf(km,hC);var vatTrung=gV===5; if(vatTrung){out.push('🔍 Thời Can '+hC+' có gốc tại Trung Cung 5; chưa xác định hướng tìm theo Thiên Bàn. Hãy kiểm tra nơi sử dụng cuối cùng và lần lại đường đi.');gV=0;}
  if(gV){
  var elV=KM_CUNG_EL[gV];
- out.push('🔍 <b>Vật mất (thời can '+hC+') đang ở '+KM_CUNG_NAME[gV]+'</b> — hành '+elV+': '+kmCanVuong(hC,'Vật',km.mChi)+'. '+'Quan hệ ngũ hành với tháng lệnh chỉ là dữ kiện tượng số; không xác định tình trạng, vị trí hay khả năng tìm lại vật.');
- out.push('📍 <b>Nơi giấu theo hành '+elV+':</b> '+NOI_GIAU[elV]+'. Hướng tìm chính: <b>'+kmHuongCung(gV)+'</b>.');
+ out.push('🔍 <b>Thời Can '+hC+' tham chiếu '+KM_CUNG_NAME[gV]+'</b> — hành '+elV+': '+kmCanVuong(hC,'Vật',km.mChi)+'. '+'Quan hệ ngũ hành với tháng lệnh chỉ là dữ kiện tượng số; không xác định tình trạng, vị trí hay khả năng tìm lại vật.');
+ out.push('📍 <b>Gợi ý tượng số theo hành '+elV+':</b> '+NOI_GIAU[elV]+'. Hướng tượng trưng, không xác định vị trí: <b>'+kmHuongCung(gV)+'</b>.');
  var thV=km.thanBan[gV],mnV=km.nhanMon[gV];
  if(thV&&VAT_THAN[thV])out.push('• Thần <b>'+thV+'</b> phủ vật: '+VAT_THAN[thV]+'.');
  if(mnV&&VAT_MON[mnV])out.push('• Môn <b>'+mnV+'</b> lâm vật: '+VAT_MON[mnV]+'.');
@@ -7982,35 +8043,35 @@ function kmLuanChuyen(km,lv){
  else if(gV)out.push('• Vật và Huyền Vũ ở hai cung khác nhau — không thể phân biệt để quên với bị lấy dựa vào bàn; hãy lần lại đường đi và chứng cứ trước khi nghi ngờ ai.');
  }
  var pp3=kmPhucPhan(km,'Thất vật');if(pp3)out.push(pp3);
- out.push(kmUngKy(gV,'tìm vật',' Không bảo đảm sẽ tìm thấy vào ngày/giờ tượng số; ưu tiên lịch sử di chuyển thực tế.'));
+ if(!vatTrung)out.push(kmUngKy(gV,'tìm vật',' Không bảo đảm sẽ tìm thấy vào ngày/giờ tượng số; ưu tiên lịch sử di chuyển thực tế.'));
  }
  if(lv==='Kiện tụng'){
+ if(kmCungOf(km,dC)===5){gN=0;eN=null;out.push('Nhật Can chỉ xác định tại Địa Bàn Trung Cung; chưa luận quan hệ Nhật Can với các Môn theo cung ký.');}
+ out.push('Cảnh Môn tham chiếu văn thư; Kinh Môn tham chiếu tranh tụng. Hai tượng này không xác định kết quả pháp lý.');
  var gC=kmCungMon(km,'Cảnh Môn'),gKi=kmCungMon(km,'Kinh Môn'),gTP2=kmCungThan(km,'Trực Phù');
  if(gKi){
  var eKi=KM_CUNG_EL[gKi];
- out.push('🏛️ <b>Kinh Môn — quan tòa, khẩu thiệt — đáp '+KM_CUNG_NAME[gKi]+' (hành '+eKi+').</b> '+kmMonVuong(KM_MON_EL['Kinh Môn'],'Kinh Môn',km.mChi)+'.');
+ out.push('🏛️ <b>Kinh Môn — tượng tranh tụng, khẩu thiệt — tại '+KM_CUNG_NAME[gKi]+' (hành '+eKi+').</b> '+kmMonVuong(KM_MON_EL['Kinh Môn'],'Kinh Môn',km.mChi)+'.');
  var thKi=km.thanBan[gKi],tiKi=km.thienTinh[gKi];
  if(thKi==='Bạch Hổ')out.push('⚠️ Kinh Môn lâm <b>Bạch Hổ</b> — tượng xung đột trong phép luận; không chứng minh có tội phạm, hung khí hoặc thương tích. Đánh giá nguy cơ bằng sự kiện thực tế.');
  else if(thKi==='Lục Hợp')out.push('🤝 Kinh Môn lâm <b>Lục Hợp</b> — tượng hòa hợp; không bảo đảm hòa giải thành công. Chỉ cân nhắc thương lượng khi phù hợp quyền lợi và tư vấn pháp lý.');
  else if(thKi==='Huyền Vũ')out.push('⚠️ Kinh Môn lâm <b>Huyền Vũ</b> — tượng thông tin khó kiểm chứng; không được kết luận có người khai gian. Nên bảo quản và xác minh chứng cứ thực tế.');
  else if(thKi==='Trực Phù')out.push('⭐ Kinh Môn lâm <b>Trực Phù</b> — tượng chính trực trong bàn; không dự đoán tính cách thẩm phán hay kết quả xét xử; cần trình bày trung thực và có chứng cứ.');
  else if(thKi==='Thái Âm')out.push('• Kinh Môn lâm <b>Thái Âm</b> — tượng kín đáo; không suy ra có người nữ can thiệp. Chọn cách xử lý dựa trên thủ tục và tư vấn pháp lý.');
- if(tiKi==='Thiên Trụ')out.push('• Kinh Môn đồng cung <b>Thiên Trụ</b> — tinh chủ tranh tụng đi vào quan tòa: tượng tranh luận; không xác định nguyên nhân vụ việc hoặc kết quả tố tụng.');
+ if(tiKi==='Thiên Trụ')out.push('• Kinh Môn đồng cung <b>Thiên Trụ</b> — tượng tranh luận; không xác định nguyên nhân vụ việc hoặc kết quả tố tụng.');
  }
  if(gC){
  var eC=KM_CUNG_EL[gC];
  out.push('📜 <b>Cảnh Môn — trạng từ, văn thư, hồ sơ — tại '+KM_CUNG_NAME[gC]+':</b> '+kmMonVuong(KM_MON_EL['Cảnh Môn'],'Cảnh Môn',km.mChi)+'. '+(km.thanBan[gC]==='Trực Phù'||km.thanBan[gC]==='Thái Âm'?'Văn thư được '+km.thanBan[gC]+' phủ — không suy ra hồ sơ sẽ được duyệt; cần kiểm tra yêu cầu và hạn nộp thực tế.':''));
- if(gKi&&gC===gKi)out.push('• Cảnh Môn đồng cung Kinh Môn — văn thư lẫn khẩu thiệt: vụ việc dây dưa giữa giấy tờ và lời nói, nên dừng tranh miệng, chỉ đưa giấy tờ.');
  if(gN)out.push('• <b>Thân — Trạng từ:</b> '+kmRelTxt(eN,eC,'Thân ('+dC+')','Cảnh Môn')+'.');
  }
  if(gKi&&gN){
  var rNK=kmRel(KM_CUNG_EL[gN],KM_CUNG_EL[gKi]);
- out.push('⚖️ <b>Thân đối với quan tòa:</b> '+['Thân tỷ hòa Kinh Môn — hai bên ngang thế, vụ này khó phân thắng bại tuyệt đối: hòa giải là kết cục tốt nhất cho cả hai.','Thân sinh cho Kinh Môn — mình phải bỏ của bỏ công nuôi vụ việc: tốn kém kéo dài, cân nhắc giá trị tranh có đáng công bỏ ra.','Kinh Môn sinh vào thân — tượng tương sinh; không chứng minh tòa án thiên vị hoặc có cơ sở thắng kiện; cần đánh giá hồ sơ pháp lý.','Thân khắc Kinh Môn — tượng tương khắc; không dự báo thắng kiện; lập luận cần dựa vào chứng cứ và luật áp dụng.','Kinh Môn khắc thân theo ngũ hành; không dự báo thua kiện hoặc ép buộc hòa giải. Cân nhắc tư vấn pháp lý trước quyết định.'][rNK]);
+ out.push('⚖️ <b>Quan hệ Nhật Can với Kinh Môn:</b> '+['Thân tỷ hòa Kinh Môn — tượng đồng hành; không xác định thế mạnh hai bên hoặc lựa chọn hòa giải.','Thân sinh cho Kinh Môn — tượng sinh xuất; không dự báo chi phí hay thời gian tố tụng.','Kinh Môn sinh vào thân — tượng tương sinh; không chứng minh tòa án thiên vị hoặc có cơ sở thắng kiện; cần đánh giá hồ sơ pháp lý.','Thân khắc Kinh Môn — tượng tương khắc; không dự báo thắng kiện; lập luận cần dựa vào chứng cứ và luật áp dụng.','Kinh Môn khắc thân theo ngũ hành; không dự báo thua kiện hoặc ép buộc hòa giải. Cân nhắc tư vấn pháp lý trước quyết định.'][rNK]);
  }
- if(gN&&(km.thanBan[gN]==='Thái Âm'||km.thanBan[gN]==='Trực Phù'))out.push('🛡️ Thân được <b>'+km.thanBan[gN]+'</b> che — có quý nhân đứng ra nói đỡ hoặc dẫn đường pháp lý; nên tìm người có kinh nghiệm tư vấn ngay, đừng tự mình đối diện.');
+ if(gN&&(km.thanBan[gN]==='Thái Âm'||km.thanBan[gN]==='Trực Phù'))out.push('🛡️ Thân được <b>'+km.thanBan[gN]+'</b> che — tượng hỗ trợ; không xác nhận có người can thiệp. Nên tìm tư vấn pháp lý phù hợp.');
  var pp4=kmPhucPhan(km,'Kiện tụng');if(pp4)out.push(pp4);
  out.push(kmUngKy(gKi,'kiện tụng',' Không dùng ứng kỳ tượng số để dự báo lịch xét xử; tra cứu thông báo chính thức.'));
- if(gTP2)out.push('🧭 <b>Ứng dụng:</b> đi gặp luật sư, nộp đơn, hầu tòa — đi về hướng <b>'+kmHuongCung(gTP2)+'</b> (cung Trực Phù, nơi người phán quyết ngự) là gợi ý tượng trưng theo bàn, không quyết định kết quả pháp lý.');
  }
  if(lv==='Tổng quan'){
  var hC0=km.hCanEff,gV0=kmCungOf(km,hC0);if(gV0===5)gV0=2;
@@ -8060,6 +8121,32 @@ function kmLuanChuyen(km,lv){
  }
  return out;
 }
+
+// V201 CANDIDATE ONLY: non-quantitative health presentation. This is not a classical-source certification.
+function kmHealthSymbolicV201(km){
+ kmValidateHealthChart(km);
+ if(!km||!km.thienTinh||!km.thienCan||!km.day)throw new Error('Thiếu dữ liệu bàn Kỳ Môn');
+ var b=0,t=0,y=0,n=0,d=km.day.can===0?kmTuan(km.day.can,km.day.chi).ngi:CAN[km.day.can];
+ for(var g=1;g<=9;g++){
+  if(km.thienTinh[g]==='Thiên Nhuế')b=g;
+  if(km.thienTinh[g]==='Thiên Tâm')t=g;
+  if(km.thienCan[g]==='Ất')y=g;
+  if(km.thienCan[g]===d)n=g;
+ }
+ if(!b)throw new Error('Không xác định Thiên Nhuế');
+ var h='<h3>🩺 Đối chiếu tượng số Sức khỏe (V201 thử nghiệm)</h3>';
+ h+='<p>Chỉ ghi nhận các vị trí trên bàn và quan hệ ngũ hành theo hệ quy chiếu của ứng dụng. Không sử dụng tổng điểm, phân hạng cát–hung, hoặc kết luận về tình trạng bệnh.</p>';
+ h+='<p><b>Thiên Nhuế:</b> '+KM_CUNG_NAME[b]+'; <b>Thiên Tâm:</b> '+(t?KM_CUNG_NAME[t]:'không xác định')+'; <b>Ất kỳ Thiên Bàn:</b> '+(y?KM_CUNG_NAME[y]:'không xác định')+'; <b>Nhật Can đại diện '+d+':</b> '+(n?KM_CUNG_NAME[n]:'không xác định')+'.</p>';
+ if(!y&&km.dia[5]==='Ất')h+='<p>Ất nằm ở Địa Bàn Trung Cung; chưa xác nhận phép ký cung Thiên Bàn nên không suy diễn vị trí Ất.</p>';
+ if(!n&&km.dia[5]===d)h+='<p>Can đại diện Nhật Can nằm ở Địa Bàn Trung Cung; chưa xác nhận phép ký cung Thiên Bàn nên không suy diễn vị trí Nhật Can.</p>';
+ h+='<p>Những tượng số này không dùng để chẩn đoán, tiên lượng, xác định thuốc hoặc thay thế đánh giá y tế.</p>';
+ return h;
+}
+
+function kmTinhVuongSuy(goc,chi){
+ if(!Number.isInteger(goc)||goc<1||goc>9||!Number.isInteger(chi)||chi<0||chi>11)throw new Error('Sao hoặc địa chi tháng không hợp lệ');
+ return ['Tướng','Vượng','Phế','Hưu','Tù'][kmRel(KM_TINH_EL[goc],CHI_EL[CHI[chi]])];
+}
 function kmPhanQuyet(km,lv){
  // V31: An unsupported topic must never silently receive a Tổng quan verdict.
  var supported=['Tổng quan','Tài lộc','Sự nghiệp','Tình duyên','Sức khỏe','Xuất hành','Thất vật','Kiện tụng'];
@@ -8085,6 +8172,45 @@ function kmPhanQuyet(km,lv){
  }
  if(!Number.isInteger(km.mChi)||km.mChi<0||km.mChi>11){
   throw new Error('Thiếu địa chi tháng của thời điểm lập cục; không dùng tháng hiện tại để chấm luận giải');
+ }
+ // Validate the eight outer palace layers before any early return.
+ var outerStars=KM_RING.map(function(g){return KM_TINH[g];});
+ var layers=[[km.thienTinh,outerStars],[km.nhanMon,Object.values(KM_MON_HOME)],[km.thanBan,KM_THAN],[km.thienCan,KM_QI6]];
+ layers.forEach(function(pair){
+  var values=KM_RING.map(function(g){return pair[0][g];});
+  if(values.some(function(v){return pair[1].indexOf(v)<0;}) || new Set(values).size!==8){
+   throw new Error('Dữ liệu tám cung ngoài Kỳ Môn thiếu, sai hoặc trùng lặp');
+  }
+ });
+ // Validate internal chart integrity against the existing engine convention.
+ function exactKeys(obj,keys){return obj && typeof obj==='object' && !Array.isArray(obj) && Object.keys(obj).length===keys.length && keys.every(function(g){return Object.prototype.hasOwnProperty.call(obj,g);});}
+ var allPalaces=[1,2,3,4,5,6,7,8,9];
+ if(!km.kc || !Number.isInteger(km.kc.cuc) || km.kc.cuc<1 || km.kc.cuc>9 || ['D','A'].indexOf(km.kc.don)<0 || !exactKeys(km.dia,allPalaces))throw new Error('Địa Bàn không hợp lệ');
+ var expectedEarth=kmDiaBan(km.kc.cuc,km.kc.don);
+ if(allPalaces.some(function(g){return km.dia[g]!==expectedEarth[g];}))throw new Error('Địa Bàn không khớp cục');
+ if(!exactKeys(km.thienCan,KM_RING)||!exactKeys(km.nhanMon,KM_RING)||!exactKeys(km.thanBan,KM_RING)||!exactKeys(km.thienTinh,allPalaces)||km.thienTinh[5]!=='Trung Cung')throw new Error('Sai cấu trúc cung');
+ if(KM_RING.some(function(g){var origin=KM_RING.find(function(p){return KM_TINH[p]===km.thienTinh[g];});return km.thienCan[g]!==km.dia[origin];}))throw new Error('Thiên Can không khớp Thiên Tinh');
+ if(!km.trungCung||km.trungCung.cung!==5||km.trungCung.diaCan!==km.dia[5]||km.trungCung.diaTinh!==KM_TINH[5])throw new Error('Metadata Trung Cung không nhất quán');
+ // Validate moving layers against the current engine convention before scoring.
+ var hourIndex=km.hIdx;
+ if(!Number.isInteger(hourIndex)||hourIndex<0||hourIndex>11)throw new Error('Chi giờ không hợp lệ');
+ var hourStem=((km.day.can%5)*2+hourIndex)%10, tuCheck=kmTuan(hourStem,hourIndex);
+ var effCheck=hourStem===0?tuCheck.ngi:CAN[hourStem];
+ var homeCheck=allPalaces.find(function(g){return km.dia[g]===tuCheck.ngi;});
+ var hourHome=allPalaces.find(function(g){return km.dia[g]===effCheck;});
+ var host=homeCheck===5?2:homeCheck, dest=hourHome===5?2:hourHome;
+ var doorDest=host;
+ for(var i=0;i<tuCheck.gioSo;i++)doorDest=km.kc.don==='D'?doorDest%9+1:(doorDest+7)%9+1;
+ if(doorDest===5)doorDest=2;
+ if(km.hCanEff!==effCheck||km.hCan!==CAN[hourStem]||km.target!==dest||km.mc!==doorDest||km.trucSuMon!==KM_MON_HOME[host]||km.trucPhuTinh!==KM_TINH[host])throw new Error('Trực Phù hoặc Trực Sử không nhất quán');
+ var doorOffset=(KM_RING.indexOf(doorDest)-KM_RING.indexOf(host)+8)%8;
+ KM_RING.forEach(function(g,i){if(km.nhanMon[KM_RING[(i+doorOffset)%8]]!==KM_MON_HOME[g])throw new Error('Bát Môn sai vị trí');});
+ KM_THAN.forEach(function(t,i){if(km.thanBan[KM_RING[(KM_RING.indexOf(dest)+(km.kc.don==='D'?i:-i)+16)%8]]!==t)throw new Error('Bát Thần sai vị trí');});
+ var tcCheck={kyCungDuKien:2,thienCamGoc:5,thienCamTinhGoc:KM_TINH[5],thienCamKyCungDuKien:2,trucPhuGoc:homeCheck,trucPhuKyCung:host,trucPhuQuaTrungCung:homeCheck===5,canGioGoc:hourHome,canGioKyCung:dest,canGioQuaTrungCung:hourHome===5,trucPhuTinhGoc:KM_TINH[homeCheck],trucPhuTinhKyCung:KM_TINH[host],trucPhuTinhKhacDoKyCung:homeCheck!==host};
+ if(Object.keys(tcCheck).some(function(k){return km.trungCung[k]!==tcCheck[k];}))throw new Error('Metadata ký Trung Cung không nhất quán');
+ // Trung Cung: do not issue a topic score from an unresolved hosted palace.
+ if(lv==='Thất vật' && kmCungOf(km,km.hCanEff)===5){
+  return '<div class="card"><b>Thất vật — chưa đủ căn cứ phân hạng</b><p>Thời Can có gốc tại Trung Cung 5. Không dùng thuộc tính Khôn 2 để chấm cát–hung khi vị trí Thiên Bàn chưa xác định. Hãy rà soát nơi sử dụng cuối cùng, đồ đạc và các manh mối thực tế.</p></div>';
  }
  // V33: A day stem/branch pair with mismatched yin-yang parity is not sexagenary.
  var dC=CAN[km.day.can];if(km.day.can===0)dC=kmTuan(km.day.can,km.day.chi).ngi;
@@ -8417,6 +8543,27 @@ function kmPhanQuyet(km,lv){
  }
  var kmTinhNhan=['đồng hành','sao sinh cung','cung sinh sao','sao khắc cung','cung khắc sao'][kmTinhQuanHe];
  var kmTinhDoiChieu='Cửu Tinh tại cung Dụng Thần: '+tinhD+' (gốc cung '+kmTinhGoc+', hành '+kmTinhNguHanh+') đang ở cung '+gD+' (hành '+KM_CUNG_EL[gD]+'); quan hệ mô tả: '+kmTinhNhan+'.';
+ var kmThangHanh=CHI_EL[CHI[km.mChi]];
+ var kmQuanHeThang=['đồng hành','sinh hành tháng','được hành tháng sinh','khắc hành tháng','bị hành tháng khắc'];
+ kmTinhDoiChieu+=' Sao–Nguyệt kiến: '+tinhD+' ('+kmTinhNguHanh+') '+kmQuanHeThang[kmRel(kmTinhNguHanh,kmThangHanh)]+'. Cung–Nguyệt kiến: cung '+gD+' ('+KM_CUNG_EL[gD]+') '+kmQuanHeThang[kmRel(KM_CUNG_EL[gD],kmThangHanh)]+'. Hành tháng '+kmThangHanh+'. Hai quan hệ này không đồng nhất với phép định vượng–tướng–hưu–tù–phế của Cửu Tinh; không cộng điểm sao. Vượng suy Cửu Tinh theo tháng (Yên Ba Điếu Tẩu Ca): '+kmTinhVuongSuy(kmTinhGoc,km.mChi)+'. Đây là trạng thái theo cổ pháp, không phải xác suất thành công.';
+ var tinhState101=kmTinhVuongSuy(kmTinhGoc,km.mChi);
+ var tinhGroup101=[1,2,7].includes(kmTinhGoc)?'hung':[3,4,5,6,8].includes(kmTinhGoc)?'cat':'binh';
+ var tinhActive101=['Vượng','Tướng'].includes(tinhState101);
+ var tinhNote101=tinhGroup101==='cat'?(tinhActive101?'Tượng thuận gặp trạng thái Vượng/Tướng; vẫn cần xét Môn và Thần.':'Tượng thuận không ở Vượng/Tướng; không mặc định thuận lợi.') : tinhGroup101==='hung'?(tinhActive101?'Tượng bất lợi gặp Vượng/Tướng; cần xem xét trở ngại cùng Môn và Thần.':'Tượng bất lợi không ở Vượng/Tướng; không mặc định trở ngại đã hết.'):'Tượng sao trung tính theo bảng hiện hành; xét cùng Môn và Thần.';
+ kmTinhDoiChieu+=' Phối hợp tượng sao (tham khảo định tính): '+tinhNote101;
+ var kmGate104=['Khai Môn','Hưu Môn','Sinh Môn'].includes(mn)?'thuận':['Tử Môn','Thương Môn','Kinh Môn'].includes(mn)?'ngại':'chưa phân loại';
+ var kmSpirit104=['Trực Phù','Thái Âm','Lục Hợp','Cửu Thiên','Cửu Địa'].includes(th)?'thuận':'ngại';
+ var kmStar104=tinhGroup101==='cat'?'thuận':tinhGroup101==='hung'?'ngại':'chưa phân loại';
+ var kmSigns104=[kmStar104,kmGate104,kmSpirit104];
+ var kmMix104=kmSigns104.includes('thuận')&&kmSigns104.includes('ngại');
+ if(kmMix104 && lv!=='Sức khỏe'){
+  var kmFocus104={'Tổng quan':'Tách từng vấn đề trước khi tổng hợp.','Tài lộc':'Đối chiếu cơ hội với chi phí và dòng tiền thực tế.','Sự nghiệp':'Đối chiếu cơ hội vị trí với điều kiện thực hiện.','Tình duyên':'Xem xét giao tiếp và sự đồng thuận thực tế.','Xuất hành':'Kiểm tra lịch trình và điều kiện an toàn.','Thất vật':'Kiểm tra manh mối, không quy kết người giữ vật.','Kiện tụng':'Đối chiếu hồ sơ và thủ tục với chuyên gia pháp lý.'}[lv];
+  kmTinhDoiChieu+=' Tinh–Môn–Thần đối nghịch (phân loại nội bộ): '+tinhD+' '+kmStar104+'; '+mn+' '+kmGate104+'; '+th+' '+kmSpirit104+'. Không triệt tiêu dấu hiệu bằng phép cộng mới; xét trạng thái sao '+tinhState101+' riêng. '+kmFocus104;
+ }
+
+ if(km.trungCung.trucPhuTinhGoc==='Thiên Cầm' && gD===km.target){
+  kmTinhDoiChieu+=' Thiên Cầm là sao gốc Trực Phù; Thiên Nhuế là sao tại cung ký theo quy ước lập bàn hiện hành. Không đồng nhất tượng nghĩa hai sao hoặc cộng thêm điểm khi chưa xác minh phép luận đồng cung.';
+ }
  // V66: subject-specific star/palace relation notes. These are modern reading prompts,
  // not verified historical formulas, and must not affect scoring or verdict tiers.
  var kmTinhHuong={
@@ -8621,12 +8768,10 @@ function kmRender(km,linhVuc){
  else if(SHENG_TT[KM_CUNG_EL[mc2]]===KM_MON_EL[monTS])relM=' — cung sinh môn, tăng lực';}
  h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">🚪 <b>Trực Sử '+monTS+'</b> đáp '+KM_CUNG_NAME[mc2]+relM+': '+KM_MON_JI[monTS]+'.</p>';
  h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">🜂 <b>Thần '+km.thanBan[km.target]+'</b> cùng Trực Phù tại '+KM_CUNG_NAME[km.target]+': '+KM_THAN_JI[km.thanBan[km.target]]+'.</p>';
- var hC2=km.hCanEff,cV=0;
- for(var g10=1;g10<=9;g10++)if(km.thienCan[g10]===hC2)cV=g10;
- if(cV===5)cV=2;
+ var hC2=km.hCanEff,cV=kmCungOf(km,hC2);
  if(cV){
  var canNote={'Ất':'Ất kỳ — nhu hòa, văn thương, quý nhân nữ','Bính':'Bính kỳ — uy quyền, quan lộc, nam quý nhân','Đinh':'Đinh kỳ — văn thư, tin vui, hy vọng','Canh':'⚠️ Canh — Thái Bạch chướng ngại, tranh đấu, hình phạt','Tân':'Tân — sai lỗi, phá lệ, cần sửa chữa','Nhâm':'Nhâm — lao ngục, ràng buộc, thị phi','Quý':'Quý — hoa cái, che lấp, khó thấy rõ','Mậu':'Mậu — tài khố, tiền bạc, vững chắc','Kỷ':'Kỷ — tư túc, tâm sự, dục vọng'}[hC2]||'';
- h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">❓ <b>Việc hỏi (thời can '+hC2+')</b> tại '+KM_CUNG_NAME[cV]+': '+canNote+'; gặp '+(km.nhanMon[cV]||'')+' ('+(km.nhanMon[cV]?KM_MON_JI[km.nhanMon[cV]].split(' — ')[0]:'')+'), sao '+(km.thienTinh[cV]||'')+', thần '+(km.thanBan[cV]||'')+'.</p>';
+ h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">❓ <b>Việc hỏi (thời can '+hC2+')</b> '+(cV===5?'tại Trung Cung 5':'tại '+KM_CUNG_NAME[cV])+': '+canNote+(cV===5?'; không suy luận Môn, Sao, Thần hoặc cát–hung từ cung ký Khôn 2.':'; gặp '+(km.nhanMon[cV]||'')+' ('+(km.nhanMon[cV]?KM_MON_JI[km.nhanMon[cV]].split(' — ')[0]:'')+'), sao '+(km.thienTinh[cV]||'')+', thần '+(km.thanBan[cV]||'')+'.')+'</p>';
  }
  var goodDirs=[];
  for(var g11=1;g11<=9;g11++){
@@ -8648,7 +8793,7 @@ function kmRender(km,linhVuc){
   h+='<h3>⚖️ Dấu hiệu cát–hung cùng xuất hiện</h3>';
   h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.65">Bàn này ghi nhận '+cc.length+' mục cát cách/tổ hợp thuận và '+hc.length+' mục hung cách/trở ngại. Đây là các dấu hiệu được nhận diện riêng; không thể chỉ đếm số mục để xác định bên nào chiếm ưu thế. Phán quyết theo chủ đề bên dưới dùng thang điểm nội bộ, chưa cộng trừ trực tiếp các cách cục này. Cần xét vị trí, Dụng Thần và điều kiện thực tế; chưa xác lập thứ tự ưu tiên cổ pháp.</p>';
  }
- h+='<div class="hr"></div>'+kmPhanQuyet(km,linhVuc);
+ h+='<div class="hr"></div>'+(linhVuc==='Sức khỏe'?kmHealthSymbolicV201(km):kmPhanQuyet(km,linhVuc));
  if(linhVuc==='Sức khỏe'){
  h+='<h3>🩺 Luận Bệnh Tật</h3>';
  kmBenhTat(km).forEach(function(n){h+='<p style="font-size:calc(13px * var(--fs,1));line-height:1.6">'+n+'</p>';});
@@ -8713,13 +8858,13 @@ function kmCungDetail(g){
  +'<div class="dim" style="font-size:calc(12px * var(--fs,1))">hành '+KM_CUNG_EL[g]+'</div></div>';
  if(g===5){
  h+='<p style="line-height:1.7"><b style="color:var(--gold)">Trung Cung</b> — ngôi giữa, khí tổng. Bản lập bàn hiện tại dùng quy ước ký Trung Cung về <b>Khôn 2 (Tây Nam)</b> đối với các bước có xử lý cung 5. Đây là quy ước của engine đang dùng, chưa phải kết luận chung cho mọi truyền phái; khi luận cần phân biệt sao gốc Thiên Cầm với sao tại cung ký.</p>';
+ if(kmCungOf(km,km.hCanEff)===5)h+='<p>Thời can '+km.hCanEff+' (việc hỏi) tại Trung Cung 5; không suy luận từ cung ký Khôn 2.</p>';
  }else{
  var mon=km.nhanMon[g]||'',tinh=km.thienTinh[g]||'',than=km.thanBan[g]||'',tc=km.thienCan[g]||'',dc=km.dia[g]||'';
  var marks=[];
  if(g===km.target)marks.push('⭐ <b>Trực Phù ('+km.trucPhuTinh+') đang đáp cung này</b> — trụ cột của cục'+(km.trucPhuTinhGoc==='Thiên Cầm'&&km.trucPhuTinh==='Thiên Nhuế'?' <span class="dim">(Thiên Cầm là Trực Phù gốc ở Trung Cung; Thiên Nhuế là sao vận hành tại cung ký. Không đồng nhất tượng nghĩa hai sao.)</span>':''));
  if(g===km.mc)marks.push('🚪 <b>Trực Sử ('+km.trucSuMon+') đang đáp cung này</b> — nơi sự việc vận hành');
- var cV=0;for(var g10=1;g10<=9;g10++)if(km.thienCan[g10]===km.hCanEff)cV=g10;
- if(cV===5)cV=2;
+ var cV=kmCungOf(km,km.hCanEff);
  if(g===cV)marks.push('❓ <b>Thời can '+km.hCanEff+' (việc hỏi) tọa cung này</b>');
  if(marks.length)h+='<p style="line-height:1.7">'+marks.join('<br>')+'</p><div class="hr"></div>';
  if(than)h+='<p style="line-height:1.7;margin:6px 0"><b style="color:#9fd0ff">🜂 Thần '+than+':</b> '+KM_THAN_JI[than]+'.</p>';
